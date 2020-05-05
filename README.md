@@ -1,1 +1,1 @@
-# ece-4-monitoring
+# EC-Earth 4 Monitoring
