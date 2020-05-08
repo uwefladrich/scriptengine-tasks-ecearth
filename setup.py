@@ -32,6 +32,6 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "scriptengine>=0.5",
+        "scriptengine>=0.4",
     ],
 )
