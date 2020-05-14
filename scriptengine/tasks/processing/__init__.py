@@ -1,6 +1,6 @@
-from .foo import Foo
+from .simulated_years import SimulatedYears
 
 def task_loader_map():
     return {
-        'foo': Foo,
+        'simulated_years': SimulatedYears,
         }
