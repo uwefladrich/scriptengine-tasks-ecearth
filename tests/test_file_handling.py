@@ -1,5 +1,4 @@
-import sys
-sys.path.append(".")
+
 
 from helpers.file_handling import filename
 import pytest
