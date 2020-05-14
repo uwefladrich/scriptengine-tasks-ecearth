@@ -7,12 +7,12 @@ def filename(diagnostic, destination):
     if "exp_id" in diagnostic:
         exp_id = diagnostic["exp_id"]
     else:
-        exp_id = "exp_id-not-given"
+        exp_id = ""
     
     if "mon_id" in diagnostic:
         mon_id = "-".join(diagnostic["mon_id"].split())
     else:
-        mon_id = "mon_id-not-given"
+        mon_id = ""
     
     return f"{destination}/{exp_id}-{mon_id}"
     
