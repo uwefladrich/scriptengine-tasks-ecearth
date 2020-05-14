@@ -1,7 +1,7 @@
 import sys
 sys.path.append(".")
 
-from ..helpers.file_handling import filename
+from helpers.file_handling import filename
 import pytest
 
 def test_filename():
