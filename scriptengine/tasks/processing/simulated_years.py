@@ -15,6 +15,12 @@ class SimulatedYears(Task):
         self.mon_id = "simulated years"
         self.description = "Current leg number of EC-Earth run."
     
+    def __repr__():
+        return (
+            f"{self.__class__.__name__}"
+            f"({self.exp_id},{self.src},{self.dst})"
+        )
+
     def run(self, context):
         diagnostic = {
             "exp_id": self.exp_id,
