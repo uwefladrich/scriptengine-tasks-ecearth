@@ -35,5 +35,7 @@ setuptools.setup(
     python_requires=">=3.6",
     install_requires=[
         "scriptengine>=0.5",
+        "pyYAML>=5.1",
+        "netCDF4>=1.5"
     ],
 )
