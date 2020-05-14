@@ -4,14 +4,14 @@ import netCDF4
 def filename(diagnostic, destination):
     """Creates the file name for a diagnostic dictionary."""
     
-    if "exp_id" in diagnostic:
+    try:
         exp_id = diagnostic["exp_id"]
-    else:
+    except (TypeError, KeyError):
         exp_id = ""
     
-    if "mon_id" in diagnostic:
+    try:
         mon_id = "-".join(diagnostic["mon_id"].split())
-    else:
+    except (TypeError, KeyError):
         mon_id = ""
     
     return f"{destination}/{exp_id}-{mon_id}"
