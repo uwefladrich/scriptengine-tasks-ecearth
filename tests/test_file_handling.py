@@ -26,5 +26,5 @@ def test_filename(dictionary, expected_result):
 
 def test_convert_to_yaml(tmpdir, list_of_dicts):
     file_handling.convert_to_yaml(list_of_dicts, str(tmpdir))
-    file = open(f"{file_handling.filename(list_of_dicts,str(tmpdir))}.yml")
-    assert list_of_dicts == yaml.load(file, Loader=yaml.FullLoader)
+    with open(f"{file_handling.filename(list_of_dicts,str(tmpdir))}.yml") as file:
+        assert list_of_dicts == yaml.load(file, Loader=yaml.FullLoader)
