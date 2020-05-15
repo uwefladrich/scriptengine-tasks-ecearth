@@ -23,11 +23,11 @@ def convert_to_yaml(diagnostic, destination):
         yaml.dump(diagnostic, outfile, sort_keys=False)
 
 
-def convert_to_nc(diagnostic, destination):
-    """Converts a diagnostic dictionary to a netCDF file."""
-    outfile = netCDF4.Dataset(f'{filename(diagnostic, destination)}.nc', 'w')
-    for k,v in diagnostic.items():
-        if k is not "data":
-            outfile.setattr(k, v)
-    #TODO: take care of data items
-    outfile.close()
+#def convert_to_nc(diagnostic, destination):
+#    """Converts a diagnostic dictionary to a netCDF file."""
+#    outfile = netCDF4.Dataset(f'{filename(diagnostic, destination)}.nc', 'w')
+#    for k,v in diagnostic.items():
+#        if k is not "data":
+#            outfile.setattr(k, v)
+#    #TODO: take care of data items
+#    outfile.close()
