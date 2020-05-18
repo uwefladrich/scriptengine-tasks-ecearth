@@ -2,6 +2,7 @@
 
 from scriptengine.tasks.base import Task
 import yaml
+import os
 import helpers.file_handling as file_handling
 
 class SimulatedYears(Task):
@@ -26,7 +27,7 @@ class SimulatedYears(Task):
             "exp_id": self.exp_id,
             "mon_id": self.mon_id,
             "description": self.description,
-            "data": self.get_leg_number(),
+            "data": self.count_leg_folders(),
         }
         file_handling.convert_to_yaml(diagnostic,self.dst)
         pass
@@ -40,4 +41,7 @@ class SimulatedYears(Task):
             self.log_warning("Leg number not found!")
             leg_number = -1
         return leg_number
+    
+    def count_leg_folders(self):
+        return len(next(os.walk(f"{self.src}/output"))[1])
 
