@@ -4,6 +4,7 @@ from scriptengine.tasks.base import Task
 import yaml
 import os
 import helpers.file_handling as file_handling
+from scriptengine.jinja import render as j2render
 
 class SimulatedYears(Task):
     def __init__(self, parameters):
@@ -23,6 +24,10 @@ class SimulatedYears(Task):
         )
 
     def run(self, context):
+        self.src = j2render(self.src, context)
+        self.exp_id = j2render(self.exp_id, context)
+        self.dst = j2render(self.dst, context)
+
         diagnostic = {
             "exp_id": self.exp_id,
             "mon_id": self.mon_id,
