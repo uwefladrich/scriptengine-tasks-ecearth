@@ -12,13 +12,13 @@ import numpy as np
 from datetime import datetime
 
 
-class SSTAverage(Task):
+class GlobalAverage(Task):
     def __init__(self, parameters):
         required = [
             "exp_id",
             "src",
             "dst",
-        #    "var",
+        #    "varname",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
         self.mon_id = "SST average"
