@@ -4,7 +4,7 @@ from .sst_average import SSTAverage
 
 def task_loader_map():
     return {
-        'simulated_years': SimulatedYears,
-        'markdown_output': MarkdownOutput,
-        'sst_average': SSTAverage,
+        'ec.mon.sim_years': SimulatedYears,
+        'ec.mon.markdown_report': MarkdownOutput,
+        'ec.mon.global_avg': SSTAverage,
         }
