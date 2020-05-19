@@ -12,6 +12,7 @@ Welcome to EC-Earth Monitoring's documentation!
    
    usage/installation
    usage/quickstart
+   tasks/processing-tasks
 
 
 
