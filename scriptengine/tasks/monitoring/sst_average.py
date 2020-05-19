@@ -1,12 +1,16 @@
 """Processing Task that calculates the global yearly SST average."""
 
 from scriptengine.tasks.base import Task
+from scriptengine.jinja import render as j2render
+import helpers.file_handling as file_handling
+
+import os, glob, ast
+
 from netCDF4 import Dataset, num2date
 import numpy as np
-import os, glob
-import helpers.file_handling as file_handling
+
 from datetime import datetime
-import yaml
+
 
 class SSTAverage(Task):
     def __init__(self, parameters):
@@ -27,14 +31,16 @@ class SSTAverage(Task):
         )
 
     def run(self, context):
-        os.chdir(f"{self.src}")
-        filepaths = [f"{self.src}/{filename}"
-                     for filename in glob.glob(f"{self.exp_id}_1m_T_*.nc")]
-        
+#        os.chdir(f"{self.src}")
+#        filepaths = [f"{self.src}/{filename}"
+#                     for filename in glob.glob(f"{self.exp_id}_1m_T_*.nc")]
+        self.src = j2render(self.src, context)
+        path_list = ast.literal_eval(self.src)
+
         sst_array = np.array([])
         left_bound = 1e+20
         right_bound = 0
-        for path in filepaths:
+        for path in path_list:
             self.log_debug(f"Getting tos from {path}")
             t_file = Dataset(path, 'r')
             tos = t_file.variables["tos"]
@@ -51,7 +57,7 @@ class SSTAverage(Task):
         self.log_debug(f"new time value: {num2date(time_value, units='seconds since 1900-01-01 00:00:00')}")
         bound_values = [[left_bound, right_bound]]
 
-        output = self.get_output_file()
+        output = self.get_output_file(context)
         sst = output.variables["sst_avg"]
         tc = output.variables["time_counter"]
         tcb = output.variables["time_counter_bounds"]
@@ -61,8 +67,9 @@ class SSTAverage(Task):
         
         output.close()
 
-    def get_output_file(self):
-        path = file_handling.filename(self.exp_id, self.mon_id, self.dst)
+    def get_output_file(self, context):
+        exp_id = j2render(self.exp_id, context)
+        path = file_handling.filename(exp_id, self.mon_id, self.dst)
         try:
             file = Dataset(f"{path}.nc",'r+')
             return file
