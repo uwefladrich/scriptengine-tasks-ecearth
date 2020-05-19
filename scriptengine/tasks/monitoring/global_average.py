@@ -1,4 +1,4 @@
-"""Processing Task that calculates the global yearly SST average."""
+"""Processing Task that calculates the global yearly average of a given extensive quantity."""
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
@@ -18,58 +18,61 @@ class GlobalAverage(Task):
             "exp_id",
             "src",
             "dst",
-        #    "varname",
+            "varname",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.mon_id = "SST average"
-        self.description = "Yearly global average of the Sea Surface Temperature over time."
+        self.mon_id = f"global average {self.varname}"
+        self.description = f"Yearly global average of the variable {self.varname} over time."
     
     def __repr__(self):
         return (
             f"{self.__class__.__name__}"
-            f"({self.exp_id},{self.src},{self.dst})"
+            f"({j2render(self.exp_id,context)},{self.src},{self.dst})"
         )
 
     def run(self, context):
-#        os.chdir(f"{self.src}")
-#        filepaths = [f"{self.src}/{filename}"
-#                     for filename in glob.glob(f"{self.exp_id}_1m_T_*.nc")]
         self.src = j2render(self.src, context)
-        path_list = ast.literal_eval(self.src)
+        self.dst = j2render(self.dst, context)
+        self.exp_id = j2render(self.exp_id, context)
+        try:
+            self.src = ast.literal_eval(self.src)
+        except ValueError:
+            self.src = ast.literal_eval(f'"{self.src}"')
+
+        self.log_info(f"Found {len(self.src)} files.")
 
         sst_array = np.array([])
         left_bound = 1e+20
         right_bound = 0
-        for path in path_list:
-            self.log_debug(f"Getting tos from {path}")
-            t_file = Dataset(path, 'r')
-            tos = t_file.variables["tos"]
-            global_average = np.mean(tos[:])
+        for path in self.src:
+            self.log_debug(f"Getting {self.varname} from {path}")
+            nc_file = Dataset(path, 'r')
+            nc_var = nc_file.variables[f"{self.varname}"]
+            global_average = np.mean(nc_var[:])
             self.log_debug(f"Global average: {global_average}")
-            sst_array = np.append(sst_array,global_average)
-            bounds = t_file.variables["time_counter_bounds"]
+            sst_array = np.append(sst_array, global_average)
+            bounds = nc_file.variables["time_counter_bounds"]
             left_bound, right_bound = self.update_bounds(left_bound, right_bound, bounds)
-            t_file.close()
+            nc_file.close()
         
         average = np.mean(sst_array)
         self.log_debug(f"Yearly average: {average}")
-        time_value = int(np.mean([left_bound, right_bound]))
+        time_value = np.mean([left_bound, right_bound])
         self.log_debug(f"new time value: {num2date(time_value, units='seconds since 1900-01-01 00:00:00')}")
         bound_values = [[left_bound, right_bound]]
 
-        output = self.get_output_file(context)
-        sst = output.variables["sst_avg"]
+        output = self.get_output_file()
+        var_avg = output.variables[f"{self.varname}_avg"]
         tc = output.variables["time_counter"]
         tcb = output.variables["time_counter_bounds"]
-        sst[:] = np.append(sst[:],average)
+        var_avg[:] = np.append(var_avg[:],average)
         tc[-1] = time_value
         tcb[-1] = bound_values
         
         output.close()
 
-    def get_output_file(self, context):
-        exp_id = j2render(self.exp_id, context)
-        path = file_handling.filename(exp_id, self.mon_id, self.dst)
+    def get_output_file(self):
+        path = file_handling.filename(self.exp_id, self.mon_id, self.dst)
         try:
             file = Dataset(f"{path}.nc",'r+')
             return file
@@ -82,15 +85,13 @@ class GlobalAverage(Task):
             file.createDimension('axis_nbounds', size=2)
             tc = file.createVariable('time_counter', 'i8', ('time_counter',))
             tcb = file.createVariable('time_counter_bounds', 'i8', ('time_counter','axis_nbounds',))
-            sst_avg = file.createVariable('sst_avg', 'f', ('time_counter',))
+            nc_avg = file.createVariable(f'{self.varname}_avg', 'f', ('time_counter',))
 
             dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             metadata = {
-                'title': self.mon_id,
-                'institution': 'SMHI',
+                'title': f'Yearly Global Average of {self.varname}',
                 'source': 'EC-Earth 4',
                 'history': dt_string + ': Creation',
-                'references': '?',
                 'exp_id': self.exp_id,
                 'description': self.description,
             #    'Conventions': 'CF-1.8',
@@ -105,7 +106,7 @@ class GlobalAverage(Task):
             tcb_meta = {
                 'long_name': 'bounds for time axis',
             }
-            sst_meta = {
+            var_meta = {
                 'units': 'degree_Celsius',
                 'standard_name': 'sea_surface_temperature',
                 'long_name': 'yearly global SST average',
@@ -113,7 +114,7 @@ class GlobalAverage(Task):
             file.setncatts(metadata)
             tc.setncatts(tc_meta)
             tcb.setncatts(tcb_meta)
-            sst_avg.setncatts(sst_meta)
+            nc_avg.setncatts(var_meta)
             return file
     
     def update_bounds(self, left_bound, right_bound, new_bounds):
