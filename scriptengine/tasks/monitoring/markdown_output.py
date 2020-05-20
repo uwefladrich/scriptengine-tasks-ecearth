@@ -41,11 +41,13 @@ class MarkdownOutput(Task):
                 cube = iris.load_cube(path)
                 qplt.plot(cube)
                 plt.savefig(f"{path}.png")
+                plt.close() 
                 nc_plots.append({
                     'plot': f'{path}.png',
                     'title': f'{cube.metadata.attributes["title"]}',
                     'description': f'{cube.metadata.attributes["description"]}',
                 })
+                
         
         env = jinja2.Environment(loader=jinja2.PackageLoader('ece-4-monitoring'))
         md_template = env.get_template('monitoring.md.j2')
