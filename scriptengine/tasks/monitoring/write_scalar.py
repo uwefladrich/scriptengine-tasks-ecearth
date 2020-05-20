@@ -24,7 +24,7 @@ class WriteScalar(Task):
         )
 
     def run(self, context):
-        self.mon_id = f"write scalar {j2render(self.name, context)}"
+        self.mon_id = f"{j2render(self.name, context)}"
         self.value = j2render(self.value, context)
         self.dst = j2render(self.dst, context)
 
