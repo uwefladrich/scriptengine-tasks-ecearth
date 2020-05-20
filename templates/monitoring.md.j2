@@ -1,6 +1,5 @@
 # EC-Earth 4: Monitoring
 
-* Experiment ID: {{exp_id}}
 {% for scalar in scalar_diagnostics -%}
 * {{ scalar["mon_id"] }}: {{ scalar["data"] }}
 {%- if "description" in scalar %}

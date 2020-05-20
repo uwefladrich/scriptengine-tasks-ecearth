@@ -12,22 +12,20 @@ import matplotlib.pyplot as plt
 class MarkdownOutput(Task):
     def __init__(self, parameters):
         required = [
-            "exp_id",
             "src",
-            "dst"
+            "dst",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
     
     def __repr__(self):
         return (
             f"{self.__class__.__name__}"
-            f"({self.exp_id}, {self.src}, {self.dst})"
+            f"({self.src}, {self.dst})"
         )
 
     def run(self, context):
         self.src = [j2render(input_file, context) 
                     for input_file in self.src]
-        self.exp_id = j2render(self.exp_id, context)
         self.dst = j2render(self.dst, context)
 
         scalars = []
@@ -54,7 +52,6 @@ class MarkdownOutput(Task):
         
         with open(f"{self.dst}", 'w') as md_out:
             md_out.write(md_template.render(
-                exp_id = self.exp_id,
                 scalar_diagnostics = scalars,
                 nc_diagnostics = nc_plots,
             ))

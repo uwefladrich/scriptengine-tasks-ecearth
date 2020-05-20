@@ -15,7 +15,6 @@ from datetime import datetime
 class GlobalAverage(Task):
     def __init__(self, parameters):
         required = [
-            "exp_id",
             "src",
             "dst",
             "varname",
@@ -28,13 +27,12 @@ class GlobalAverage(Task):
     def __repr__(self):
         return (
             f"{self.__class__.__name__}"
-            f"({j2render(self.exp_id,context)},{self.src},{self.dst})"
+            f"({self.src},{self.dst})"
         )
 
     def run(self, context):
         self.src = j2render(self.src, context)
         self.dst = j2render(self.dst, context)
-        self.exp_id = j2render(self.exp_id, context)
         try:
             self.src = ast.literal_eval(self.src)
         except ValueError:
@@ -87,7 +85,7 @@ class GlobalAverage(Task):
         output.close()
 
     def get_output_file(self):
-        path = file_handling.filename(self.exp_id, self.mon_id, self.dst)
+        path = file_handling.filename(self.mon_id, self.dst)
         try:
             file = Dataset(f"{path}.nc",'r+')
             return file
@@ -107,7 +105,6 @@ class GlobalAverage(Task):
                 'title': f'Global Average of {self.varname}',
                 'source': 'EC-Earth 4',
                 'history': dt_string + ': Creation',
-                'exp_id': self.exp_id,
                 'description': self.description,
             #    'Conventions': 'CF-1.8',
             }

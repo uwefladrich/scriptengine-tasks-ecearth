@@ -6,26 +6,23 @@ import yaml
 
 
 
-@pytest.mark.parametrize("exp_id, mon_id, expected_result", [
-    ("", "", "none/-"),
-    ("exp", "", "none/exp-"),
-    ("", "mon id", "none/-mon-id"),
-    ("exp","mon id", "none/exp-mon-id"),
+@pytest.mark.parametrize("mon_id, expected_result", [
+    ("", "none/"),
+    ("mon id", "none/mon-id"),
 ])
 
-def test_filename(exp_id, mon_id, expected_result):
+def test_filename(mon_id, expected_result):
     path = "none"
-    assert file_handling.filename(exp_id, mon_id, path) == expected_result
+    assert file_handling.filename(mon_id, path) == expected_result
 
 @pytest.mark.parametrize("list_of_dicts, expected_input", [
-    (5, ["", ""]),
-    ({"key": "value"}, ["", ""]),
-    ({"exp_id": "exp"}, ["exp", ""]),
-    ({"mon_id": "mon id"}, ["", "mon id"]),
-    ({"exp_id": "exp","mon_id": "mon id"}, ["exp","mon id"]),
+    (5, ""),
+    ({"key": "value"}, ""),
+    ({"mon_id": "mon id"}, "mon id"),
 ])
 
 def test_convert_to_yaml(tmpdir, list_of_dicts, expected_input):
     file_handling.convert_to_yaml(list_of_dicts, str(tmpdir))
-    with open(f"{file_handling.filename(*expected_input,str(tmpdir))}.yml") as file:
+    path = file_handling.filename(expected_input,str(tmpdir))
+    with open(f"{path}.yml") as file:
         assert list_of_dicts == yaml.load(file, Loader=yaml.FullLoader)
