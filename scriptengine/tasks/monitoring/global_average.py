@@ -22,7 +22,8 @@ class GlobalAverage(Task):
         ]
         super().__init__(__name__, parameters, required_parameters=required)
         self.mon_id = f"global average {self.varname}"
-        self.description = f"Yearly global average of the variable {self.varname} over time."
+        self.description = (f"Global average of the variable {self.varname} "
+                            f"per leg over time.")
     
     def __repr__(self):
         return (
@@ -44,6 +45,8 @@ class GlobalAverage(Task):
         sst_array = np.array([])
         left_bound = 1e+20
         right_bound = 0
+
+        var_metadata = {}
         for path in self.src:
             self.log_debug(f"Getting {self.varname} from {path}")
             nc_file = Dataset(path, 'r')
@@ -53,6 +56,14 @@ class GlobalAverage(Task):
             sst_array = np.append(sst_array, global_average)
             bounds = nc_file.variables["time_counter_bounds"]
             left_bound, right_bound = self.update_bounds(left_bound, right_bound, bounds)
+
+            # access metadata of variable
+            if not var_metadata:
+                var_metadata["standard_name"] = nc_var.standard_name
+                var_metadata["long_name"] = nc_var.long_name
+                var_metadata["missing_value"] = nc_var.missing_value
+                var_metadata["units"] = nc_var.units
+
             nc_file.close()
         
         average = np.mean(sst_array)
@@ -62,9 +73,13 @@ class GlobalAverage(Task):
         bound_values = [[left_bound, right_bound]]
 
         output = self.get_output_file()
+        
         var_avg = output.variables[f"{self.varname}_avg"]
         tc = output.variables["time_counter"]
         tcb = output.variables["time_counter_bounds"]
+
+        var_avg.setncatts(var_metadata)
+
         var_avg[:] = np.append(var_avg[:],average)
         tc[-1] = time_value
         tcb[-1] = bound_values
@@ -89,7 +104,7 @@ class GlobalAverage(Task):
 
             dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             metadata = {
-                'title': f'Yearly Global Average of {self.varname}',
+                'title': f'Global Average of {self.varname}',
                 'source': 'EC-Earth 4',
                 'history': dt_string + ': Creation',
                 'exp_id': self.exp_id,
@@ -106,15 +121,9 @@ class GlobalAverage(Task):
             tcb_meta = {
                 'long_name': 'bounds for time axis',
             }
-            var_meta = {
-                'units': 'degree_Celsius',
-                'standard_name': 'sea_surface_temperature',
-                'long_name': 'yearly global SST average',
-            }
             file.setncatts(metadata)
             tc.setncatts(tc_meta)
             tcb.setncatts(tcb_meta)
-            nc_avg.setncatts(var_meta)
             return file
     
     def update_bounds(self, left_bound, right_bound, new_bounds):
