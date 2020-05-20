@@ -32,7 +32,6 @@ class SimulatedLegs(Task):
             "data": self.count_leg_folders(),
         }
         file_handling.convert_to_yaml(diagnostic,self.dst)
-        pass
 
     def get_leg_number(self):
         """
