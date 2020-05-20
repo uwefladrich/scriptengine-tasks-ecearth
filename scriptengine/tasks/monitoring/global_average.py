@@ -75,19 +75,27 @@ class GlobalAverage(Task):
         var_avg = output.variables[f"{self.varname}_avg"]
         tc = output.variables["time_counter"]
         tcb = output.variables["time_counter_bounds"]
-
-        var_avg.setncatts(var_metadata)
-
-        var_avg[:] = np.append(var_avg[:],average)
-        tc[-1] = time_value
-        tcb[-1] = bound_values
+        
+        if self.monotonic_insert(tcb, bound_values):
+            var_avg.setncatts(var_metadata)
+            var_avg[:] = np.append(var_avg[:],average)
+            tc[-1] = time_value
+            tcb[-1] = bound_values
+        else:
+            self.log_warning(
+                (f"Inserting time step would lead to "
+                 f"non-monotonic time axis. "
+                 f"Discarding current time step.")               
+            )            
         
         output.close()
+
 
     def get_output_file(self):
         path = file_handling.filename(self.mon_id, self.dst)
         try:
             file = Dataset(f"{path}.nc",'r+')
+            file.set_auto_mask(False)
             return file
         except FileNotFoundError:
             file = Dataset(f"{path}.nc",'w')
@@ -133,3 +141,12 @@ class GlobalAverage(Task):
             self.log_debug(f"Updating right time bound to {new_bounds_right}")
             right_bound = new_bounds_right
         return left_bound, right_bound
+
+    def monotonic_insert(self, old_bounds, new_bounds):
+        try:
+            if old_bounds[-1][-1] > new_bounds[0][0]:
+                return False
+            else:
+                return True
+        except IndexError:
+            return True
