@@ -7,6 +7,7 @@ import os, glob
 import yaml
 import iris
 import iris.quickplot as qplt 
+import matplotlib.pyplot as plt
 
 class MarkdownOutput(Task):
     def __init__(self, parameters):
@@ -36,8 +37,10 @@ class MarkdownOutput(Task):
                 scalars.append(dct)
             if path.endswith('.nc'):
                 cube = iris.load_cube(path)
-                qplt.plot(cube)
-                qplt.plt.savefig(f"{path}.png")
+                qplt.plot(cube, '.-')
+                plt.xticks(rotation=45)
+                plt.tight_layout()
+                plt.savefig(f"{path}.png")
                 qplt.plt.close() 
                 nc_plots.append({
                     'plot': f'{path}.png',
