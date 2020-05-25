@@ -38,7 +38,7 @@ class MarkdownOutput(Task):
                     scalars.append(dct)
                 except FileNotFoundError:
                     self.log_warning(f"FileNotFoundError: Ignoring {path}.")
-            if path.endswith('.nc'):
+            elif path.endswith('.nc'):
                 try:
                     cube = iris.load_cube(path)
                     qplt.plot(cube, '.-')
