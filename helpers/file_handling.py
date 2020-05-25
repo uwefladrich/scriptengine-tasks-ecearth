@@ -1,6 +1,8 @@
 import yaml
 import netCDF4
 
+"""File handling functions. Not necessary anymore."""
+
 def filename(mon_id, destination):
     """Creates the file name for a diagnostic."""
     mon_id = "-".join(mon_id.split())
