@@ -30,5 +30,12 @@ class WriteScalar(Task):
     
     def save(self, dst, **kwargs):
         """Saves a scalar diagnostic in a YAML file."""
-        with open(dst, 'w') as outfile:
-            yaml.dump(kwargs, outfile, sort_keys=False)
+        if dst.endswith(".yml") or dst.endswith(".yaml"):
+            self.log_info(f"Saving Scalar diagnostic as {dst}")
+            with open(dst, 'w') as outfile:
+                yaml.dump(kwargs, outfile, sort_keys=False)
+        else:
+            self.log_warning((
+                f"{dst} does not end in valid YAML file extension. "
+                f"Diagnostic will not be saved."
+            ))
