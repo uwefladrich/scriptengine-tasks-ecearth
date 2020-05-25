@@ -32,21 +32,29 @@ class MarkdownOutput(Task):
         nc_plots = []
         for path in self.src:
             if path.endswith('.yml'):
-                with open(path) as yml_file: 
-                    dct = yaml.load(yml_file, Loader = yaml.FullLoader)
-                scalars.append(dct)
+                try:
+                    with open(path) as yml_file: 
+                        dct = yaml.load(yml_file, Loader = yaml.FullLoader)
+                    scalars.append(dct)
+                except FileNotFoundError:
+                    self.log_warning(f"FileNotFoundError: Ignoring {path}.")
             if path.endswith('.nc'):
-                cube = iris.load_cube(path)
-                qplt.plot(cube, '.-')
-                plt.xticks(rotation=45)
-                plt.tight_layout()
-                plt.savefig(f"{path}.png")
-                qplt.plt.close() 
-                nc_plots.append({
-                    'plot': f'{path}.png',
-                    'title': f'{cube.metadata.attributes["title"]}',
-                    'description': f'{cube.metadata.attributes["description"]}',
-                })
+                try:
+                    cube = iris.load_cube(path)
+                    qplt.plot(cube, '.-')
+                    plt.xticks(rotation=45)
+                    plt.tight_layout()
+                    plt.savefig(f"{path}.png")
+                    qplt.plt.close() 
+                    nc_plots.append({
+                        'plot': f'{path}.png',
+                        'title': f'{cube.metadata.attributes["title"]}',
+                        'description': f'{cube.metadata.attributes["description"]}',
+                    })
+                except IOError:
+                    self.log_warning(f"IOError, file not found: Ignoring {path}.")
+            else:
+                self.log_warning(f"{path} does not end in .nc or .yml. Ignored.")
                 
         
         env = jinja2.Environment(loader=jinja2.PackageLoader('ece-4-monitoring'))

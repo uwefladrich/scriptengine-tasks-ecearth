@@ -32,6 +32,14 @@ class GlobalAverage(Task):
     def run(self, context):
         src = j2render(self.src, context)
         dst = j2render(self.dst, context)
+
+        if not dst.endswith(".nc"):
+            self.log_warning((
+                f"{dst} does not end in valid netCDF file extension. "
+                f"Diagnostic will not be treated, returning now."
+            ))
+            return
+        
         try:
             src = ast.literal_eval(src)
         except ValueError:
@@ -90,7 +98,7 @@ class GlobalAverage(Task):
         output.close()
 
 
-    def get_output_file(self, dst):
+    def get_output_file(self, dst):            
         try:
             file = Dataset(dst,'r+')
             file.set_auto_mask(False)
