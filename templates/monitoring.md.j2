@@ -8,7 +8,7 @@
 {% endfor %}
 
 {% for diagnostic in nc_diagnostics -%}
-## {{diagnostic["title"].title()}})
+## {{diagnostic["title"].title()}}
 
 ![]({{diagnostic["plot"]}} "{{diagnostic["title"]}}")
 

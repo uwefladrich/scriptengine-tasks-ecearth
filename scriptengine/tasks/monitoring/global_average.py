@@ -66,12 +66,14 @@ class GlobalAverage(Task):
 
             # access metadata of variable
             if not var_metadata:
+                self.long_name = nc_var.long_name
+                var_metadata["long_name"] = self.long_name
                 var_metadata["standard_name"] = nc_var.standard_name
-                var_metadata["long_name"] = nc_var.long_name
                 var_metadata["missing_value"] = nc_var.missing_value
                 var_metadata["units"] = nc_var.units
 
             nc_file.close()
+        
         
         average = np.mean(sst_array)
         self.log_debug(f"Yearly average: {average}")
