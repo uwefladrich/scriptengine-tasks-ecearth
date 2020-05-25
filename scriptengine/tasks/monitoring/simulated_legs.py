@@ -1,19 +1,17 @@
 """Processing Task that writes out the current leg number."""
-
-from scriptengine.tasks.base import Task
+from write_scalar import WriteScalar
 import yaml
 import os
-import helpers.file_handling as file_handling
 from scriptengine.jinja import render as j2render
 
-class SimulatedLegs(Task):
+class SimulatedLegs(WriteScalar):
     def __init__(self, parameters):
         required = [
             "src",
             "dst",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.mon_id = "simulated legs"
+        self.name = "simulated legs"
         self.description = "Current leg number of EC-Earth run."
     
     def __repr__(self):
@@ -23,15 +21,17 @@ class SimulatedLegs(Task):
         )
 
     def run(self, context):
-        self.src = j2render(self.src, context)
-        self.dst = j2render(self.dst, context)
+        src = j2render(self.src, context)
+        dst = j2render(self.dst, context)
 
-        diagnostic = {
-            "mon_id": self.mon_id,
-            "description": self.description,
-            "data": self.count_leg_folders(),
-        }
-        file_handling.convert_to_yaml(diagnostic,self.dst)
+        value = self.count_leg_folders(src)
+
+        self.save(
+            dst,
+            name=self.name,
+            description=self.description,
+            data=value,
+        )
 
     def get_leg_number(self):
         """
@@ -46,9 +46,9 @@ class SimulatedLegs(Task):
             leg_number = -1
         return leg_number
     
-    def count_leg_folders(self):
+    def count_leg_folders(self, src):
         """
         Get leg number by counting leg folders in rundir/output.
         """
-        return len(next(os.walk(f"{self.src}/output"))[1])
+        return len(next(os.walk(f"{src}/output"))[1])
 

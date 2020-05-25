@@ -3,7 +3,6 @@
 from scriptengine.tasks.base import Task
 import yaml
 import os
-import helpers.file_handling as file_handling
 from scriptengine.jinja import render as j2render
 
 class WriteScalar(Task):
@@ -14,7 +13,6 @@ class WriteScalar(Task):
             "dst",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.mon_id = "write scalar"
         #TODO: Description?
     
     def __repr__(self):
@@ -24,13 +22,13 @@ class WriteScalar(Task):
         )
 
     def run(self, context):
-        self.mon_id = f"{j2render(self.name, context)}"
-        self.value = j2render(self.value, context)
-        self.dst = j2render(self.dst, context)
+        name = j2render(self.name, context)
+        value = j2render(self.value, context)
+        dst = j2render(self.dst, context)
 
-        diagnostic = {
-            "mon_id": self.mon_id,
-            "data": self.value,
-        }
-
-        file_handling.convert_to_yaml(diagnostic,self.dst)
+        self.save(dst, name=name, data=value)
+    
+    def save(self, dst, **kwargs):
+        """Saves a scalar diagnostic in a YAML file."""
+        with open(dst, 'w') as outfile:
+            yaml.dump(kwargs, outfile, sort_keys=False)
