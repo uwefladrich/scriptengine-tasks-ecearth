@@ -2,7 +2,6 @@
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
-import helpers.file_handling as file_handling
 
 import os, glob, ast
 
@@ -31,21 +30,21 @@ class GlobalAverage(Task):
         )
 
     def run(self, context):
-        self.src = j2render(self.src, context)
-        self.dst = j2render(self.dst, context)
+        src = j2render(self.src, context)
+        dst = j2render(self.dst, context)
         try:
-            self.src = ast.literal_eval(self.src)
+            src = ast.literal_eval(src)
         except ValueError:
-            self.src = ast.literal_eval(f'"{self.src}"')
+            src = ast.literal_eval(f'"{src}"')
 
-        self.log_info(f"Found {len(self.src)} files.")
+        self.log_info(f"Found {len(src)} files.")
 
         sst_array = np.array([])
         left_bound = 1e+20
         right_bound = 0
 
         var_metadata = {}
-        for path in self.src:
+        for path in src:
             self.log_debug(f"Getting {self.varname} from {path}")
             nc_file = Dataset(path, 'r')
             nc_var = nc_file.variables[f"{self.varname}"]
@@ -70,7 +69,7 @@ class GlobalAverage(Task):
         self.log_debug(f"new time value: {num2date(time_value, units='seconds since 1900-01-01 00:00:00')}")
         bound_values = [[left_bound, right_bound]]
 
-        output = self.get_output_file()
+        output = self.get_output_file(dst)
         
         var_avg = output.variables[f"{self.varname}_avg"]
         tc = output.variables["time_counter"]
@@ -91,14 +90,13 @@ class GlobalAverage(Task):
         output.close()
 
 
-    def get_output_file(self):
-        path = file_handling.filename(self.mon_id, self.dst)
+    def get_output_file(self, dst):
         try:
-            file = Dataset(f"{path}.nc",'r+')
+            file = Dataset(dst,'r+')
             file.set_auto_mask(False)
             return file
         except FileNotFoundError:
-            file = Dataset(f"{path}.nc",'w')
+            file = Dataset(dst,'w')
             file.set_auto_mask(False)
             self.log_info("File was newly created. Setting up metadata.")
                        
