@@ -3,7 +3,8 @@ from .write_scalar import WriteScalar
 import os
 from scriptengine.jinja import render as j2render
 from dateutil.relativedelta import relativedelta
-import datetime
+
+import yaml # temporary until base class Task has getarg() function
 
 class SimulatedYears(WriteScalar):
     def __init__(self, parameters):
@@ -23,13 +24,18 @@ class SimulatedYears(WriteScalar):
         )
 
     def run(self, context):
-        format_str = "%Y-%m-%d"
-
         dst = j2render(self.dst, context)
-        start = j2render(self.start, context)
-        end = j2render(self.end, context)
-        start = datetime.datetime.strptime(start, format_str)
-        end = datetime.datetime.strptime(end, format_str)
+        rendered_start = j2render(self.start, context)
+        rendered_end = j2render(self.end, context)
+
+        try:
+            start = yaml.full_load(rendered_start)
+        except (yaml.parser.ParserError, yaml.constructor.ConstructorError):
+            start = rendered_start
+        try:
+            end = yaml.full_load(rendered_end)
+        except (yaml.parser.ParserError, yaml.constructor.ConstructorError):
+            end = rendered_end
         
         value = relativedelta(end, start).years
 
