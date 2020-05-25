@@ -1,5 +1,5 @@
 """Processing Task that writes out the current leg number."""
-from write_scalar import WriteScalar
+from .write_scalar import WriteScalar
 import yaml
 import os
 from scriptengine.jinja import render as j2render
@@ -10,7 +10,7 @@ class SimulatedLegs(WriteScalar):
             "src",
             "dst",
         ]
-        super().__init__(__name__, parameters, required_parameters=required)
+        super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
         self.name = "simulated legs"
         self.description = "Current leg number of EC-Earth run."
     
