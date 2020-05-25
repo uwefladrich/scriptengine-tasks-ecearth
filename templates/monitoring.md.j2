@@ -1,7 +1,7 @@
 # EC-Earth 4: Monitoring
 
 {% for scalar in scalar_diagnostics -%}
-* {{ scalar["name"] }}: {{ scalar["data"] }}
+* {{ scalar["long_name"] }}: {{ scalar["data"] }}
 {%- if "description" in scalar %}
     * {{scalar["description"]}} 
 {% endif %}

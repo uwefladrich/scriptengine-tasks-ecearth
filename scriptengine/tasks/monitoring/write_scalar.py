@@ -8,7 +8,7 @@ from scriptengine.jinja import render as j2render
 class WriteScalar(Task):
     def __init__(self, parameters):
         required = [
-            "name",
+            "long_name",
             "value",
             "dst",
         ]
@@ -18,15 +18,15 @@ class WriteScalar(Task):
     def __repr__(self):
         return (
             f"{self.__class__.__name__}"
-            f"({self.name},{self.value},{self.dst})"
+            f"({self.long_name},{self.value},{self.dst})"
         )
 
     def run(self, context):
-        name = j2render(self.name, context)
+        long_name = j2render(self.long_name, context)
         value = j2render(self.value, context)
         dst = j2render(self.dst, context)
 
-        self.save(dst, name=name, data=value)
+        self.save(dst, long_name=long_name, data=value)
     
     def save(self, dst, **kwargs):
         """Saves a scalar diagnostic in a YAML file."""

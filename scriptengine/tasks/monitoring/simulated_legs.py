@@ -11,7 +11,7 @@ class SimulatedLegs(WriteScalar):
             "dst",
         ]
         super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
-        self.name = "simulated legs"
+        self.long_name = "Simulated Legs"
         self.description = "Current leg number of EC-Earth run."
     
     def __repr__(self):
@@ -28,7 +28,7 @@ class SimulatedLegs(WriteScalar):
 
         self.save(
             dst,
-            name=self.name,
+            name=self.long_name,
             description=self.description,
             data=value,
         )
