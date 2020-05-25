@@ -12,7 +12,8 @@ class SimulatedLegs(WriteScalar):
         ]
         super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
         self.long_name = "Simulated Legs"
-        self.description = "Current leg number of EC-Earth run."
+        self.comment = "Current amount of folders in output directory."
+        self.type = "scalar"
     
     def __repr__(self):
         return (
@@ -28,9 +29,10 @@ class SimulatedLegs(WriteScalar):
 
         self.save(
             dst,
-            name=self.long_name,
-            description=self.description,
+            long_name=self.long_name,
+            comment=self.comment,
             data=value,
+            type=self.type,
         )
 
     def get_leg_number(self):

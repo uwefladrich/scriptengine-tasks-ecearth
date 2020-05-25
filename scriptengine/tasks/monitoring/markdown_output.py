@@ -48,8 +48,9 @@ class MarkdownOutput(Task):
                     qplt.plt.close() 
                     nc_plots.append({
                         'plot': f'{path}.png',
-                        'title': f'{cube.metadata.attributes["title"]}',
-                        'description': f'{cube.metadata.attributes["description"]}',
+                        'long_name': cube.long_name,
+                        'title': cube.metadata.attributes["title"],
+                        'comment': cube.metadata.attributes["comment"],
                     })
                 except IOError:
                     self.log_warning(f"IOError, file not found: Ignoring {path}.")

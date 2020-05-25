@@ -13,7 +13,7 @@ class WriteScalar(Task):
             "dst",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        #TODO: Description?
+        self.type = "scalar"
     
     def __repr__(self):
         return (
@@ -26,7 +26,7 @@ class WriteScalar(Task):
         value = j2render(self.value, context)
         dst = j2render(self.dst, context)
 
-        self.save(dst, long_name=long_name, data=value)
+        self.save(dst, long_name=long_name, data=value, type=self.type)
     
     def save(self, dst, **kwargs):
         """Saves a scalar diagnostic in a YAML file."""

@@ -20,8 +20,10 @@ class GlobalAverage(Task):
         ]
         super().__init__(__name__, parameters, required_parameters=required)
         self.mon_id = f"global average {self.varname}"
-        self.description = (f"Global average of the variable {self.varname} "
-                            f"per leg over time.")
+        self.comment = (f"Global average time series of the variable {self.varname}. "
+                            f"Each data point represents the (spatial and temporal) "
+                            f"average over one leg.")
+        self.type = "time series"
     
     def __repr__(self):
         return (
@@ -116,10 +118,11 @@ class GlobalAverage(Task):
 
             dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             metadata = {
-                'title': f'Global Average of {self.varname}',
+                'title': f'{self.long_name.title()} (Global Average Time Series)',
                 'source': 'EC-Earth 4',
                 'history': dt_string + ': Creation',
-                'description': self.description,
+                'comment': self.comment,
+                'type': self.type,
             #    'Conventions': 'CF-1.8',
             }
             tc_meta = { 
