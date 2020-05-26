@@ -61,9 +61,9 @@ class MarkdownOutput(Task):
                 self.plot_cube(cubes[0], plot_path)
                 self.nc_plots.append({
                     'plot': [plot_path],
-                    'long_name': [cube.long_name],
-                    'title': cube.metadata.attributes["title"],
-                    'comment': cube.metadata.attributes["comment"],
+                    'long_name': [cubes[0].long_name],
+                    'title': cubes[0].metadata.attributes["title"],
+                    'comment': cubes[0].metadata.attributes["comment"],
                 })
             else:
                 plot_list = []
