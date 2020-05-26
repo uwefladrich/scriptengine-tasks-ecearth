@@ -4,6 +4,7 @@ from .write_scalar import WriteScalar
 from .markdown_output import MarkdownOutput
 from .global_average import GlobalAverage
 from .disk_usage import DiskUsage
+from .ice_volume import IceVolume
 
 def task_loader_map():
     return {
@@ -13,4 +14,5 @@ def task_loader_map():
         'ece.mon.markdown_report': MarkdownOutput,
         'ece.mon.global_avg': GlobalAverage,
         'ece.mon.disk_usage': DiskUsage,
+        'ece.mon.ice_volume': IceVolume,
         }
