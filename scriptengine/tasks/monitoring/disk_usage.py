@@ -24,7 +24,7 @@ class DiskUsage(WriteScalar):
         src = j2render(self.src, context)
         dst = j2render(self.dst, context)
 
-        value = round(self.get_directory_size(src) * 1e-9, 3)
+        value = round(self.get_directory_size(src) * 1e-9, 1)
 
         self.save(
             dst,
