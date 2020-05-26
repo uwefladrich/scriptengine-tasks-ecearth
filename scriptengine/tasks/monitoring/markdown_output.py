@@ -28,32 +28,18 @@ class MarkdownOutput(Task):
                     for input_file in self.src]
         self.dst = j2render(self.dst, context)
 
-        scalars = []
-        nc_plots = []
+        self.scalars = []
+        self.nc_plots = []
         for path in self.src:
             if path.endswith('.yml'):
                 try:
                     with open(path) as yml_file: 
                         dct = yaml.load(yml_file, Loader = yaml.FullLoader)
-                    scalars.append(dct)
+                    self.scalars.append(dct)
                 except FileNotFoundError:
                     self.log_warning(f"FileNotFoundError: Ignoring {path}.")
             elif path.endswith('.nc'):
-                try:
-                    cube = iris.load_cube(path)
-                    qplt.plot(cube, '.-')
-                    plt.xticks(rotation=45)
-                    plt.tight_layout()
-                    plt.savefig(f"{path}.png")
-                    qplt.plt.close() 
-                    nc_plots.append({
-                        'plot': f'{path}.png',
-                        'long_name': cube.long_name,
-                        'title': cube.metadata.attributes["title"],
-                        'comment': cube.metadata.attributes["comment"],
-                    })
-                except IOError:
-                    self.log_warning(f"IOError, file not found: Ignoring {path}.")
+                self.plot_netCDF(path)
             else:
                 self.log_warning(f"{path} does not end in .nc or .yml. Ignored.")
                 
@@ -63,6 +49,44 @@ class MarkdownOutput(Task):
         
         with open(f"{self.dst}", 'w') as md_out:
             md_out.write(md_template.render(
-                scalar_diagnostics = scalars,
-                nc_diagnostics = nc_plots,
+                scalar_diagnostics = self.scalars,
+                nc_diagnostics = self.nc_plots,
             ))
+    
+    def plot_netCDF(self, path):
+        try:
+            cubes = iris.load(path)
+            if len(cubes) == 1:
+                plot_path = f"{path}.png" 
+                self.plot_cube(cubes[0], plot_path)
+                self.nc_plots.append({
+                    'plot': [plot_path],
+                    'long_name': [cube.long_name],
+                    'title': cube.metadata.attributes["title"],
+                    'comment': cube.metadata.attributes["comment"],
+                })
+            else:
+                plot_list = []
+                ln_list = []
+                for count, cube in enumerate(cubes):
+                    plot_path = f"{path}-{count}.png"
+                    long_name = cube.long_name
+                    self.plot_cube(cube, plot_path)
+                    plot_list.append(plot_path)
+                    ln_list.append(long_name)
+                self.nc_plots.append({
+                    'plot': plot_list,
+                    'long_name': ln_list,
+                    'title': cubes[0].metadata.attributes["title"],
+                    'comment': cubes[0].metadata.attributes["comment"],
+                })
+        except IOError:
+            self.log_warning(f"IOError, file not found: Ignoring {path}.")
+    
+    def plot_cube(self, cube, dst):
+        qplt.plot(cube, '.-')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.savefig(dst)
+        qplt.plt.close() 
+        self.log_debug(f"New plot created at {dst}.")
