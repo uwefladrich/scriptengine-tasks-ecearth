@@ -176,8 +176,8 @@ class IceVolume(Task):
             return file
     
     def update_bounds(self, left_bound, right_bound, new_bounds):
-        new_bounds_left = new_bounds[:].data[0][0] 
-        new_bounds_right = new_bounds[:].data[0][1]
+        new_bounds_left = new_bounds.data[0][0] 
+        new_bounds_right = new_bounds.data[0][1]
         if new_bounds_left < left_bound:
             self.log_debug(f"Updating left time bound to {new_bounds_left}")
             left_bound = new_bounds_left

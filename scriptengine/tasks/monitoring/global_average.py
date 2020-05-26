@@ -48,9 +48,10 @@ class GlobalAverage(Task):
 
         self.log_info(f"Found {len(src)} files.")
 
-        sst_array = np.array([])
+        global_avg_array = np.array([])
         left_bound = 1e+20
         right_bound = 0
+        time_bound_weights = np.array([])
 
         var_metadata = {}
         for path in src:
@@ -59,8 +60,11 @@ class GlobalAverage(Task):
             nc_var = nc_file.variables[f"{self.varname}"]
             global_average = np.mean(nc_var[:])
             self.log_debug(f"Global average: {global_average}")
-            sst_array = np.append(sst_array, global_average)
-            bounds = nc_file.variables["time_counter_bounds"]
+            global_avg_array = np.append(global_avg_array, global_average)
+
+            bounds = nc_file.variables["time_counter_bounds"][:]
+            time_interval = bounds[0][1] - bounds[0][0]
+            time_bound_weights = np.append(time_bound_weights, time_interval)
             left_bound, right_bound = self.update_bounds(left_bound, right_bound, bounds)
 
             # access metadata of variable
@@ -74,7 +78,7 @@ class GlobalAverage(Task):
             nc_file.close()
         
         
-        average = np.mean(sst_array)
+        average = np.average(global_avg_array, weights=time_bound_weights)
         self.log_debug(f"Yearly average: {average}")
         time_value = np.mean([left_bound, right_bound])
         self.log_debug(f"new time value: {num2date(time_value, units='seconds since 1900-01-01 00:00:00')}")
@@ -142,8 +146,8 @@ class GlobalAverage(Task):
             return file
     
     def update_bounds(self, left_bound, right_bound, new_bounds):
-        new_bounds_left = new_bounds[:].data[0][0] 
-        new_bounds_right = new_bounds[:].data[0][1]
+        new_bounds_left = new_bounds.data[0][0] 
+        new_bounds_right = new_bounds.data[0][1]
         if new_bounds_left < left_bound:
             self.log_debug(f"Updating left time bound to {new_bounds_left}")
             left_bound = new_bounds_left
