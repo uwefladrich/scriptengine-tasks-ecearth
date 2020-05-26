@@ -27,7 +27,7 @@ class IceVolume(Task):
     def __repr__(self):
         return (
             f"{self.__class__.__name__}"
-            f"({self.src},{self.dst})"
+            f"({self.src},{self.domain},{self.dst})"
         )
 
     def run(self, context):
@@ -57,57 +57,58 @@ class IceVolume(Task):
         except:
             self.log_warning("Problem with domain file, aborting.")
             return
-
         cell_areas = np.multiply(cell_lengths[:], cell_widths[:])
 
-        sivolu_nh_array = np.array([])
-        sivolu_sh_array = np.array([])
-        bounds_array = np.array([])
+        # Initialization for the loop
+        nh_sivolu_array = np.array([])
+        sh_sivolu_array = np.array([])
+        time_bound_weights = np.array([])
         left_bound = 1e+20
         right_bound = 0
 
-        var_metadata = {}
-
         for path in src:
-            self.log_debug(f"Getting sivolu from {path}")
+            self.log_debug(f"Getting 'sivolu' from {path}")
             nc_file = Dataset(path, 'r')
-            sivolu_per_area = nc_file.variables[f"sivolu"]
-            sivolu = np.multiply(sivolu_per_area[:], cell_areas)
-            lat_amount = sivolu.shape[1]
+
+            volume_per_area = nc_file.variables["sivolu"]
+            volume = np.multiply(volume_per_area[:], cell_areas)
+
+            lat_amount = volume.shape[1] # nav_lat is second coordinate of sivolu variable
             lats = np.linspace(-90,90,lat_amount)
-            sivolu_nh = sivolu[:, lats>0, :]
-            sivolu_sh = sivolu[:, lats<=0, :]
-            nh_sum = np.sum(sivolu_nh)
-            sh_sum = np.sum(sivolu_sh)
-            print(f"nh_sum = {nh_sum}, sh_sum = {sh_sum}")
-            sivolu_nh_array = np.append(sivolu_nh_array, nh_sum)
-            sivolu_sh_array = np.append(sivolu_sh_array, sh_sum)
+            nh_volume = volume[:, lats>0, :]
+            sh_volume = volume[:, lats<=0, :]
+            nh_sum = np.sum(nh_volume)
+            sh_sum = np.sum(sh_volume)
+
+            nh_sivolu_array = np.append(nh_sivolu_array, nh_sum)
+            sh_sivolu_array = np.append(sh_sivolu_array, sh_sum)    
+
             bounds = nc_file.variables["time_counter_bounds"][:]
-            tcb_length = bounds[0][1] - bounds[0][0]
-            bounds_array = np.append(bounds_array, tcb_length)
+            time_interval = bounds[0][1] - bounds[0][0]
+            time_bound_weights = np.append(time_bound_weights, time_interval)
             left_bound, right_bound = self.update_bounds(left_bound, right_bound, bounds)
 
             nc_file.close()
         
+        nh_average = np.average(nh_sivolu_array, weights=time_bound_weights)
+        sh_average = np.average(sh_sivolu_array, weights=time_bound_weights)
+        self.log_debug(f"nh_average = {nh_average}, sh_average = {sh_average}")
         
-        nh_average = np.average(sivolu_nh_array, weights=bounds_array)
-        sh_average = np.average(sivolu_sh_array, weights=bounds_array)
-        print(f"nh_average = {nh_average}, sh_average = {sh_average}")
         time_value = np.mean([left_bound, right_bound])
         self.log_debug(f"new time value: {num2date(time_value, units='seconds since 1900-01-01 00:00:00')}")
         bound_values = [[left_bound, right_bound]]
 
         output = self.get_output_file(dst)
         
-        sivolu_nh = output.variables["total_sivolu_nh"]
-        sivolu_sh = output.variables["total_sivolu_sh"]
+        total_nh_volume = output.variables["total_nh_volume"]
+        total_sh_volume = output.variables["total_sh_volume"]
         tc = output.variables["time_counter"]
         tcb = output.variables["time_counter_bounds"]
         
         if self.monotonic_insert(tcb, bound_values):
             tc[:] = np.append(tc[:],time_value)
-            sivolu_nh[-1] = nh_average
-            sivolu_sh[-1] = sh_average
+            total_nh_volume[-1] = nh_average
+            total_sh_volume[-1] = sh_average
             tcb[-1] = bound_values
         else:
             self.log_warning(
@@ -133,8 +134,8 @@ class IceVolume(Task):
             file.createDimension('axis_nbounds', size=2)
             tc = file.createVariable('time_counter', 'i8', ('time_counter',))
             tcb = file.createVariable('time_counter_bounds', 'i8', ('time_counter','axis_nbounds',))
-            sivolu_nh = file.createVariable(f'total_sivolu_nh', 'f', ('time_counter',))
-            sivolu_sh = file.createVariable(f'total_sivolu_sh', 'f', ('time_counter',))
+            total_nh_volume = file.createVariable(f'total_nh_volume', 'f', ('time_counter',))
+            total_sh_volume = file.createVariable(f'total_sh_volume', 'f', ('time_counter',))
 
             dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             metadata = {
@@ -170,8 +171,8 @@ class IceVolume(Task):
             file.setncatts(metadata)
             tc.setncatts(tc_meta)
             tcb.setncatts(tcb_meta)
-            sivolu_nh.setncatts(nh_metadata)
-            sivolu_sh.setncatts(sh_metadata)
+            total_nh_volume.setncatts(nh_metadata)
+            total_sh_volume.setncatts(sh_metadata)
             return file
     
     def update_bounds(self, left_bound, right_bound, new_bounds):
