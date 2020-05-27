@@ -1,0 +1,3 @@
+scriptengine>=0.5
+pyYAML>=5.1
+numpy>=1.16.1
