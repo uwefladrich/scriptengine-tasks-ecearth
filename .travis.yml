@@ -27,6 +27,7 @@ install:
   - conda install -c conda-forge iris
   - pip install -U pip
   - pip install -r requirements/pip-requirements.txt
+  - pip install PyYAML
   - pip install .
 # command to run tests
 script: pytest
