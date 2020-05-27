@@ -25,7 +25,6 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - conda activate test-environment
   - conda install -c conda-forge iris
-  - conda install pip
   - pip install -U pip
   - pip install -r requirements/pip-requirements.txt
   - pip install .
