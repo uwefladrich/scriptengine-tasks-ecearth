@@ -1,0 +1,10 @@
+name: test-environment
+channels:
+  - conda-forge
+dependencies:
+  - pyYAML>=5.1
+  - numpy>=1.16.1
+  - netCDF4>=1.5
+  - iris>=2.2.0
+  - pip:
+    - scriptengine>=0.5
