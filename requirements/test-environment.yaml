@@ -6,5 +6,6 @@ dependencies:
   - numpy>=1.16.1
   - netCDF4>=1.5
   - iris>=2.2.0
+  - pip
   - pip:
     - scriptengine>=0.5
