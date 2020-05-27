@@ -26,7 +26,8 @@ install:
   - conda activate test-environment
   - conda install -c conda-forge iris
   - conda install pip
-  - sudo pip install -r requirements/pip-requirements.txt
+  - pip install -U pip
+  - pip install -r requirements/pip-requirements.txt
   - pip install .
 # command to run tests
 script: pytest
