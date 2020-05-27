@@ -42,8 +42,13 @@ class MarkdownOutput(Task):
                 self.plot_netCDF(path)
             else:
                 self.log_warning(f"{path} does not end in .nc or .yml. Ignored.")
-                
-        
+
+        try:  
+            exp_id_index = next((index for (index, d) in enumerate(self.scalars) if d["long_name"] == "Experiment ID"), None)      
+            self.scalars.insert(0, self.scalars.pop(exp_id_index))
+        except:
+            pass
+
         env = jinja2.Environment(loader=jinja2.PackageLoader('ece-4-monitoring'))
         md_template = env.get_template('monitoring.md.j2')
         
