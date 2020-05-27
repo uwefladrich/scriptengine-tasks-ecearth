@@ -25,8 +25,7 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - conda activate test-environment
   - conda install -c conda-forge iris
-  - pip install -r requirements/pip-requirements.txt
-  - pip install pyYAML>=5.1
+  - sudo pip install -r requirements/pip-requirements.txt
   - pip install .
 # command to run tests
 script: pytest
