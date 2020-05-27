@@ -26,6 +26,7 @@ install:
   - conda activate test-environment
   - conda install -c conda-forge iris
   - pip install -r requirements/pip-requirements.txt
+  - pip install pyYAML>=5.1
   - pip install .
 # command to run tests
 script: pytest
