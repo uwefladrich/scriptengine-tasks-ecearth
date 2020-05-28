@@ -34,44 +34,52 @@ class IceVolume(Task):
         src = j2render(self.src, context)
         dst = j2render(self.dst, context)
         domain = j2render(self.domain, context)
-
-        if not dst.endswith(".nc"):
-            self.log_warning((
-                f"{dst} does not end in valid netCDF file extension. "
-                f"Diagnostic will not be treated, returning now."
-            ))
-            return
-
         try:
             src = ast.literal_eval(src)
         except ValueError:
             src = ast.literal_eval(f'"{src}"')
 
+        if not dst.endswith(".nc"):
+            self.log_warning((
+                f"{dst} does not end in valid netCDF file extension. "
+                f"Diagnostic can not be saved, returning now."
+            ))
+            return
+
         self.log_info(f"Found {len(src)} files.")
+
+        # Get March and September files from src
+        try:
+            mar = self.get_month_from_src("03", src)
+            sep = self.get_month_from_src("09", src)
+        except FileNotFoundError as e:
+            self.log_warning((f"FileNotFoundError: {e}."
+                              f"Diagnostic can not be created, returning now."))
+            return
 
         # Calculate cell areas
         try:
             domain_file = Dataset(domain,'r')
             cell_lengths = domain_file.variables["e1t"]
             cell_widths = domain_file.variables["e2t"]
-        except (FileNotFoundError, KeyError):
-            self.log_warning("Problem with domain file, aborting.")
-            return
+        except (FileNotFoundError, KeyError) as e:
+            self.log_warning((f"Problem with domain file, aborting."
+                              f"Exception: {e}"))
+            return   
         cell_areas = np.multiply(cell_lengths[:], cell_widths[:])
 
         # Initialization for the loop
         nh_sivolu_array = np.array([])
         sh_sivolu_array = np.array([])
-        time_bound_weights = np.array([])
-        left_bound = 1e+20
-        right_bound = 0
+        time_counter = []
+        time_counter_bounds = []
 
-        for path in src:
-            self.log_debug(f"Getting 'sivolu' from {path}")
-            nc_file = Dataset(path, 'r')
+        for month in [mar, sep]:
+            self.log_debug(f"Getting 'sivolu' from {month}")
+            nc_file = Dataset(month, 'r')
 
-            volume_per_area = nc_file.variables["sivolu"]
-            volume = np.multiply(volume_per_area[:], cell_areas)
+            volume_per_area = nc_file.variables["sivolu"][:]
+            volume = np.multiply(volume_per_area, cell_areas)
 
             lat_amount = volume.shape[1] # nav_lat is second coordinate of sivolu variable
             lats = np.linspace(-90,90,lat_amount)
@@ -83,20 +91,13 @@ class IceVolume(Task):
             nh_sivolu_array = np.append(nh_sivolu_array, nh_sum)
             sh_sivolu_array = np.append(sh_sivolu_array, sh_sum)    
 
+            value = nc_file.variables["time_counter"][:]
             bounds = nc_file.variables["time_counter_bounds"][:]
-            time_interval = bounds[0][1] - bounds[0][0]
-            time_bound_weights = np.append(time_bound_weights, time_interval)
-            left_bound, right_bound = self.update_bounds(left_bound, right_bound, bounds)
+
+            time_counter_bounds.append(bounds)
+            time_counter.append(value)
 
             nc_file.close()
-        
-        nh_average = np.average(nh_sivolu_array, weights=time_bound_weights)
-        sh_average = np.average(sh_sivolu_array, weights=time_bound_weights)
-        self.log_debug(f"nh_average = {nh_average}, sh_average = {sh_average}")
-        
-        time_value = np.mean([left_bound, right_bound])
-        self.log_debug(f"new time value: {num2date(time_value, units='seconds since 1900-01-01 00:00:00')}")
-        bound_values = [[left_bound, right_bound]]
         
         output = self.get_output_file(dst)
         
@@ -104,12 +105,16 @@ class IceVolume(Task):
         total_sh_volume = output.variables["total_sh_volume"]
         tc = output.variables["time_counter"]
         tcb = output.variables["time_counter_bounds"]
+
         
-        if self.monotonic_insert(tcb, bound_values):
-            tc[:] = np.append(tc[:],time_value)
-            total_nh_volume[-1] = nh_average
-            total_sh_volume[-1] = sh_average
-            tcb[-1] = bound_values
+        if self.monotonic_insert(tcb, time_counter_bounds[0]):
+            tc[:] = np.append(tc[:],time_counter)
+            total_nh_volume[-2] = nh_sivolu_array[0]
+            total_nh_volume[-1] = nh_sivolu_array[1]
+            total_sh_volume[-2] = sh_sivolu_array[0]
+            total_sh_volume[-1] = sh_sivolu_array[1]
+            tcb[-2] = time_counter_bounds[0]
+            tcb[-1] = time_counter_bounds[1]
         else:
             self.log_warning(
                 (f"Inserting time step would lead to "
@@ -194,3 +199,10 @@ class IceVolume(Task):
                 return True
         except IndexError:
             return True
+    
+    def get_month_from_src(self, month, path_list):
+        for path in path_list:
+            if path[-5:-3] == month:
+                return path
+        raise FileNotFoundError(f"Month {month} not found in {path_list}!")
+        
