@@ -47,9 +47,9 @@ class MarkdownOutput(Task):
 
         try:  
             exp_id_index = next((index for (index, d) in enumerate(self.scalars) if d["long_name"] == "Experiment ID"), None)      
-            self.scalars.insert(0, self.scalars.pop(exp_id_index))
-        except:
-            pass
+            self.scalars.insert(0, self.scalars.pop(exp_id_index)) # raises TypeError exp_id_index == None
+        except TypeError:
+            self.log_debug('No scalar with long_name "Experiment ID" given.')
 
         env = jinja2.Environment(loader=jinja2.PackageLoader('ece-4-monitoring'))
         md_template = env.get_template('monitoring.md.j2')

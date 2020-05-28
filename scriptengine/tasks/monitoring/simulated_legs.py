@@ -43,7 +43,7 @@ class SimulatedLegs(WriteScalar):
             leg_info = yaml.load(file, Loader=yaml.FullLoader)
         try:
             leg_number = leg_info["config"]["schedule"]["leg"]["num"]
-        except:
+        except (KeyError, TypeError):
             self.log_warning("Leg number not found!")
             leg_number = -1
         return leg_number
