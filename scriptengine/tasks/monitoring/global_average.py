@@ -16,6 +16,7 @@ class GlobalAverage(Task):
         required = [
             "src",
             "dst",
+            "domain",
             "varname",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
@@ -33,6 +34,8 @@ class GlobalAverage(Task):
     def run(self, context):
         src = j2render(self.src, context)
         dst = j2render(self.dst, context)
+        domain = j2render(self.domain, context)
+        varname = j2render(self.varname, context)
 
         if not dst.endswith(".nc"):
             self.log_warning((
@@ -48,6 +51,17 @@ class GlobalAverage(Task):
 
         self.log_info(f"Found {len(src)} files.")
 
+        # Calculate cell areas
+        try:
+            domain_file = Dataset(domain,'r')
+            cell_lengths = domain_file.variables["e1t"]
+            cell_widths = domain_file.variables["e2t"]
+        except (FileNotFoundError, KeyError):
+            self.log_warning("Problem with domain file, aborting.")
+            return
+        cell_areas = np.multiply(cell_lengths[:], cell_widths[:])
+        #print(type(cell_areas))
+
         global_avg_array = np.array([])
         left_bound = 1e+20
         right_bound = 0
@@ -55,11 +69,13 @@ class GlobalAverage(Task):
 
         var_metadata = {}
         for path in src:
-            self.log_debug(f"Getting {self.varname} from {path}")
+            self.log_debug(f"Getting {varname} from {path}")
             nc_file = Dataset(path, 'r')
-            nc_var = nc_file.variables[f"{self.varname}"]
-            global_average = np.mean(nc_var[:])
+
+            nc_var = nc_file.variables[varname]
+            global_average = np.ma.average(nc_var[:], weights=cell_areas)
             self.log_debug(f"Global average: {global_average}")
+            
             global_avg_array = np.append(global_avg_array, global_average)
 
             bounds = nc_file.variables["time_counter_bounds"][:]
@@ -84,9 +100,9 @@ class GlobalAverage(Task):
         self.log_debug(f"new time value: {num2date(time_value, units='seconds since 1900-01-01 00:00:00')}")
         bound_values = [[left_bound, right_bound]]
 
-        output = self.get_output_file(dst)
+        output = self.get_output_file(varname, dst)
         
-        var_avg = output.variables[f"{self.varname}_avg"]
+        var_avg = output.variables[f"{varname}_avg"]
         tc = output.variables["time_counter"]
         tcb = output.variables["time_counter_bounds"]
         
@@ -105,7 +121,7 @@ class GlobalAverage(Task):
         output.close()
 
 
-    def get_output_file(self, dst):            
+    def get_output_file(self, varname, dst):            
         try:
             file = Dataset(dst,'r+')
             file.set_auto_mask(False)
@@ -119,7 +135,7 @@ class GlobalAverage(Task):
             file.createDimension('axis_nbounds', size=2)
             tc = file.createVariable('time_counter', 'i8', ('time_counter',))
             tcb = file.createVariable('time_counter_bounds', 'i8', ('time_counter','axis_nbounds',))
-            nc_avg = file.createVariable(f'{self.varname}_avg', 'f', ('time_counter',))
+            nc_avg = file.createVariable(f'{varname}_avg', 'f', ('time_counter',))
 
             dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             metadata = {
