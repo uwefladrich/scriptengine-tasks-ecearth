@@ -1,14 +1,15 @@
-"""Visualization Task that saves Data and Plots to a Markdown File."""
+"""Presentation Task that saves Data and Plots to a Markdown File."""
+
+import os, glob
+import jinja2
+import yaml
+import iris
+import matplotlib.pyplot as plt
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
 from helpers.file_handling import cd
-import jinja2
-import os, glob
-import yaml
-import iris
-import iris.quickplot as qplt 
-import matplotlib.pyplot as plt
+from helpers.cube_plot import ts_plot
 
 class MarkdownOutput(Task):
     def __init__(self, parameters):
@@ -95,10 +96,8 @@ class MarkdownOutput(Task):
             self.log_warning(f"IOError, file not found: Ignoring {path}.")
     
     def plot_cube(self, cube, folder, file):
-        qplt.plot(cube, '.-')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
+        ts_plot(cube)
         with cd(folder):
-            plt.savefig(file)
-        qplt.plt.close() 
+            plt.savefig(file, bbox_inches="tight")
+        plt.close()
         self.log_debug(f"New plot created at {folder}.")
