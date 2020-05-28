@@ -1,13 +1,21 @@
+"""setup.py for package ece-4-monitoring."""
+
 import os
 import codecs
 import setuptools
 
 def read(rel_path):
+    """
+    Helper function to read file in relative path.
+    """
     here = os.path.abspath(os.path.dirname(__file__))
     with codecs.open(os.path.join(here, rel_path), "r") as fp:
         return fp.read()
 
 def get_version(rel_path):
+    """
+    Helper function to get package version.
+    """
     for line in read(rel_path).splitlines():
         if line.startswith("__version__"):
             delim = '"' if '"' in line else "'"

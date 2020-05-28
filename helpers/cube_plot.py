@@ -1,4 +1,5 @@
-import iris
+"""Helper module to plot Iris monitoring cubes."""
+
 import iris.quickplot as qplt
 import matplotlib.pyplot as plt
 import cftime
@@ -7,20 +8,17 @@ def _title(cube_or_coord, with_units):
     """
     Create Plot/Axis Title from Iris cube/coordinate
 
-    Slight variance on _title() in iris/quickplot.py. 
+    Slight variance on _title() in iris/quickplot.py.
     """
-    
-    if cube_or_coord is None or isinstance(cube_or_coord, int):
+
+    if isinstance(cube_or_coord, int) or cube_or_coord == None:
         title = ""
     else:
         title = cube_or_coord.name().replace("_", " ").title()
         units = cube_or_coord.units
         if with_units and not (
-            units.is_unknown()
-            or units.is_no_unit()
-#            or units == cf_units.Unit("1")
+                units.is_unknown() or units.is_no_unit()
         ):
-
             if qplt._use_symbol(units):
                 units = units.symbol
             title += " / {}".format(units)
@@ -42,10 +40,9 @@ def ts_plot(ts_cube):
         for date in dates:
             fmt_dates.append(date.strftime("%Y-%m"))
 
-    plt.plot(fmt_dates,ts_cube.data,marker='o')
-    plt.xticks(fmt_dates,rotation=45)
+    plt.plot(fmt_dates, ts_cube.data, marker='o')
+    plt.xticks(fmt_dates, rotation=45)
     plt.tight_layout()
-    plt.xlabel(_title(time_coord,False))
-    plt.title(_title(ts_cube,False))
-    plt.ylabel(_title(ts_cube,True))
-
+    plt.xlabel(_title(time_coord, False))
+    plt.title(_title(ts_cube, False))
+    plt.ylabel(_title(ts_cube, True))
