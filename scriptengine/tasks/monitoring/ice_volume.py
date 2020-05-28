@@ -41,7 +41,7 @@ class IceVolume(Task):
                 f"Diagnostic will not be treated, returning now."
             ))
             return
-        
+
         try:
             src = ast.literal_eval(src)
         except ValueError:
@@ -54,7 +54,7 @@ class IceVolume(Task):
             domain_file = Dataset(domain,'r')
             cell_lengths = domain_file.variables["e1t"]
             cell_widths = domain_file.variables["e2t"]
-        except:
+        except (FileNotFoundError, KeyError):
             self.log_warning("Problem with domain file, aborting.")
             return
         cell_areas = np.multiply(cell_lengths[:], cell_widths[:])
@@ -77,8 +77,8 @@ class IceVolume(Task):
             lats = np.linspace(-90,90,lat_amount)
             nh_volume = volume[:, lats>0, :]
             sh_volume = volume[:, lats<=0, :]
-            nh_sum = np.sum(nh_volume)
-            sh_sum = np.sum(sh_volume)
+            nh_sum = np.ma.sum(nh_volume)
+            sh_sum = np.ma.sum(sh_volume)
 
             nh_sivolu_array = np.append(nh_sivolu_array, nh_sum)
             sh_sivolu_array = np.append(sh_sivolu_array, sh_sum)    
@@ -97,7 +97,7 @@ class IceVolume(Task):
         time_value = np.mean([left_bound, right_bound])
         self.log_debug(f"new time value: {num2date(time_value, units='seconds since 1900-01-01 00:00:00')}")
         bound_values = [[left_bound, right_bound]]
-
+        
         output = self.get_output_file(dst)
         
         total_nh_volume = output.variables["total_nh_volume"]
