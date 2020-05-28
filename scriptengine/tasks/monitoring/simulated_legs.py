@@ -35,11 +35,11 @@ class SimulatedLegs(WriteScalar):
             type=self.type,
         )
 
-    def get_leg_number(self):
+    def get_leg_number(self, src):
         """
         Alternative way to get leg number: Get leg number from leginfo.yml file.
         """
-        with open(f"{self.src}/leginfo.yml", 'r') as file:
+        with open(f"{src}/leginfo.yml", 'r') as file:
             leg_info = yaml.load(file, Loader=yaml.FullLoader)
         try:
             leg_number = leg_info["config"]["schedule"]["leg"]["num"]
