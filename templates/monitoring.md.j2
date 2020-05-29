@@ -12,10 +12,6 @@
 
 {% for plot in diagnostic["plot"] -%}
 
-{% if diagnostic["plot"]|length > 1 %}
-### {{diagnostic["long_name"][loop.index0]}}
-{% endif %}
-
 ![]({{plot}} "{{diagnostic["long_name"][loop.index0]}}")
 
 {% endfor %}
