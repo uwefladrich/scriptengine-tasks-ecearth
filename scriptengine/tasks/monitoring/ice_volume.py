@@ -137,8 +137,8 @@ class IceVolume(Task):
                        
             file.createDimension('time_counter', size=None)
             file.createDimension('axis_nbounds', size=2)
-            tc = file.createVariable('time_counter', 'i8', ('time_counter',))
-            tcb = file.createVariable('time_counter_bounds', 'i8', ('time_counter','axis_nbounds',))
+            tc = file.createVariable('time_counter', 'd', ('time_counter',))
+            tcb = file.createVariable('time_counter_bounds', 'd', ('time_counter','axis_nbounds',))
             total_nh_volume = file.createVariable(f'total_nh_volume', 'f', ('time_counter',))
             total_sh_volume = file.createVariable(f'total_sh_volume', 'f', ('time_counter',))
 

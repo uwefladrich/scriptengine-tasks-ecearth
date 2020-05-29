@@ -133,8 +133,8 @@ class GlobalAverage(Task):
                        
             file.createDimension('time_counter', size=None)
             file.createDimension('axis_nbounds', size=2)
-            tc = file.createVariable('time_counter', 'i8', ('time_counter',))
-            tcb = file.createVariable('time_counter_bounds', 'i8', ('time_counter','axis_nbounds',))
+            tc = file.createVariable('time_counter', 'd', ('time_counter',))
+            tcb = file.createVariable('time_counter_bounds', 'd', ('time_counter','axis_nbounds',))
             nc_avg = file.createVariable(f'{varname}_avg', 'f', ('time_counter',))
 
             dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
