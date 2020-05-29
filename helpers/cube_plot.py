@@ -3,6 +3,7 @@
 import iris.quickplot as qplt
 import matplotlib.pyplot as plt
 import cftime
+import math
 
 def _title(name, units=None):
     """
@@ -36,8 +37,15 @@ def ts_plot(ts_cube):
         for date in dates:
             fmt_dates.append(date.strftime("%Y-%m"))
 
-    plt.plot(fmt_dates, ts_cube.data, marker='o')
-    plt.xticks(fmt_dates, rotation=45)
+    fig, ax = plt.subplots()
+    ax.plot(fmt_dates, ts_cube.data, marker='o')
+    fig.autofmt_xdate()    
+    major_step = 2*math.ceil(len(fmt_dates) / 18) - 1
+    minor_step = math.ceil(len(fmt_dates) / 35)
+    ax.set_xticks(fmt_dates[::major_step])
+    ax.set_xticks(fmt_dates[::minor_step], minor=True)
+    ax.set_xticklabels(fmt_dates[::major_step])
+    
     plt.tight_layout()
     plt.title(_title(ts_cube.long_name))
     plt.xlabel(_title(time_coord.name()))
