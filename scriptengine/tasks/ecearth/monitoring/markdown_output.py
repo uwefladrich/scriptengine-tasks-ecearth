@@ -51,7 +51,7 @@ class MarkdownOutput(Task):
         except TypeError:
             self.log_debug('No scalar with long_name "Experiment ID" given.')
 
-        env = jinja2.Environment(loader=jinja2.PackageLoader('ece-4-monitoring'))
+        env = jinja2.Environment(loader=jinja2.PackageLoader('scriptengine-tasks-ecearth'))
         md_template = env.get_template('monitoring.md.j2')
         
         with cd(self.dst):

@@ -22,8 +22,8 @@ def get_version(rel_path):
             return line.split(delim)[1]
 
 setuptools.setup(
-    name="ece-4-monitoring",
-    version=get_version("scriptengine/tasks/monitoring/version.py"),
+    name="scriptengine-tasks-ecearth",
+    version=get_version("scriptengine/tasks/ecearth/version.py"),
     author="Valentina Schueller",
     author_email="valentina.schueller@gmail.com",
     description="ScriptEngine tasks for monitoring the EC-Earth climate model",
@@ -32,7 +32,8 @@ setuptools.setup(
     url="https://github.com/valentinaschueller/ece-4-monitoring",
     packages=[
         "helpers",
-        "scriptengine.tasks.monitoring",
+        "scriptengine.tasks.ecearth",
+        "scriptengine.tasks.ecearth.monitoring",
         "tests",
     ],
     classifiers=[
