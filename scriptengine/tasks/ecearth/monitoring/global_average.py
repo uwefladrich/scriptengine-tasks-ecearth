@@ -20,7 +20,7 @@ class GlobalAverage(Task):
             "varname",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Global average time series of the variable **{self.varname}**. "
+        self.comment = (f"Global average time series of **{self.varname}**. "
                             f"Each data point represents the (spatial and temporal) "
                             f"average over one leg.")
         self.type = "time series"
