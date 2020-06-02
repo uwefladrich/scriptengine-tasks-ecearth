@@ -145,7 +145,7 @@ class GlobalAverage(Task):
                 'history': dt_string + ': Creation',
                 'comment': self.comment,
                 'type': self.type,
-            #    'Conventions': 'CF-1.8',
+                'Conventions': 'CF-1.7',
             }
             tc_meta = { 
                 'units': 'seconds since 1900-01-01 00:00:00',
