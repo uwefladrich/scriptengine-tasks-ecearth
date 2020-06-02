@@ -40,8 +40,13 @@ def ts_plot(ts_cube):
     fig, ax = plt.subplots()
     ax.plot(fmt_dates, ts_cube.data, marker='o')
     fig.autofmt_xdate()    
-    major_step = 2*math.ceil(len(fmt_dates) / 18) - 1
-    minor_step = math.ceil(len(fmt_dates) / 35)
+    minor_step = math.ceil(len(fmt_dates) / 40)
+    if len(fmt_dates) < 10:
+        major_step = minor_step
+    elif len(fmt_dates) < 20:
+        major_step = 2*minor_step
+    else:
+        major_step = 3*minor_step
     ax.set_xticks(fmt_dates[::major_step])
     ax.set_xticks(fmt_dates[::minor_step], minor=True)
     ax.set_xticklabels(fmt_dates[::major_step])
