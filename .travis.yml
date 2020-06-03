@@ -14,7 +14,7 @@ install:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
-  - conda env create -n test-environment python=$TRAVIS_PYTHON_VERSION
+  - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
   - conda activate test-environment
   - conda install pip
   - conda install -c conda-forge iris
