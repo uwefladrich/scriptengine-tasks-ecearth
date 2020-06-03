@@ -72,8 +72,8 @@ class GlobalAverage(Task):
             self.log_debug(f"Getting {varname} from {path}")
             nc_file = Dataset(path, 'r')
 
-            nc_var = nc_file.variables[varname][:]
-            masked = np.ma.masked_equal(nc_var, 0)
+            nc_var = nc_file.variables[varname]
+            masked = np.ma.masked_equal(nc_var[:], 0)
             global_average = np.ma.average(masked, weights=cell_areas)
             self.log_debug(f"Global average: {global_average}")
             
