@@ -1,13 +1,21 @@
+"""setup.py for package ece-4-monitoring."""
+
 import os
 import codecs
 import setuptools
 
 def read(rel_path):
+    """
+    Helper function to read file in relative path.
+    """
     here = os.path.abspath(os.path.dirname(__file__))
     with codecs.open(os.path.join(here, rel_path), "r") as fp:
         return fp.read()
 
 def get_version(rel_path):
+    """
+    Helper function to get package version.
+    """
     for line in read(rel_path).splitlines():
         if line.startswith("__version__"):
             delim = '"' if '"' in line else "'"
@@ -15,7 +23,7 @@ def get_version(rel_path):
 
 setuptools.setup(
     name="scriptengine-tasks-ecearth",
-    version=get_version("scriptengine/tasks/monitoring/version.py"),
+    version=get_version("scriptengine/tasks/ecearth/version.py"),
     author="Valentina Schueller",
     author_email="valentina.schueller@gmail.com",
     description="ScriptEngine tasks for monitoring the EC-Earth climate model",
@@ -24,7 +32,8 @@ setuptools.setup(
     url="https://github.com/valentinaschueller/ece-4-monitoring",
     packages=[
         "helpers",
-        "scriptengine.tasks.monitoring",
+        "scriptengine.tasks.ecearth",
+        "scriptengine.tasks.ecearth.monitoring",
         "tests",
     ],
     classifiers=[

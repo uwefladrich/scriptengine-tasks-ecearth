@@ -1,13 +1,15 @@
-"""Visualization Task that saves Data and Plots to a Markdown File."""
+"""Presentation Task that saves Data and Plots to a Markdown File."""
+
+import os, glob
+import jinja2
+import yaml
+import iris
+import matplotlib.pyplot as plt
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
-import jinja2
-import os, glob
-import yaml
-import iris
-import iris.quickplot as qplt 
-import matplotlib.pyplot as plt
+from helpers.file_handling import cd
+from helpers.cube_plot import ts_plot
 
 class MarkdownOutput(Task):
     def __init__(self, parameters):
@@ -39,28 +41,38 @@ class MarkdownOutput(Task):
                 except FileNotFoundError:
                     self.log_warning(f"FileNotFoundError: Ignoring {path}.")
             elif path.endswith('.nc'):
-                self.plot_netCDF(path)
+                self.plot_netCDF(path, self.dst)
             else:
                 self.log_warning(f"{path} does not end in .nc or .yml. Ignored.")
-                
-        
-        env = jinja2.Environment(loader=jinja2.PackageLoader('ece-4-monitoring'))
+
+        try:  
+            exp_id_index = next((index for (index, d) in enumerate(self.scalars) if d["long_name"] == "Experiment ID"), None)      
+            self.scalars.insert(0, self.scalars.pop(exp_id_index)) # raises TypeError exp_id_index == None
+        except TypeError:
+            self.log_debug('No scalar with long_name "Experiment ID" given.')
+
+        env = jinja2.Environment(loader=jinja2.PackageLoader('scriptengine-tasks-ecearth'))
         md_template = env.get_template('monitoring.md.j2')
         
-        with open(f"{self.dst}", 'w') as md_out:
-            md_out.write(md_template.render(
-                scalar_diagnostics = self.scalars,
-                nc_diagnostics = self.nc_plots,
-            ))
+        with cd(self.dst):
+            with open(f"./summary.md", 'w') as md_out:
+                md_out.write(md_template.render(
+                    scalar_diagnostics = self.scalars,
+                    nc_diagnostics = self.nc_plots,
+                ))
     
-    def plot_netCDF(self, path):
+    def plot_netCDF(self, path, dst_folder):
         try:
             cubes = iris.load(path)
+
+            # get file name without extension
+            base_name = os.path.splitext(os.path.basename(path))[0]
+
             if len(cubes) == 1:
-                plot_path = f"{path}.png" 
-                self.plot_cube(cubes[0], plot_path)
+                dst_file = f"./{base_name}.png" 
+                self.plot_cube(cubes[0], dst_folder, dst_file)
                 self.nc_plots.append({
-                    'plot': [plot_path],
+                    'plot': [dst_file],
                     'long_name': [cubes[0].long_name],
                     'title': cubes[0].metadata.attributes["title"],
                     'comment': cubes[0].metadata.attributes["comment"],
@@ -68,11 +80,11 @@ class MarkdownOutput(Task):
             else:
                 plot_list = []
                 ln_list = []
-                for count, cube in enumerate(cubes):
-                    plot_path = f"{path}-{count}.png"
+                for cube in cubes:
+                    dst_file = f"./{base_name}-{cube.var_name}.png"
                     long_name = cube.long_name
-                    self.plot_cube(cube, plot_path)
-                    plot_list.append(plot_path)
+                    self.plot_cube(cube, dst_folder, dst_file)
+                    plot_list.append(dst_file)
                     ln_list.append(long_name)
                 self.nc_plots.append({
                     'plot': plot_list,
@@ -83,10 +95,9 @@ class MarkdownOutput(Task):
         except IOError:
             self.log_warning(f"IOError, file not found: Ignoring {path}.")
     
-    def plot_cube(self, cube, dst):
-        qplt.plot(cube, '.-')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        plt.savefig(dst)
-        qplt.plt.close() 
-        self.log_debug(f"New plot created at {dst}.")
+    def plot_cube(self, cube, folder, file):
+        ts_plot(cube)
+        with cd(folder):
+            plt.savefig(file, bbox_inches="tight")
+        plt.close()
+        self.log_debug(f"New plot created at {folder}.")

@@ -1,9 +1,9 @@
 # EC-Earth 4: Monitoring
 
-{% for scalar in scalar_diagnostics -%}
-* {{ scalar["long_name"] }}: {{ scalar["data"] }}
+{% for scalar in scalar_diagnostics %}
+**{{ scalar["long_name"] }}**: {{ scalar["data"] }}<br>
 {%- if "comment" in scalar %}
-    * {{scalar["comment"]}} 
+{{scalar["comment"]}} 
 {% endif %}
 {% endfor %}
 
@@ -11,10 +11,6 @@
 ## {{diagnostic["title"].title()}}
 
 {% for plot in diagnostic["plot"] -%}
-
-{% if diagnostic["plot"]|length > 1 %}
-### {{diagnostic["long_name"][loop.index0]}}
-{% endif %}
 
 ![]({{plot}} "{{diagnostic["long_name"][loop.index0]}}")
 
