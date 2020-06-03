@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
+from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import cd
 from helpers.cube_plot import ts_plot
 
@@ -16,6 +17,7 @@ class MarkdownOutput(Task):
         required = [
             "src",
             "dst",
+            "template",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
     
@@ -29,6 +31,7 @@ class MarkdownOutput(Task):
         self.src = [j2render(input_file, context) 
                     for input_file in self.src]
         self.dst = j2render(self.dst, context)
+        template = j2render(self.template, context)
 
         self.scalars = []
         self.nc_plots = []
@@ -51,8 +54,17 @@ class MarkdownOutput(Task):
         except TypeError:
             self.log_debug('No scalar with long_name "Experiment ID" given.')
 
-        env = jinja2.Environment(loader=jinja2.PackageLoader('scriptengine-tasks-ecearth'))
-        md_template = env.get_template('monitoring.md.j2')
+        search_path = [ '.', 'templates' ]
+        if "_se_ocwd" in context:
+            search_path.extend([context["_se_ocwd"],
+                                os.path.join(context["_se_ocwd"], "templates")])
+        self.log_debug(f"Search path for template: {search_path}")
+
+        loader = jinja2.FileSystemLoader(search_path)
+        environment = jinja2.Environment(loader=loader)
+        for name, function in j2filters().items():
+            environment.filters[name] = function
+        md_template = environment.get_template(template)
         
         with cd(self.dst):
             with open(f"./summary.md", 'w') as md_out:
