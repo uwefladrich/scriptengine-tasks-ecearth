@@ -52,6 +52,8 @@ def ts_plot(ts_cube):
     ax.set_xticks(fmt_dates[::minor_step], minor=True)
     ax.set_xticklabels(fmt_dates[::major_step])
     
+    ax.ticklabel_format(axis='y', style='sci', scilimits=(-3,6), useOffset=False, useMathText=True)
+
     plt.tight_layout()
     plt.title(_title(ts_cube.long_name))
     plt.xlabel(_title(time_coord.name()))
