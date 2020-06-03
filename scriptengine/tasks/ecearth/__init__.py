@@ -5,6 +5,7 @@ from .monitoring.markdown_output import MarkdownOutput
 from .monitoring.global_average import GlobalAverage
 from .monitoring.disk_usage import DiskUsage
 from .monitoring.ice_volume import IceVolume
+from .monitoring.ice_area import SeaIceArea
 
 def task_loader_map():
     return {
@@ -15,4 +16,5 @@ def task_loader_map():
         'ece.mon.global_avg': GlobalAverage,
         'ece.mon.disk_usage': DiskUsage,
         'ece.mon.ice_volume': IceVolume,
+        'ece.mon.ice_area': SeaIceArea,
         }
