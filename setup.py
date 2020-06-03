@@ -14,7 +14,7 @@ def get_version(rel_path):
             return line.split(delim)[1]
 
 setuptools.setup(
-    name="ece-4-monitoring",
+    name="scriptengine-tasks-ecearth",
     version=get_version("scriptengine/tasks/monitoring/version.py"),
     author="Valentina Schueller",
     author_email="valentina.schueller@gmail.com",
