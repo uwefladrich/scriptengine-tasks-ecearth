@@ -1,6 +1,0 @@
-name: test-environment
-channels:
-  - conda-forge
-dependencies:
-  - iris>=2.2.0
-  - pip
