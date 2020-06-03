@@ -7,6 +7,7 @@ import os, glob, ast
 
 from netCDF4 import Dataset, num2date
 import numpy as np
+import cf_units
 
 from datetime import datetime
 
@@ -99,6 +100,9 @@ class IceVolume(Task):
 
             nc_file.close()
         
+        nh_sivolu_array = self.change_units(nh_sivolu_array)
+        sh_sivolu_array = self.change_units(sh_sivolu_array)
+
         output = self.get_output_file(dst)
         
         total_nh_volume = output.variables["total_nh_volume"]
@@ -165,12 +169,12 @@ class IceVolume(Task):
             sh_metadata = {
                 "long_name": self.long_name + " on Southern Hemisphere",
                 "standard_name": "sea_ice_volume",
-                "units": "m3",
+                "units": "km3",
             }
             nh_metadata = {
                 "long_name": self.long_name + " on Northern Hemisphere",
                 "standard_name": "sea_ice_volume",
-                "units": "m3",
+                "units": "km3",
             }
 
             file.setncatts(metadata)
@@ -205,4 +209,10 @@ class IceVolume(Task):
             if path[-5:-3] == month:
                 return path
         raise FileNotFoundError(f"Month {month} not found in {path_list}!")
+
+    def change_units(self, arr):
+        old_unit = cf_units.Unit('m3')
+        target_unit = cf_units.Unit('km3')
+        arr = old_unit.convert(arr, target_unit)
+        return arr
         

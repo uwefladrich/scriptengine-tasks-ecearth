@@ -23,13 +23,6 @@ def _title(name, units=None):
         title += " / {}".format(units)
     return title
 
-def custom_convert(cube):
-    if cube.units.name == 'meter^3':
-        target_unit = unit.Unit('km3')
-        cube.data = cube.units.convert(cube.data, target_unit)
-        cube.units = target_unit
-    return cube
-
 def ts_plot(ts_cube):
     """
     Plot a monitoring time series cube.
@@ -44,8 +37,6 @@ def ts_plot(ts_cube):
         fmt_dates = []
         for date in dates:
             fmt_dates.append(date.strftime("%Y-%m"))
-
-    ts_cube = custom_convert(ts_cube)
 
     fig, ax = plt.subplots()
     ax.plot(fmt_dates, ts_cube.data, marker='o')
