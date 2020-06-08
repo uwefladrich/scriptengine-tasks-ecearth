@@ -1,9 +1,11 @@
 """Processing Task that writes out the disk usage of a given folder."""
-from .write_scalar import WriteScalar
 import os
+
 from scriptengine.jinja import render as j2render
+from .write_scalar import WriteScalar
 
 class DiskUsage(WriteScalar):
+    """DiskUsage Processing Task"""
     def __init__(self, parameters):
         required = [
             "src",
@@ -13,12 +15,6 @@ class DiskUsage(WriteScalar):
         self.long_name = "Disk Usage in GB"
         self.comment = "Current size of output directory."
         self.type = "scalar"
-    
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}"
-            f"({self.src},{self.dst})"
-        )
 
     def run(self, context):
         src = j2render(self.src, context)
@@ -51,4 +47,3 @@ class DiskUsage(WriteScalar):
             return -1
 
         return total
-

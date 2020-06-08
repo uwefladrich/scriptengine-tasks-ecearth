@@ -25,12 +25,6 @@ class GlobalAverage(Task):
                         f"average over one leg.")
         self.type = "time series"
 
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}"
-            f"({self.src},{self.dst})"
-        )
-
     def run(self, context):
         src = j2render(self.src, context)
         dst = j2render(self.dst, context)
@@ -64,27 +58,15 @@ class GlobalAverage(Task):
             'time',
             iris.analysis.MEAN,
             weights=month_weights)
+        
+        ann_spatial_avg = helpers.set_metadata(
+            ann_spatial_avg,
+            title=f'{ann_spatial_avg.long_name} (Global Average Time Series)',
+            comment=self.comment,
+            diagnostic_type=self.type,
+            )
 
-        metadata = {
-            'title': f'{ann_spatial_avg.long_name} (Global Average Time Series)',
-            'comment': self.comment,
-            'type': self.type,
-            'source': 'EC-Earth 4',
-            'Conventions': 'CF-1.7',
-            }
-        metadata_to_discard = [
-            'description',
-            'interval_operation',
-            'interval_write',
-            'name',
-            'online_operation',
-            ]
-        for key, value in metadata.items():
-            ann_spatial_avg.attributes[key] = value
-        for key in metadata_to_discard:
-            ann_spatial_avg.attributes.pop(key, None)
-
-        self.save_cube(ann_spatial_avg, dst) 
+        self.save_cube(ann_spatial_avg, dst)
 
     def save_cube(self, new_cube, dst):
         """save global average cubes in netCDF file"""

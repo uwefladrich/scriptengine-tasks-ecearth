@@ -1,12 +1,13 @@
 """Processing Task that writes out the number of so far simulated years."""
-from .write_scalar import WriteScalar
-import os
-from scriptengine.jinja import render as j2render
-from dateutil.relativedelta import relativedelta
 
 import yaml # temporary until base class Task has getarg() function
+from dateutil.relativedelta import relativedelta
+
+from scriptengine.jinja import render as j2render
+from .write_scalar import WriteScalar
 
 class SimulatedYears(WriteScalar):
+    """SimulatedYears Processing Task"""
     def __init__(self, parameters):
         required = [
             "dst",
@@ -17,12 +18,6 @@ class SimulatedYears(WriteScalar):
         self.long_name = "Simulated Years"
         self.comment = "Current number of simulated years."
         self.type = "scalar"
-    
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}"
-            f"({self.dst},{self.start},{self.end})"
-        )
 
     def run(self, context):
         dst = j2render(self.dst, context)
@@ -37,7 +32,7 @@ class SimulatedYears(WriteScalar):
             end = yaml.full_load(rendered_end)
         except (yaml.parser.ParserError, yaml.constructor.ConstructorError):
             end = rendered_end
-        
+
         value = relativedelta(end, start).years
 
         self.save(
@@ -47,4 +42,3 @@ class SimulatedYears(WriteScalar):
             data=value,
             type=self.type,
         )
-

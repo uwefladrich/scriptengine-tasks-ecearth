@@ -64,3 +64,25 @@ def load_input_cube(src, varname):
     equalise_attributes(month_cubes) # 'timeStamp' and 'uuid' would cause ConcatenateError
     leg_cube = month_cubes.concatenate_cube()
     return leg_cube
+
+def set_metadata(cube, title=None, comment=None, diagnostic_type=None):
+    """Set metadata for diagnostic."""
+    metadata = {
+        'title': title,
+        'comment': comment,
+        'type': diagnostic_type,
+        'source': 'EC-Earth 4',
+        'Conventions': 'CF-1.7',
+        }
+    metadata_to_discard = [
+        'description',
+        'interval_operation',
+        'interval_write',
+        'name',
+        'online_operation',
+        ]
+    for key, value in metadata.items():
+        cube.attributes[key] = value
+    for key in metadata_to_discard:
+        cube.attributes.pop(key, None)
+    return cube

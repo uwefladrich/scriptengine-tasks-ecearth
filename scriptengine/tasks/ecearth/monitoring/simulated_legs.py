@@ -1,10 +1,13 @@
 """Processing Task that writes out the current leg number."""
-from .write_scalar import WriteScalar
-import yaml
+
 import os
+import yaml
+
 from scriptengine.jinja import render as j2render
+from .write_scalar import WriteScalar
 
 class SimulatedLegs(WriteScalar):
+    """SimulatedLegs Processing Task."""
     def __init__(self, parameters):
         required = [
             "src",
@@ -14,12 +17,6 @@ class SimulatedLegs(WriteScalar):
         self.long_name = "Simulated Legs"
         self.comment = "Current amount of folders in output directory."
         self.type = "scalar"
-    
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}"
-            f"({self.src},{self.dst})"
-        )
 
     def run(self, context):
         src = j2render(self.src, context)
@@ -47,10 +44,9 @@ class SimulatedLegs(WriteScalar):
             self.log_warning("Leg number not found!")
             leg_number = -1
         return leg_number
-    
+
     def count_leg_folders(self, src):
         """
         Get leg number by counting leg folders in rundir/output.
         """
         return len(next(os.walk(f"{src}/output"))[1])
-

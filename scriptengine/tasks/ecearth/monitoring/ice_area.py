@@ -25,12 +25,6 @@ class SeaIceArea(Task):
         self.type = "time series"
         self.long_name = "Global Sea Ice Area"
 
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}"
-            f"({self.src},{self.domain},{self.dst})"
-        )
-
     def run(self, context):
         """run function of SeaIceArea Processing Task"""
         src = j2render(self.src, context)
@@ -64,24 +58,12 @@ class SeaIceArea(Task):
         # Treat main cube properties before extracting hemispheres
         # Remove auxiliary time coordinate
         leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
-        metadata = {
-            'title': self.long_name.title(),
-            'comment': self.comment,
-            'type': self.type,
-            'source': 'EC-Earth 4',
-            'Conventions': 'CF-1.7',
-            }
-        metadata_to_discard = [
-            'description',
-            'interval_operation',
-            'interval_write',
-            'name',
-            'online_operation',
-            ]
-        for key, value in metadata.items():
-            leg_cube.attributes[key] = value
-        for key in metadata_to_discard:
-            leg_cube.attributes.pop(key, None)
+        leg_cube = helpers.set_metadata(
+            leg_cube,
+            title=self.long_name.title(),
+            comment=self.comment,
+            diagnostic_type=self.type,
+        )
         leg_cube.standard_name = "sea_ice_area"
         leg_cube.units = cf_units.Unit('m2')
         leg_cube.convert_units('1e6 km2')
