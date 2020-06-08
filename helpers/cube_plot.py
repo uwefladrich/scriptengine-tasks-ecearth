@@ -27,7 +27,7 @@ def ts_plot(ts_cube):
     """
     Plot a monitoring time series cube.
     """
-    time_coord = ts_cube.dim_coords[0]
+    time_coord = ts_cube.coord('time')
     dates = cftime.num2pydate(time_coord.points, "seconds since 1900-01-01 00:00")
 
     fmt_dates = []

@@ -20,18 +20,9 @@ class SimulatedYears(WriteScalar):
         self.type = "scalar"
 
     def run(self, context):
-        dst = j2render(self.dst, context)
-        rendered_start = j2render(self.start, context)
-        rendered_end = j2render(self.end, context)
-
-        try:
-            start = yaml.full_load(rendered_start)
-        except (yaml.parser.ParserError, yaml.constructor.ConstructorError):
-            start = rendered_start
-        try:
-            end = yaml.full_load(rendered_end)
-        except (yaml.parser.ParserError, yaml.constructor.ConstructorError):
-            end = rendered_end
+        dst = self.getarg('dst', context)
+        start = self.getarg('start', context)
+        end = self.getarg('end', context)
 
         value = relativedelta(end, start).years
 

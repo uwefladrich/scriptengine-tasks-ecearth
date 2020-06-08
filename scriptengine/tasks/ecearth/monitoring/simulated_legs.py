@@ -19,8 +19,8 @@ class SimulatedLegs(WriteScalar):
         self.type = "scalar"
 
     def run(self, context):
-        src = j2render(self.src, context)
-        dst = j2render(self.dst, context)
+        src = self.getarg('src', context)
+        dst = self.getarg('dst', context)
 
         value = self.count_leg_folders(src)
 

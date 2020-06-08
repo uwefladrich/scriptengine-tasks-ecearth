@@ -27,13 +27,13 @@ class SeaIceVolume(Task):
 
     def run(self, context):
         """run function of SeaIceVolume Processing Task"""
-        src = j2render(self.src, context)
-        dst = j2render(self.dst, context)
-        domain = j2render(self.domain, context)
-        try:
-            src = ast.literal_eval(src)
-        except ValueError:
-            src = ast.literal_eval(f'"{src}"')
+        src = self.getarg('src', context)
+        dst = self.getarg('dst', context)
+        domain = self.getarg('domain', context)
+        #try:
+        #    src = ast.literal_eval(src)
+        #except ValueError:
+        #    src = ast.literal_eval(f'"{src}"')
 
         if not dst.endswith(".nc"):
             self.log_warning((

@@ -17,9 +17,9 @@ class WriteScalar(Task):
         self.type = "scalar"
 
     def run(self, context):
-        long_name = j2render(self.long_name, context)
-        value = j2render(self.value, context)
-        dst = j2render(self.dst, context)
+        long_name = self.getarg('long_name', context)
+        value = self.getarg('value', context)
+        dst = self.getarg('dst', context)
 
         self.save(dst, long_name=long_name, data=value, type=self.type)
 

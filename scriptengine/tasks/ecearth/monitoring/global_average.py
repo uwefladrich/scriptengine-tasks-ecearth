@@ -26,14 +26,14 @@ class GlobalAverage(Task):
         self.type = "time series"
 
     def run(self, context):
-        src = j2render(self.src, context)
-        dst = j2render(self.dst, context)
-        domain = j2render(self.domain, context)
-        varname = j2render(self.varname, context)
-        try:
-            src = ast.literal_eval(src)
-        except ValueError:
-            src = ast.literal_eval(f'"{src}"')
+        src = self.getarg('src', context)
+        dst = self.getarg('dst', context)
+        domain = self.getarg('domain', context)
+        varname = self.getarg('varname', context)
+        #try:
+        #    src = ast.literal_eval(src)
+        #except ValueError:
+        #    src = ast.literal_eval(f'"{src}"')
 
         if not dst.endswith(".nc"):
             self.log_warning((
@@ -58,6 +58,8 @@ class GlobalAverage(Task):
             'time',
             iris.analysis.MEAN,
             weights=month_weights)
+        # Promote time from scalar to dimension coordinate
+        ann_spatial_avg = iris.util.new_axis(ann_spatial_avg, 'time')
         
         ann_spatial_avg = helpers.set_metadata(
             ann_spatial_avg,
@@ -78,7 +80,7 @@ class GlobalAverage(Task):
                 self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
             else:
                 cube_list = iris.cube.CubeList([current_cube, new_cube])
-                merged_cube = cube_list.merge_cube()
+                merged_cube = cube_list.concatenate_cube()
                 iris.save(merged_cube, f"{dst}-copy.nc")
                 os.remove(dst)
                 os.rename(f"{dst}-copy.nc", dst)

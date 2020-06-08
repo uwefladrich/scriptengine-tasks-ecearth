@@ -23,9 +23,9 @@ class MarkdownOutput(Task):
         super().__init__(__name__, parameters, required_parameters=required)
 
     def run(self, context):
-        src = [j2render(input_file, context) for input_file in self.src]
-        dst = j2render(self.dst, context)
-        template = j2render(self.template, context)
+        src = self.getarg('src', context)
+        dst = self.getarg('dst', context)
+        template = self.getarg('template', context)
 
         scalars = []
         nc_plots = []

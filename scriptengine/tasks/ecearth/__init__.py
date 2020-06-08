@@ -22,6 +22,6 @@ def task_loader_map():
         'ece.mon.markdown_report': MarkdownOutput,
         'ece.mon.global_avg': GlobalAverage,
         'ece.mon.disk_usage': DiskUsage,
-        'ece.mon.ice_volume': SeaIceArea,
+        'ece.mon.ice_volume': SeaIceVolume,
         'ece.mon.ice_area': SeaIceArea,
         }

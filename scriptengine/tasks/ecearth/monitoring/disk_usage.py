@@ -17,8 +17,8 @@ class DiskUsage(WriteScalar):
         self.type = "scalar"
 
     def run(self, context):
-        src = j2render(self.src, context)
-        dst = j2render(self.dst, context)
+        src = self.getarg('src', context)
+        dst = self.getarg('dst', context)
 
         value = round(self.get_directory_size(src) * 1e-9, 1)
 
