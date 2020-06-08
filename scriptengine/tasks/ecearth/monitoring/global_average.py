@@ -8,7 +8,7 @@ import iris
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
-from helpers.file_handling import compute_spatial_weights, compute_month_weights, load_input_cube
+import helpers.file_handling as helpers
 
 class GlobalAverage(Task):
     """GlobalAverage Processing Task"""
@@ -48,16 +48,16 @@ class GlobalAverage(Task):
             ))
             return
 
-        leg_cube = load_input_cube(src, varname)
+        leg_cube = helpers.load_input_cube(src, varname)
         leg_cube.data = np.ma.masked_equal(leg_cube.data, 0) # mask land cells
 
-        cell_weights = compute_spatial_weights(domain, leg_cube.shape)
+        cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape)
         spatial_avg = leg_cube.collapsed(
             ['latitude', 'longitude'],
             iris.analysis.MEAN,
             weights=cell_weights,
             )
-        month_weights = compute_month_weights(spatial_avg)
+        month_weights = helpers.compute_month_weights(spatial_avg)
         # Remove auxiliary time coordinate before collapsing cube
         spatial_avg.remove_coord(spatial_avg.coord('time', dim_coords=False))
         ann_spatial_avg = spatial_avg.collapsed(
