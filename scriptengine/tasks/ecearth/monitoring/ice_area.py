@@ -1,7 +1,7 @@
 """Processing Task that calculates the global sea ice area in one leg."""
 
 import os
-import ast
+import warnings
 
 import iris
 import numpy as np
@@ -73,16 +73,23 @@ class SeaIceArea(Task):
         nh_cube.data = np.ma.masked_where(latitudes < 0, leg_cube.data)
         sh_cube.data = np.ma.masked_where(latitudes > 0, leg_cube.data)
 
-        nh_weighted_sum = nh_cube.collapsed(
-            ['latitude', 'longitude'],
-            iris.analysis.SUM,
-            weights=cell_weights,
-            )
-        sh_weighted_sum = sh_cube.collapsed(
-            ['latitude', 'longitude'],
-            iris.analysis.SUM,
-            weights=cell_weights,
-            )
+        with warnings.catch_warnings():
+            # Suppress warning about insufficient metadata.
+            warnings.filterwarnings(
+                'ignore',
+                "Collapsing a multi-dimensional coordinate.", 
+                UserWarning,
+                )
+            nh_weighted_sum = nh_cube.collapsed(
+                ['latitude', 'longitude'],
+                iris.analysis.SUM,
+                weights=cell_weights,
+                )
+            sh_weighted_sum = sh_cube.collapsed(
+                ['latitude', 'longitude'],
+                iris.analysis.SUM,
+                weights=cell_weights,
+                )
         nh_weighted_sum.long_name = self.long_name + " on Northern Hemisphere"
         sh_weighted_sum.long_name = self.long_name + " on Southern Hemisphere"
         nh_weighted_sum.var_name = 'siarean'

@@ -1,7 +1,7 @@
 """Processing Task that calculates the global yearly average of a given extensive quantity."""
 
 import os
-import ast
+import warnings
 
 import numpy as np
 import iris
@@ -30,10 +30,6 @@ class GlobalAverage(Task):
         dst = self.getarg('dst', context)
         domain = self.getarg('domain', context)
         varname = self.getarg('varname', context)
-        #try:
-        #    src = ast.literal_eval(src)
-        #except ValueError:
-        #    src = ast.literal_eval(f'"{src}"')
 
         if not dst.endswith(".nc"):
             self.log_warning((
@@ -46,11 +42,18 @@ class GlobalAverage(Task):
         leg_cube.data = np.ma.masked_equal(leg_cube.data, 0) # mask land cells
 
         cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape)
-        spatial_avg = leg_cube.collapsed(
-            ['latitude', 'longitude'],
-            iris.analysis.MEAN,
-            weights=cell_weights,
-            )
+        with warnings.catch_warnings():
+            # Suppress warning about insufficient metadata.
+            warnings.filterwarnings(
+                'ignore',
+                "Collapsing a multi-dimensional coordinate.", 
+                UserWarning,
+                )
+            spatial_avg = leg_cube.collapsed(
+                ['latitude', 'longitude'],
+                iris.analysis.MEAN,
+                weights=cell_weights,
+                )
         month_weights = helpers.compute_month_weights(spatial_avg)
         # Remove auxiliary time coordinate before collapsing cube
         spatial_avg.remove_coord(spatial_avg.coord('time', dim_coords=False))

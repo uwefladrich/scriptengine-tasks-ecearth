@@ -1,6 +1,7 @@
 """Helper module for handling files."""
 
 import os
+import warnings
 import yaml
 import numpy as np
 import iris
@@ -60,7 +61,14 @@ def compute_month_weights(monthly_data_cube):
 
 def load_input_cube(src, varname):
     """Load input files into one cube."""
-    month_cubes = iris.load(src, varname)
+    with warnings.catch_warnings():
+        # Suppress psu warning
+        warnings.filterwarnings(
+            action='ignore', 
+            message="Ignoring netCDF variable", 
+            category=UserWarning,
+            )
+        month_cubes = iris.load(src, varname)
     equalise_attributes(month_cubes) # 'timeStamp' and 'uuid' would cause ConcatenateError
     leg_cube = month_cubes.concatenate_cube()
     return leg_cube
