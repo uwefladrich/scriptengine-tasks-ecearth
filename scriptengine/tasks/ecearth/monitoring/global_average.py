@@ -65,7 +65,7 @@ class GlobalAverage(Task):
 
         time_aux = spatial_avg.coord('time', dim_coords=False)
         spatial_avg.remove_coord(time_aux)
-        spatial_avg.coord('time', dim_coords=True)
+        time_dim = spatial_avg.coord('time', dim_coords=True)
         month_lengths = np.array([bound[1] - bound[0] for bound in time_dim.bounds])
 
         ann_spatial_avg = spatial_avg.collapsed('time', iris.analysis.MEAN, weights=month_lengths)
@@ -93,6 +93,7 @@ class GlobalAverage(Task):
 
 
     def save_cube(self, ann_spatial_avg, dst):
+        """save global average cubes in netCDF file"""
         try:
             old_diagnostic = iris.load_cube(dst)
             old_bounds = old_diagnostic.coord('time').bounds
