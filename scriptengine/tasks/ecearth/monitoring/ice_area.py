@@ -4,13 +4,12 @@ import os
 import ast
 
 import iris
-from iris.experimental.equalise_cubes import equalise_attributes
 import numpy as np
 import cf_units
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
-from helpers.file_handling import get_month_from_src
+import helpers.file_handling as helpers
 
 class SeaIceArea(Task):
     """SeaIceArea Processing Task"""
@@ -51,26 +50,20 @@ class SeaIceArea(Task):
 
         # Get March and September files from src
         try:
-            mar = get_month_from_src("03", src)
-            sep = get_month_from_src("09", src)
+            mar = helpers.get_month_from_src("03", src)
+            sep = helpers.get_month_from_src("09", src)
         except FileNotFoundError as error:
             self.log_warning((f"FileNotFoundError: {error}."
                               f"Diagnostic can not be created, returning now."))
             return
 
-        month_cubes = iris.load([mar, sep], 'siconc')
-        equalise_attributes(month_cubes) # 'timeStamp' and 'uuid' would cause ConcatenateError
-        leg_cube = month_cubes.concatenate_cube()
+        leg_cube = helpers.load_input_cube([mar, sep], 'siconc')
         latitudes = np.broadcast_to(leg_cube.coord('latitude').points, leg_cube.shape)
-
-        # Calculate cell areas
-        domain_cfg = iris.load(domain)
-        cell_areas = domain_cfg.extract('e1t')[0][0] * domain_cfg.extract('e2t')[0][0]
-        cell_weights = np.broadcast_to(cell_areas.data, leg_cube.shape)
+        cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape)
 
         # Treat main cube properties before extracting hemispheres
-        time_aux = leg_cube.coord('time', dim_coords=False)
-        leg_cube.remove_coord(time_aux)
+        # Remove auxiliary time coordinate
+        leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
         metadata = {
             'title': self.long_name.title(),
             'comment': self.comment,
@@ -104,7 +97,7 @@ class SeaIceArea(Task):
             weights=cell_weights,
             )
         sh_weighted_sum = sh_cube.collapsed(
-            ['latitude', 'longitude'], 
+            ['latitude', 'longitude'],
             iris.analysis.SUM,
             weights=cell_weights,
             )
@@ -114,7 +107,7 @@ class SeaIceArea(Task):
         sh_weighted_sum.var_name = 'siareas'
 
         self.save_cubes(nh_weighted_sum, sh_weighted_sum, dst)
-    
+
     def save_cubes(self, new_siarean, new_siareas, dst):
         """save sea ice area cubes in netCDF file"""
         try:

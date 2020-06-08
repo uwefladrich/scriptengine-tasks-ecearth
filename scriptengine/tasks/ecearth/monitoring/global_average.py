@@ -5,10 +5,10 @@ import ast
 
 import numpy as np
 import iris
-from iris.experimental.equalise_cubes import equalise_attributes
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
+from helpers.file_handling import compute_spatial_weights, compute_month_weights, load_input_cube
 
 class GlobalAverage(Task):
     """GlobalAverage Processing Task"""
@@ -48,27 +48,22 @@ class GlobalAverage(Task):
             ))
             return
 
-        # Calculate cell areas
-        domain_cfg = iris.load(domain)
-        cell_areas = domain_cfg.extract('e1t')[0][0] * domain_cfg.extract('e2t')[0][0]
+        leg_cube = load_input_cube(src, varname)
+        leg_cube.data = np.ma.masked_equal(leg_cube.data, 0) # mask land cells
 
-        month_cubes = iris.load(src, varname)
-        equalise_attributes(month_cubes) # 'timeStamp' and 'uuid' would cause ConcatenateError
-        leg_cube = month_cubes.concatenate_cube()
-        leg_cube.data = np.ma.masked_equal(leg_cube.data, 0) # land cells are not masked
-        cell_weights = np.broadcast_to(cell_areas.data, leg_cube.shape)
+        cell_weights = compute_spatial_weights(domain, leg_cube.shape)
         spatial_avg = leg_cube.collapsed(
             ['latitude', 'longitude'],
             iris.analysis.MEAN,
             weights=cell_weights,
             )
-
-        time_aux = spatial_avg.coord('time', dim_coords=False)
-        spatial_avg.remove_coord(time_aux)
-        time_dim = spatial_avg.coord('time', dim_coords=True)
-        month_lengths = np.array([bound[1] - bound[0] for bound in time_dim.bounds])
-
-        ann_spatial_avg = spatial_avg.collapsed('time', iris.analysis.MEAN, weights=month_lengths)
+        month_weights = compute_month_weights(spatial_avg)
+        # Remove auxiliary time coordinate before collapsing cube
+        spatial_avg.remove_coord(spatial_avg.coord('time', dim_coords=False))
+        ann_spatial_avg = spatial_avg.collapsed(
+            'time',
+            iris.analysis.MEAN,
+            weights=month_weights)
 
         metadata = {
             'title': f'{ann_spatial_avg.long_name} (Global Average Time Series)',
@@ -89,25 +84,23 @@ class GlobalAverage(Task):
         for key in metadata_to_discard:
             ann_spatial_avg.attributes.pop(key, None)
 
-        self.save_cube(ann_spatial_avg, dst)
+        self.save_cube(ann_spatial_avg, dst) 
 
-
-    def save_cube(self, ann_spatial_avg, dst):
+    def save_cube(self, new_cube, dst):
         """save global average cubes in netCDF file"""
         try:
-            old_diagnostic = iris.load_cube(dst)
-            old_bounds = old_diagnostic.coord('time').bounds
-            new_bounds = ann_spatial_avg.coord('time').bounds
-            if old_bounds[-1][-1] > new_bounds[0][0]:
+            current_cube = iris.load_cube(dst)
+            current_bounds = current_cube.coord('time').bounds
+            new_bounds = new_cube.coord('time').bounds
+            if current_bounds[-1][-1] > new_bounds[0][0]:
                 self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
             else:
-                cubes = iris.cube.CubeList([old_diagnostic, ann_spatial_avg])
-                diagnostic = cubes.merge_cube()
-                iris.save(diagnostic, f"{dst}-copy.nc")
+                cube_list = iris.cube.CubeList([current_cube, new_cube])
+                merged_cube = cube_list.merge_cube()
+                iris.save(merged_cube, f"{dst}-copy.nc")
                 os.remove(dst)
                 os.rename(f"{dst}-copy.nc", dst)
         except OSError: # file does not exist yet.
-            diagnostic = ann_spatial_avg
-            iris.save(diagnostic, dst)
+            iris.save(new_cube, dst)
             return
         
