@@ -1,5 +1,5 @@
-# EC-Earth 4 Monitoring
+# ScriptEngine Tasks for EC-Earth
 
-This package contains [ScriptEngine](https://github.com/uwefladrich/scriptengine) tasks for the EC-Earth climate model. With the contained tasks, EC-Earth diagnostics can be created and visualized during runtime.
+Provides [ScriptEngine](https://github.com/uwefladrich/scriptengine) tasks useful for the EC-Earth climate model.
 
 This package is currently being developed. The documentation can be found in the `docs` folder and will be continuously updated.

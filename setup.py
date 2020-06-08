@@ -1,5 +1,4 @@
-"""setup.py for package ece-4-monitoring."""
-
+"""setup.py for package scriptengine-tasks-ecearth."""
 import os
 import codecs
 import setuptools
@@ -24,12 +23,12 @@ def get_version(rel_path):
 setuptools.setup(
     name="scriptengine-tasks-ecearth",
     version=get_version("scriptengine/tasks/ecearth/version.py"),
-    author="Valentina Schueller",
-    author_email="valentina.schueller@gmail.com",
-    description="ScriptEngine tasks for monitoring the EC-Earth climate model",
+    author="Uwe Fladrich, Valentina Schueller",
+    author_email="uwe.fladrich@protonmail.com, valentina.schueller@gmail.com",
+    description="ScriptEngine tasks for use with the EC-Earth climate model",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
-    url="https://github.com/valentinaschueller/ece-4-monitoring",
+    url="https://github.com/uwefladrich/scriptengine-tasks-ecearth",
     packages=[
         "helpers",
         "scriptengine.tasks.ecearth",
