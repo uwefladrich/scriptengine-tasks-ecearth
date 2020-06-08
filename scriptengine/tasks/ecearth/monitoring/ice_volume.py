@@ -1,18 +1,18 @@
-"""Processing Task that calculates the global ice volume in one leg."""
+"""Processing Task that calculates the global sea ice volume in one leg."""
 
-from scriptengine.tasks.base import Task
-from scriptengine.jinja import render as j2render
+import os
+import ast
 
-import os, glob, ast
-
-from netCDF4 import Dataset, num2date
+import iris
 import numpy as np
 import cf_units
 
-from datetime import datetime
+from scriptengine.tasks.base import Task
+from scriptengine.jinja import render as j2render
+import helpers.file_handling as helpers
 
-
-class IceVolume(Task):
+class SeaIceVolume(Task):
+    """SeaIceVolume Processing Task"""
     def __init__(self, parameters):
         required = [
             "src",
@@ -24,7 +24,7 @@ class IceVolume(Task):
                         f"separated into Northern and Southern Hemisphere. ")
         self.type = "time series"
         self.long_name = "Global Sea Ice Volume"
-    
+
     def __repr__(self):
         return (
             f"{self.__class__.__name__}"
@@ -32,6 +32,7 @@ class IceVolume(Task):
         )
 
     def run(self, context):
+        """run function of SeaIceVolume Processing Task"""
         src = j2render(self.src, context)
         dst = j2render(self.dst, context)
         domain = j2render(self.domain, context)
@@ -47,172 +48,85 @@ class IceVolume(Task):
             ))
             return
 
-        self.log_info(f"Found {len(src)} files.")
-
         # Get March and September files from src
         try:
-            mar = self.get_month_from_src("03", src)
-            sep = self.get_month_from_src("09", src)
-        except FileNotFoundError as e:
-            self.log_warning((f"FileNotFoundError: {e}."
+            mar = helpers.get_month_from_src("03", src)
+            sep = helpers.get_month_from_src("09", src)
+        except FileNotFoundError as error:
+            self.log_warning((f"FileNotFoundError: {error}."
                               f"Diagnostic can not be created, returning now."))
             return
 
-        # Calculate cell areas
+        leg_cube = helpers.load_input_cube([mar, sep], 'sivolu')
+        latitudes = np.broadcast_to(leg_cube.coord('latitude').points, leg_cube.shape)
+        cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape)
+
+        # Treat main cube properties before extracting hemispheres
+        # Remove auxiliary time coordinate
+        leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
+        metadata = {
+            'title': self.long_name.title(),
+            'comment': self.comment,
+            'type': self.type,
+            'source': 'EC-Earth 4',
+            'Conventions': 'CF-1.7',
+            }
+        metadata_to_discard = [
+            'description',
+            'interval_operation',
+            'interval_write',
+            'name',
+            'online_operation',
+            ]
+        for key, value in metadata.items():
+            leg_cube.attributes[key] = value
+        for key in metadata_to_discard:
+            leg_cube.attributes.pop(key, None)
+        leg_cube.standard_name = "sea_ice_volume"
+        leg_cube.units = cf_units.Unit('m3')
+        leg_cube.convert_units('1e3 km3')
+
+        nh_cube = leg_cube.copy()
+        sh_cube = leg_cube.copy()
+        nh_cube.data = np.ma.masked_where(latitudes < 0, leg_cube.data)
+        sh_cube.data = np.ma.masked_where(latitudes > 0, leg_cube.data)
+
+        nh_weighted_sum = nh_cube.collapsed(
+            ['latitude', 'longitude'],
+            iris.analysis.SUM,
+            weights=cell_weights,
+            )
+        sh_weighted_sum = sh_cube.collapsed(
+            ['latitude', 'longitude'],
+            iris.analysis.SUM,
+            weights=cell_weights,
+            )
+        nh_weighted_sum.long_name = self.long_name + " on Northern Hemisphere"
+        sh_weighted_sum.long_name = self.long_name + " on Southern Hemisphere"
+        nh_weighted_sum.var_name = 'sivoln'
+        sh_weighted_sum.var_name = 'sivols'
+
+        self.save_cubes(nh_weighted_sum, sh_weighted_sum, dst)
+
+    def save_cubes(self, new_sivoln, new_sivols, dst):
+        """save sea ice volume cubes in netCDF file"""
         try:
-            domain_file = Dataset(domain,'r')
-            cell_lengths = domain_file.variables["e1t"]
-            cell_widths = domain_file.variables["e2t"]
-        except (FileNotFoundError, KeyError) as e:
-            self.log_warning((f"Problem with domain file, aborting."
-                              f"Exception: {e}"))
-            return   
-        cell_areas = np.multiply(cell_lengths[:], cell_widths[:])
-
-        # Initialization for the loop
-        nh_sivolu_array = np.array([])
-        sh_sivolu_array = np.array([])
-        time_counter = []
-        time_counter_bounds = []
-
-        for month in [mar, sep]:
-            self.log_debug(f"Getting 'sivolu' from {month}")
-            nc_file = Dataset(month, 'r')
-
-            volume_per_area = nc_file.variables["sivolu"][:]
-            volume = np.multiply(volume_per_area, cell_areas)
-
-            lat_amount = volume.shape[1] # nav_lat is second coordinate of sivolu variable
-            lats = np.linspace(-90,90,lat_amount)
-            nh_volume = volume[:, lats>0, :]
-            sh_volume = volume[:, lats<=0, :]
-            nh_sum = np.ma.sum(nh_volume)
-            sh_sum = np.ma.sum(sh_volume)
-
-            nh_sivolu_array = np.append(nh_sivolu_array, nh_sum)
-            sh_sivolu_array = np.append(sh_sivolu_array, sh_sum)    
-
-            value = nc_file.variables["time_counter"][:]
-            bounds = nc_file.variables["time_counter_bounds"][:]
-
-            time_counter_bounds.append(bounds)
-            time_counter.append(value)
-
-            nc_file.close()
-        
-        nh_sivolu_array = self.change_units(nh_sivolu_array)
-        sh_sivolu_array = self.change_units(sh_sivolu_array)
-
-        output = self.get_output_file(dst)
-        
-        total_nh_volume = output.variables["total_nh_volume"]
-        total_sh_volume = output.variables["total_sh_volume"]
-        tc = output.variables["time_counter"]
-        tcb = output.variables["time_counter_bounds"]
-
-        
-        if self.monotonic_insert(tcb, time_counter_bounds[0]):
-            tc[:] = np.append(tc[:],time_counter)
-            total_nh_volume[-2] = nh_sivolu_array[0]
-            total_nh_volume[-1] = nh_sivolu_array[1]
-            total_sh_volume[-2] = sh_sivolu_array[0]
-            total_sh_volume[-1] = sh_sivolu_array[1]
-            tcb[-2] = time_counter_bounds[0]
-            tcb[-1] = time_counter_bounds[1]
-        else:
-            self.log_warning(
-                (f"Inserting time step would lead to "
-                 f"non-monotonic time axis. "
-                 f"Discarding current time step.")               
-            )            
-        
-        output.close()
-
-
-    def get_output_file(self, dst):            
-        try:
-            file = Dataset(dst,'r+')
-            file.set_auto_mask(False)
-            return file
-        except FileNotFoundError:
-            file = Dataset(dst,'w')
-            file.set_auto_mask(False)
-            self.log_info("File was newly created. Setting up metadata.")
-                       
-            file.createDimension('time_counter', size=None)
-            file.createDimension('axis_nbounds', size=2)
-            tc = file.createVariable('time_counter', 'd', ('time_counter',))
-            tcb = file.createVariable('time_counter_bounds', 'd', ('time_counter','axis_nbounds',))
-            total_nh_volume = file.createVariable(f'total_nh_volume', 'f', ('time_counter',))
-            total_sh_volume = file.createVariable(f'total_sh_volume', 'f', ('time_counter',))
-
-            dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            metadata = {
-                'title': f'{self.long_name.title()}',
-                'source': 'EC-Earth 4',
-                'history': dt_string + ': Creation',
-                'comment': self.comment,
-                'type': self.type,
-                'Conventions': 'CF-1.7',
-            }
-            tc_meta = { 
-                'units': 'seconds since 1900-01-01 00:00:00',
-                'standard_name': 'time',
-                'long_name': 'time axis',
-                'calendar': 'gregorian',
-                'bounds': 'time_counter_bounds',
-            }
-            tcb_meta = {
-                'long_name': 'bounds for time axis',
-            }
-            # access metadata of variable
-            sh_metadata = {
-                "long_name": self.long_name + " on Southern Hemisphere",
-                "standard_name": "sea_ice_volume",
-                "units": "km3",
-            }
-            nh_metadata = {
-                "long_name": self.long_name + " on Northern Hemisphere",
-                "standard_name": "sea_ice_volume",
-                "units": "km3",
-            }
-
-            file.setncatts(metadata)
-            tc.setncatts(tc_meta)
-            tcb.setncatts(tcb_meta)
-            total_nh_volume.setncatts(nh_metadata)
-            total_sh_volume.setncatts(sh_metadata)
-            return file
-    
-    def update_bounds(self, left_bound, right_bound, new_bounds):
-        new_bounds_left = new_bounds.data[0][0] 
-        new_bounds_right = new_bounds.data[0][1]
-        if new_bounds_left < left_bound:
-            self.log_debug(f"Updating left time bound to {new_bounds_left}")
-            left_bound = new_bounds_left
-        if new_bounds_right > right_bound:
-            self.log_debug(f"Updating right time bound to {new_bounds_right}")
-            right_bound = new_bounds_right
-        return left_bound, right_bound
-
-    def monotonic_insert(self, old_bounds, new_bounds):
-        try:
-            if old_bounds[-1][-1] > new_bounds[0][0]:
-                return False
+            current_sivoln = iris.load_cube(dst, 'sivoln')
+            current_sivols = iris.load_cube(dst, 'sivols')
+            current_bounds = current_sivoln.coord('time').bounds
+            new_bounds = new_sivoln.coord('time').bounds
+            if current_bounds[-1][-1] > new_bounds[0][0]:
+                self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
             else:
-                return True
-        except IndexError:
-            return True
-    
-    def get_month_from_src(self, month, path_list):
-        for path in path_list:
-            if path[-5:-3] == month:
-                return path
-        raise FileNotFoundError(f"Month {month} not found in {path_list}!")
-
-    def change_units(self, arr):
-        old_unit = cf_units.Unit('m3')
-        target_unit = cf_units.Unit('km3')
-        arr = old_unit.convert(arr, target_unit)
-        return arr
+                sivoln_list = iris.cube.CubeList([current_sivoln, new_sivoln])
+                sivols_list = iris.cube.CubeList([current_sivols, new_sivols])
+                sivoln = sivoln_list.concatenate_cube()
+                sivols = sivols_list.concatenate_cube()
+                sivol_global = iris.cube.CubeList([sivoln, sivols])
+                iris.save(sivol_global, f"{dst}-copy.nc")
+                os.remove(dst)
+                os.rename(f"{dst}-copy.nc", dst)
+        except OSError: # file does not exist yet.
+            sivol_global = iris.cube.CubeList([new_sivoln, new_sivols])
+            iris.save(sivol_global, dst)
         

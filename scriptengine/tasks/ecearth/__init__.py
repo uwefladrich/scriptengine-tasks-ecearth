@@ -9,7 +9,7 @@ from .monitoring.write_scalar import WriteScalar
 from .monitoring.markdown_output import MarkdownOutput
 from .monitoring.global_average import GlobalAverage
 from .monitoring.disk_usage import DiskUsage
-from .monitoring.ice_volume import IceVolume
+from .monitoring.ice_volume import SeaIceVolume
 from .monitoring.ice_area import SeaIceArea
 from .slurm import Sbatch
 
@@ -22,6 +22,6 @@ def task_loader_map():
         'ece.mon.markdown_report': MarkdownOutput,
         'ece.mon.global_avg': GlobalAverage,
         'ece.mon.disk_usage': DiskUsage,
-        'ece.mon.ice_volume': IceVolume,
+        'ece.mon.ice_volume': SeaIceArea,
         'ece.mon.ice_area': SeaIceArea,
         }
