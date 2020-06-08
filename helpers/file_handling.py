@@ -32,3 +32,12 @@ def convert_to_yaml(diagnostic, destination):
     
     with open(f"{filename(mon_id, destination)}.yml", 'w') as outfile:
         yaml.dump(diagnostic, outfile, sort_keys=False)
+
+def get_month_from_src(month, path_list):
+    """
+    function to get path for desired month from path_list
+    """
+    for path in path_list:
+        if path[-5:-3] == month:
+            return path
+    raise FileNotFoundError(f"Month {month} not found in {path_list}!")
