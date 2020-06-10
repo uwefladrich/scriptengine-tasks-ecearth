@@ -10,7 +10,8 @@ from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
 from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import cd
-from helpers.cube_plot import ts_plot
+from helpers.cube_plot import time_series_plot, static_map_plot, dynamic_map_plot
+import helpers.exceptions as exceptions
 
 class MarkdownOutput(Task):
     """MarkdownOutput Presentation Task"""
@@ -73,41 +74,70 @@ class MarkdownOutput(Task):
     def plot_netcdf(self, nc_plots, path, dst_folder):
         try:
             cubes = iris.load(path)
-
-            # get file name without extension
-            base_name = os.path.splitext(os.path.basename(path))[0]
-
-            if len(cubes) == 1:
-                dst_file = f"./{base_name}.png"
-                self.plot_cube(cubes[0], dst_folder, dst_file)
-                nc_plots.append({
-                    'plot': [dst_file],
-                    'long_name': [cubes[0].long_name],
-                    'title': cubes[0].metadata.attributes["title"],
-                    'comment': cubes[0].metadata.attributes["comment"],
-                })
-            else:
-                plot_list = []
-                ln_list = []
-                for cube in cubes:
-                    dst_file = f"./{base_name}-{cube.var_name}.png"
-                    long_name = cube.long_name
-                    self.plot_cube(cube, dst_folder, dst_file)
-                    plot_list.append(dst_file)
-                    ln_list.append(long_name)
-                nc_plots.append({
-                    'plot': plot_list,
-                    'long_name': ln_list,
-                    'title': cubes[0].metadata.attributes["title"],
-                    'comment': cubes[0].metadata.attributes["comment"],
-                })
         except IOError:
             self.log_warning(f"IOError, file not found: Ignoring {path}.")
+            return nc_plots
+        
+        if cubes[0].attributes['type'] == 'time series':
+            new_plots = self.plot_time_series(cubes, path, dst_folder)
+        elif cubes[0].attributes['type'] == 'map':
+            new_plots = self.plot_map(cubes, path, dst_folder)
+        
+        nc_plots.append(new_plots)
         return nc_plots
 
-    def plot_cube(self, cube, folder, file):
-        ts_plot(cube)
-        with cd(folder):
-            plt.savefig(file, bbox_inches="tight")
-        plt.close()
-        self.log_debug(f"New plot created at {folder}.")
+    def plot_time_series(self, cube_list, path, dst_folder):
+        # get file name without extension
+        base_name = os.path.splitext(os.path.basename(path))[0]
+        if len(cube_list) == 1:
+            cube = cube_list[0]
+            dst_file = f"./{base_name}.png"
+            time_series_plot(cube, dst_folder, dst_file)
+            self.log_debug(f"New plot created at {dst_folder}.")
+            long_name_list = [cube.long_name]
+            plot_list = [dst_file]
+        else:
+            plot_list = []
+            long_name_list = []
+            for cube in cube_list:
+                dst_file = f"./{base_name}-{cube.var_name}.png"
+                long_name = cube.long_name
+                time_series_plot(cube, dst_folder, dst_file)
+                self.log_debug(f"New plot created at {dst_folder}.")
+                plot_list.append(dst_file)
+                long_name_list.append(long_name)
+        
+        new_plots = {
+                'plot': plot_list,
+                'long_name': long_name_list,
+                'title': cube_list[0].metadata.attributes["title"],
+                'comment': cube_list[0].metadata.attributes["comment"],
+            }
+        return new_plots
+    
+    def plot_map(self, cube_list, path, dst_folder):
+        # get file name without extension
+        base_name = os.path.splitext(os.path.basename(path))[0]
+        plot_list = []
+        long_name_list = []
+        for cube in cube_list:
+            if cube.var_name.endswith('avg'):
+                try:
+                    new_plot_path = static_map_plot(cube, dst_folder, base_name)
+                except exceptions.InvalidMapTypeException as msg:
+                    self.log_warning(f"Invalid Map Type: {msg}")
+            else:
+                try:
+                    new_plot_path = dynamic_map_plot(cube, dst_folder, base_name)
+                except exceptions.InvalidMapTypeException as msg:
+                    self.log_warning(f"Invalid Map Type: {msg}")
+            plot_list.append(new_plot_path)
+            long_name_list.append(cube.long_name)
+
+        new_plots = {
+            'plot': plot_list,
+            'long_name': long_name_list,
+            'title': cube_list[0].metadata.attributes["title"],
+            'comment': cube_list[0].metadata.attributes["comment"],
+        }
+        return new_plots

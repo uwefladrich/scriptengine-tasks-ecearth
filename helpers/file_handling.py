@@ -73,7 +73,7 @@ def load_input_cube(src, varname):
     leg_cube = month_cubes.concatenate_cube()
     return leg_cube
 
-def set_metadata(cube, title=None, comment=None, diagnostic_type=None):
+def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs):
     """Set metadata for diagnostic."""
     metadata = {
         'title': title,
@@ -82,6 +82,9 @@ def set_metadata(cube, title=None, comment=None, diagnostic_type=None):
         'source': 'EC-Earth 4',
         'Conventions': 'CF-1.7',
         }
+    for key, value in kwargs.items():
+        metadata[f'{key}'] = value
+    
     metadata_to_discard = [
         'description',
         'interval_operation',
