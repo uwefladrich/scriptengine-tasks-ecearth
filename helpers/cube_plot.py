@@ -1,10 +1,18 @@
 """Helper module to plot Iris monitoring cubes."""
 
+import os
+import imageio
+
 import iris.quickplot as qplt
 import matplotlib.pyplot as plt
 import cftime
 import cf_units as unit
 import math
+import numpy as np
+
+from helpers.file_handling import cd
+import helpers.map_type_handling as type_handling
+from helpers.exceptions import InvalidMapTypeException
 
 def _title(name, units=None):
     """
@@ -13,22 +21,31 @@ def _title(name, units=None):
     Slight variance on _title() in iris/quickplot.py.
     """
     title = name.replace("_", " ").title()
+    unit_text = fmt_units(units)
+    if unit_text:
+        title += " / {}".format(unit_text)
+    return title
+
+def fmt_units(units):
     if not (
         units == None 
         or units.is_unknown() 
         or units.is_no_unit()
-        ):
+    ):
         if qplt._use_symbol(units):
-            units = units.symbol
-        title += " / {}".format(units)
-    return title
+            return units.symbol
+        else:
+            return units
+    else:
+        return None
 
-def ts_plot(ts_cube):
+
+def plot_time_series(ts_cube, dst_folder, dst_file):
     """
     Plot a monitoring time series cube.
     """
     time_coord = ts_cube.coord('time')
-    dates = cftime.num2pydate(time_coord.points, "seconds since 1900-01-01 00:00")
+    dates = cftime.num2pydate(time_coord.points, time_coord.units.name)
 
     fmt_dates = []
     for date in dates:
@@ -51,10 +68,87 @@ def ts_plot(ts_cube):
     ax.set_xticks(fmt_dates[::major_step])
     ax.set_xticks(fmt_dates[::minor_step], minor=True)
     ax.set_xticklabels(fmt_dates[::major_step])
-    
     ax.ticklabel_format(axis='y', style='sci', scilimits=(-3,6), useOffset=False, useMathText=True)
-
     plt.tight_layout()
     plt.title(_title(ts_cube.long_name))
     plt.xlabel(_title(time_coord.name()))
     plt.ylabel(_title(ts_cube.name(), ts_cube.units))
+    with cd(dst_folder):
+        plt.savefig(dst_file, bbox_inches="tight")
+        plt.close()
+
+def plot_static_map(map_cube, report_folder, base_name):
+    """
+    Plot a monitoring map cube as a static image.
+    """
+    map_type = map_cube.attributes['map_type']
+    map_handler = type_handling.function_mapper(map_type)
+    if not map_handler:
+        raise InvalidMapTypeException(map_type)
+
+    unit_text = f"{fmt_units(map_cube.units)}"
+    value_range = [
+        np.ma.min(map_cube.data),
+        np.ma.max(map_cube.data),
+    ]
+    time_coord = map_cube.coord('time')
+    dates = cftime.num2pydate(time_coord.bounds[0], time_coord.units.name)
+    start_year = dates[0].strftime("%Y")
+    end_year = dates[-1].strftime("%Y")
+    plot_title = f"{_title(map_cube.long_name)} {start_year} - {end_year}"
+    map_handler(
+        map_cube[0],
+        title=plot_title,
+        value_range=value_range,
+        units=unit_text,
+    )
+    dst = f"./{base_name}.png"
+    with cd(report_folder):
+        plt.savefig(dst, bbox_inches="tight")
+        plt.close()
+    
+    return dst
+
+def plot_dynamic_map(map_cube, report_folder, base_name):
+    """
+    Plot a monitoring map cube as an animated GIF.
+    """
+    png_dir = f"{base_name}_frames"
+    number_of_time_steps = len(map_cube.coord('time').points)
+    with cd(report_folder):
+        if not os.path.isdir(png_dir):
+            os.mkdir(png_dir)
+        number_of_pngs = len([name for name in os.listdir(png_dir)])
+    if number_of_pngs == number_of_time_steps:
+        return
+    
+    value_range = [
+        np.ma.min(map_cube.data),
+        np.ma.max(map_cube.data),
+    ]
+    map_type = map_cube.attributes['map_type']
+    map_handler = type_handling.function_mapper(map_type)
+    if not map_handler:
+        raise InvalidMapTypeException(map_type)
+    unit_text = f"{fmt_units(map_cube.units)}"
+
+    dst = f"./{base_name}.gif"
+    with cd(f"{report_folder}/{png_dir}"):
+        for time_step in range(number_of_pngs, number_of_time_steps):
+            time_coord = map_cube[time_step].coord('time')
+            date = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
+            year = date.strftime("%Y")
+            plot_title = f"{_title(map_cube.long_name)} {year}"
+            map_handler(
+                map_cube[time_step],
+                title=plot_title,
+                value_range=value_range,
+                units=unit_text,
+            )
+            plt.savefig(f"./{base_name}-{time_step:03}.png", bbox_inches="tight")
+            plt.close()   
+        images = []
+        for file_name in sorted(os.listdir(".")):
+            images.append(imageio.imread(file_name))
+        imageio.mimsave(f'.{dst}', images, fps=2)
+    return dst

@@ -1,6 +1,7 @@
 """Helper module for handling files."""
 
 import os
+import warnings
 import yaml
 import numpy as np
 import iris
@@ -52,20 +53,30 @@ def compute_spatial_weights(domain_src, array_shape):
     cell_weights = np.broadcast_to(cell_areas.data, array_shape)
     return cell_weights
 
-def compute_month_weights(monthly_data_cube):
+def compute_month_weights(monthly_data_cube, cube_shape=None):
     """Compute weights for the different month lengths"""
     time_dim = monthly_data_cube.coord('time', dim_coords=True)
-    month_lengths = np.array([bound[1] - bound[0] for bound in time_dim.bounds])
-    return month_lengths
+    month_weights = np.array([bound[1] - bound[0] for bound in time_dim.bounds])
+    if cube_shape:
+        weight_shape = np.ones(cube_shape[1:])
+        month_weights = np.array([ time_weight * weight_shape for time_weight in month_weights ])
+    return month_weights
 
 def load_input_cube(src, varname):
     """Load input files into one cube."""
-    month_cubes = iris.load(src, varname)
+    with warnings.catch_warnings():
+        # Suppress psu warning
+        warnings.filterwarnings(
+            action='ignore', 
+            message="Ignoring netCDF variable", 
+            category=UserWarning,
+            )
+        month_cubes = iris.load(src, varname)
     equalise_attributes(month_cubes) # 'timeStamp' and 'uuid' would cause ConcatenateError
     leg_cube = month_cubes.concatenate_cube()
     return leg_cube
 
-def set_metadata(cube, title=None, comment=None, diagnostic_type=None):
+def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs):
     """Set metadata for diagnostic."""
     metadata = {
         'title': title,
@@ -74,6 +85,9 @@ def set_metadata(cube, title=None, comment=None, diagnostic_type=None):
         'source': 'EC-Earth 4',
         'Conventions': 'CF-1.7',
         }
+    for key, value in kwargs.items():
+        metadata[f'{key}'] = value
+    
     metadata_to_discard = [
         'description',
         'interval_operation',

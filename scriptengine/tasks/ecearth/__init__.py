@@ -11,6 +11,7 @@ from .monitoring.global_average import GlobalAverage
 from .monitoring.disk_usage import DiskUsage
 from .monitoring.ice_volume import SeaIceVolume
 from .monitoring.ice_area import SeaIceArea
+from .monitoring.ocean_map import OceanMap
 from .slurm import Sbatch
 
 def task_loader_map():
@@ -24,4 +25,5 @@ def task_loader_map():
         'ece.mon.disk_usage': DiskUsage,
         'ece.mon.ice_volume': SeaIceVolume,
         'ece.mon.ice_area': SeaIceArea,
+        'ece.mon.ocean_map': OceanMap,
         }
