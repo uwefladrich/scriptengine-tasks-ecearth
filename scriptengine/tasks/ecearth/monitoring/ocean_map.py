@@ -37,18 +37,18 @@ class OceanMap(Task):
         leg_cube = helpers.load_input_cube(src, varname)
         leg_cube.data = np.ma.masked_equal(leg_cube.data, 0) # mask land cells
 
-        #month_weights = helpers.compute_month_weights(leg_cube, leg_cube.shape)
         # Remove auxiliary time coordinate before collapsing cube
         leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
+
+        month_weights = helpers.compute_month_weights(leg_cube, leg_cube.shape)
         annual_avg = leg_cube.collapsed(
             'time',
             iris.analysis.MEAN,
+            weights=month_weights
         )
-            #weights=month_weights)
         
         # Promote time from scalar to dimension coordinate
         annual_avg = iris.util.new_axis(annual_avg, 'time')
-        #ann_spatial_avg = ann_spatial_avg[0]
 
         annual_avg = helpers.set_metadata(
             annual_avg,
@@ -81,7 +81,7 @@ class OceanMap(Task):
     def compute_simulation_avg(self, yearly_averages):
         """
         Compute Time Average for the whole simulation.
-        """
+        """ 
         simulation_avg = yearly_averages.collapsed(
             'time',
             iris.analysis.MEAN,
