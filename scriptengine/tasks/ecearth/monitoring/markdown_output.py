@@ -32,14 +32,9 @@ class MarkdownOutput(Task):
         nc_plots = []
         for path in src:
             if path.endswith('.yml'):
-                try:
-                    with open(path) as yml_file:
-                        dct = yaml.load(yml_file, Loader=yaml.FullLoader)
-                    scalars.append(dct)
-                except FileNotFoundError:
-                    self.log_warning(f"FileNotFoundError: Ignoring {path}.")
+                scalars = self.load_yaml(path, scalars)
             elif path.endswith('.nc'):
-                nc_plots = self.plot_netcdf(nc_plots, path, dst)
+                nc_plots = self.load_netcdf(path, dst, nc_plots)
             else:
                 self.log_warning(f"{path} does not end in .nc or .yml. Ignored.")
 
@@ -70,8 +65,17 @@ class MarkdownOutput(Task):
                     scalar_diagnostics=scalars,
                     nc_diagnostics=nc_plots,
                 ))
+    
+    def load_yaml(self, yaml_path, scalar_dict):
+        try:
+            with open(yaml_path) as yml_file:
+                loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)   
+        except FileNotFoundError:
+            self.log_warning(f"FileNotFoundError: Ignoring {yaml_path}.")
+        return scalar_dict.append(loaded_dict)
 
-    def plot_netcdf(self, nc_plots, path, dst_folder):
+
+    def load_netcdf(self, path, nc_plots, dst_folder):
         try:
             cubes = iris.load(path)
         except IOError:
@@ -79,26 +83,26 @@ class MarkdownOutput(Task):
             return nc_plots
         
         if cubes[0].attributes['type'] == 'time series':
-            new_plots = self.plot_time_series(cubes, path, dst_folder)
+            new_plots = self.load_time_series(cubes, path, dst_folder)
         elif cubes[0].attributes['type'] == 'map':
-            new_plots = self.plot_map(cubes, path, dst_folder)
+            new_plots = self.load_map(cubes, path, dst_folder)
         
         nc_plots.append(new_plots)
         return nc_plots
 
-    def plot_time_series(self, cube_list, path, dst_folder):
+    def load_time_series(self, cube_list, path, dst_folder):
         # get file name without extension
         base_name = os.path.splitext(os.path.basename(path))[0]
+        plot_list = []
+        long_name_list = []
         if len(cube_list) == 1:
             cube = cube_list[0]
             dst_file = f"./{base_name}.png"
             time_series_plot(cube, dst_folder, dst_file)
             self.log_debug(f"New plot created at {dst_folder}.")
-            long_name_list = [cube.long_name]
-            plot_list = [dst_file]
+            long_name_list.append(cube.long_name)
+            plot_list.append(dst_file)
         else:
-            plot_list = []
-            long_name_list = []
             for cube in cube_list:
                 dst_file = f"./{base_name}-{cube.var_name}.png"
                 long_name = cube.long_name
@@ -108,14 +112,14 @@ class MarkdownOutput(Task):
                 long_name_list.append(long_name)
         
         new_plots = {
-                'plot': plot_list,
-                'long_name': long_name_list,
-                'title': cube_list[0].metadata.attributes["title"],
-                'comment': cube_list[0].metadata.attributes["comment"],
-            }
+            'plot': plot_list,
+            'long_name': long_name_list,
+            'title': cube_list[0].metadata.attributes["title"],
+            'comment': cube_list[0].metadata.attributes["comment"],
+        }
         return new_plots
     
-    def plot_map(self, cube_list, path, dst_folder):
+    def load_map(self, cube_list, path, dst_folder):
         # get file name without extension
         base_name = os.path.splitext(os.path.basename(path))[0]
         plot_list = []
