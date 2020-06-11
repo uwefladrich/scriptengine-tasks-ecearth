@@ -40,24 +40,24 @@ class OceanMap(Task):
         #month_weights = helpers.compute_month_weights(leg_cube, leg_cube.shape)
         # Remove auxiliary time coordinate before collapsing cube
         leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
-        ann_spatial_avg = leg_cube.collapsed(
+        annual_avg = leg_cube.collapsed(
             'time',
             iris.analysis.MEAN,
         )
             #weights=month_weights)
         
         # Promote time from scalar to dimension coordinate
-        ann_spatial_avg = iris.util.new_axis(ann_spatial_avg, 'time')
+        annual_avg = iris.util.new_axis(annual_avg, 'time')
         #ann_spatial_avg = ann_spatial_avg[0]
 
-        ann_spatial_avg = helpers.set_metadata(
-            ann_spatial_avg,
-            title=f'{ann_spatial_avg.long_name} (Yearly Average Map)',
+        annual_avg = helpers.set_metadata(
+            annual_avg,
+            title=f'{annual_avg.long_name} (Yearly Average Map)',
             comment=self.comment,
             diagnostic_type=self.type,
             map_type=self.map_type,
         )
-        self.save_cube(ann_spatial_avg, varname, dst)
+        self.save_cube(annual_avg, varname, dst)
 
     def save_cube(self, new_cube, varname, dst):
         """save global average cubes in netCDF file"""
@@ -69,11 +69,25 @@ class OceanMap(Task):
                 self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
             else:
                 cube_list = iris.cube.CubeList([current_cube, new_cube])
-                merged_cube = cube_list.concatenate_cube()
-                iris.save(merged_cube, f"{dst}-copy.nc")
+                yearly_averages = cube_list.concatenate_cube()
+                simulation_avg = self.compute_simulation_avg(yearly_averages)
+                iris.save([yearly_averages, simulation_avg], f"{dst}-copy.nc")
                 os.remove(dst)
                 os.rename(f"{dst}-copy.nc", dst)
         except OSError: # file does not exist yet.
             iris.save(new_cube, dst)
             return
-        
+
+    def compute_simulation_avg(self, yearly_averages):
+        """
+        Compute Time Average for the whole simulation.
+        """
+        simulation_avg = yearly_averages.collapsed(
+            'time',
+            iris.analysis.MEAN,
+        )
+        simulation_avg.var_name = simulation_avg.var_name + '_sim_avg'
+        simulation_avg.coord('time').var_name = 'time_value'
+        # Promote time from scalar to dimension coordinate
+        simulation_avg = iris.util.new_axis(simulation_avg, 'time')
+        return simulation_avg
