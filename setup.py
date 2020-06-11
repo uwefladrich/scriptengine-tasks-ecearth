@@ -44,6 +44,9 @@ setuptools.setup(
     install_requires=[
         "scriptengine>=0.5",
         "pyYAML>=5.1",
-        "netCDF4>=1.5"
+        "netCDF4>=1.5",
+        "numpy>=1.16.1",
+        "pytest>5.0",
+        "imageio>=2.0",
     ],
 )
