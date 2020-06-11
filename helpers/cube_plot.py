@@ -40,12 +40,12 @@ def fmt_units(units):
         return None
 
 
-def time_series_plot(ts_cube, dst_folder, dst_file):
+def plot_time_series(ts_cube, dst_folder, dst_file):
     """
     Plot a monitoring time series cube.
     """
     time_coord = ts_cube.coord('time')
-    dates = cftime.num2pydate(time_coord.points, "seconds since 1900-01-01 00:00")
+    dates = cftime.num2pydate(time_coord.points, time_coord.units.name)
 
     fmt_dates = []
     for date in dates:
@@ -77,7 +77,7 @@ def time_series_plot(ts_cube, dst_folder, dst_file):
         plt.savefig(dst_file, bbox_inches="tight")
         plt.close()
 
-def static_map_plot(map_cube, report_folder, base_name):
+def plot_static_map(map_cube, report_folder, base_name):
     """
     Plot a monitoring map cube as a static image.
     """
@@ -85,15 +85,21 @@ def static_map_plot(map_cube, report_folder, base_name):
     map_handler = type_handling.function_mapper(map_type)
     if not map_handler:
         raise InvalidMapTypeException(map_type)
-    axis_labels = [
-        "Longitude",
-        "Latitude"
-    ]
+
     unit_text = f"{fmt_units(map_cube.units)}"
+    value_range = [
+        np.ma.min(map_cube.data),
+        np.ma.max(map_cube.data),
+    ]
+    time_coord = map_cube.coord('time')
+    dates = cftime.num2pydate(time_coord.bounds[0], time_coord.units.name)
+    start_year = dates[0].strftime("%Y")
+    end_year = dates[-1].strftime("%Y")
+    plot_title = f"{_title(map_cube.long_name)} {start_year} - {end_year}"
     map_handler(
         map_cube[0],
-        title=_title(map_cube.long_name),
-        axis_labels=axis_labels,
+        title=plot_title,
+        value_range=value_range,
         units=unit_text,
     )
     dst = f"./{base_name}.png"
@@ -103,7 +109,7 @@ def static_map_plot(map_cube, report_folder, base_name):
     
     return dst
 
-def dynamic_map_plot(map_cube, report_folder, base_name):
+def plot_dynamic_map(map_cube, report_folder, base_name):
     """
     Plot a monitoring map cube as an animated GIF.
     """
@@ -128,17 +134,21 @@ def dynamic_map_plot(map_cube, report_folder, base_name):
 
     dst = f"./{base_name}.gif"
     with cd(f"{report_folder}/{png_dir}"):
-        for time_step in range(0, number_of_time_steps):
+        for time_step in range(number_of_pngs, number_of_time_steps):
+            time_coord = map_cube[time_step].coord('time')
+            date = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
+            year = date.strftime("%Y")
+            plot_title = f"{_title(map_cube.long_name)} {year}"
             map_handler(
                 map_cube[time_step],
-                title=_title(map_cube.long_name),
+                title=plot_title,
                 value_range=value_range,
                 units=unit_text,
             )
-            plt.savefig(f"./{base_name}-{time_step}.png", bbox_inches="tight")
+            plt.savefig(f"./{base_name}-{time_step:03}.png", bbox_inches="tight")
             plt.close()   
         images = []
-        for file_name in os.listdir("."):
+        for file_name in sorted(os.listdir(".")):
             images.append(imageio.imread(file_name))
-        imageio.mimsave(f'.{dst}', images)
+        imageio.mimsave(f'.{dst}', images, fps=2)
     return dst

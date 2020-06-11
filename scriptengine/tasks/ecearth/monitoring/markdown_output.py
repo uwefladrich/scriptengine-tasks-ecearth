@@ -10,7 +10,7 @@ from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
 from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import cd
-from helpers.cube_plot import time_series_plot, static_map_plot, dynamic_map_plot
+from helpers.cube_plot import plot_time_series, plot_static_map, plot_dynamic_map
 import helpers.exceptions as exceptions
 
 class MarkdownOutput(Task):
@@ -69,13 +69,18 @@ class MarkdownOutput(Task):
     def load_yaml(self, yaml_path, scalar_dict):
         try:
             with open(yaml_path) as yml_file:
-                loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)   
+                loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
+            return scalar_dict.append(loaded_dict)
         except FileNotFoundError:
             self.log_warning(f"FileNotFoundError: Ignoring {yaml_path}.")
-        return scalar_dict.append(loaded_dict)
+            return scalar_dict
+        
 
 
-    def load_netcdf(self, path, nc_plots, dst_folder):
+    def load_netcdf(self, path, dst_folder, nc_plots):
+        """
+        Load netCDF file and determine diagnostic type.
+        """
         try:
             cubes = iris.load(path)
         except IOError:
@@ -91,6 +96,10 @@ class MarkdownOutput(Task):
         return nc_plots
 
     def load_time_series(self, cube_list, path, dst_folder):
+        """
+        Load time series diagnostic and call plot creator.
+        """
+        self.log_debug(f"Loading time series diagnostic {path}")
         # get file name without extension
         base_name = os.path.splitext(os.path.basename(path))[0]
         plot_list = []
@@ -98,7 +107,7 @@ class MarkdownOutput(Task):
         if len(cube_list) == 1:
             cube = cube_list[0]
             dst_file = f"./{base_name}.png"
-            time_series_plot(cube, dst_folder, dst_file)
+            plot_time_series(cube, dst_folder, dst_file)
             self.log_debug(f"New plot created at {dst_folder}.")
             long_name_list.append(cube.long_name)
             plot_list.append(dst_file)
@@ -106,7 +115,7 @@ class MarkdownOutput(Task):
             for cube in cube_list:
                 dst_file = f"./{base_name}-{cube.var_name}.png"
                 long_name = cube.long_name
-                time_series_plot(cube, dst_folder, dst_file)
+                plot_time_series(cube, dst_folder, dst_file)
                 self.log_debug(f"New plot created at {dst_folder}.")
                 plot_list.append(dst_file)
                 long_name_list.append(long_name)
@@ -120,19 +129,25 @@ class MarkdownOutput(Task):
         return new_plots
     
     def load_map(self, cube_list, path, dst_folder):
+        """
+        Load map diagnostic and determine map type.
+        """
+        self.log_debug(f"Loading map diagnostic {path}")
         # get file name without extension
         base_name = os.path.splitext(os.path.basename(path))[0]
         plot_list = []
         long_name_list = []
         for cube in cube_list:
-            if cube.var_name.endswith('avg'):
+            if cube.var_name.endswith('_sim_avg'):
+                self.log_debug(f"New static map: {cube.var_name}")
                 try:
-                    new_plot_path = static_map_plot(cube, dst_folder, base_name)
+                    new_plot_path = plot_static_map(cube, dst_folder, base_name)
                 except exceptions.InvalidMapTypeException as msg:
                     self.log_warning(f"Invalid Map Type: {msg}")
             else:
+                self.log_debug(f"New dynamic map: {cube.var_name}")
                 try:
-                    new_plot_path = dynamic_map_plot(cube, dst_folder, base_name)
+                    new_plot_path = plot_dynamic_map(cube, dst_folder, base_name)
                 except exceptions.InvalidMapTypeException as msg:
                     self.log_warning(f"Invalid Map Type: {msg}")
             plot_list.append(new_plot_path)
