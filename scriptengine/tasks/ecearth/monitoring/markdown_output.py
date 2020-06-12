@@ -48,9 +48,9 @@ class MarkdownOutput(Task):
             self.log_debug('No scalar with long_name "Experiment ID" given.')
 
         search_path = ['.', 'templates']
-        if "_se_ocwd" in context:
-            search_path.extend([context["_se_ocwd"],
-                                os.path.join(context["_se_ocwd"], "templates")])
+        if "_se_cmd_cwd" in context:
+            search_path.extend([context["_se_cmd_cwd"],
+                                os.path.join(context["_se_cmd_cwd"], "templates")])
         self.log_debug(f"Search path for template: {search_path}")
 
         loader = jinja2.FileSystemLoader(search_path)
