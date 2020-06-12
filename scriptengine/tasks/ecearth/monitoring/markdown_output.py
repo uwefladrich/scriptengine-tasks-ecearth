@@ -32,11 +32,14 @@ class MarkdownOutput(Task):
         nc_plots = []
         for path in src:
             if path.endswith('.yml'):
-                scalars = self.load_yaml(path, scalars)
+                scalars.append(self.load_yaml(path))
             elif path.endswith('.nc'):
-                nc_plots = self.load_netcdf(path, dst, nc_plots)
+                nc_plots.append(self.load_netcdf(path, dst))
             else:
                 self.log_warning(f"{path} does not end in .nc or .yml. Ignored.")
+
+        scalars = [scalar for scalar in scalars if scalar]
+        nc_plots = [nc_plot for nc_plot in nc_plots if nc_plot]
 
         try:
             exp_id_index = next(
@@ -48,9 +51,9 @@ class MarkdownOutput(Task):
             self.log_debug('No scalar with long_name "Experiment ID" given.')
 
         search_path = ['.', 'templates']
-        if "_se_cmd_cwd" in context:
-            search_path.extend([context["_se_cmd_cwd"],
-                                os.path.join(context["_se_cmd_cwd"], "templates")])
+        if "_se_ocwd" in context:
+            search_path.extend([context["_se_ocwd"],
+                                os.path.join(context["_se_ocwd"], "templates")])
         self.log_debug(f"Search path for template: {search_path}")
 
         loader = jinja2.FileSystemLoader(search_path)
@@ -66,18 +69,18 @@ class MarkdownOutput(Task):
                     nc_diagnostics=nc_plots,
                 ))
     
-    def load_yaml(self, yaml_path, scalar_dict):
+    def load_yaml(self, yaml_path):
         try:
             with open(yaml_path) as yml_file:
                 loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
-            return scalar_dict.append(loaded_dict)
+            return loaded_dict
         except FileNotFoundError:
             self.log_warning(f"FileNotFoundError: Ignoring {yaml_path}.")
-            return scalar_dict
+            return None
         
 
 
-    def load_netcdf(self, path, dst_folder, nc_plots):
+    def load_netcdf(self, path, dst_folder):
         """
         Load netCDF file and determine diagnostic type.
         """
@@ -85,15 +88,14 @@ class MarkdownOutput(Task):
             cubes = iris.load(path)
         except IOError:
             self.log_warning(f"IOError, file not found: Ignoring {path}.")
-            return nc_plots
+            return None
         
         if cubes[0].attributes['type'] == 'time series':
             new_plots = self.load_time_series(cubes, path, dst_folder)
         elif cubes[0].attributes['type'] == 'map':
             new_plots = self.load_map(cubes, path, dst_folder)
         
-        nc_plots.append(new_plots)
-        return nc_plots
+        return new_plots
 
     def load_time_series(self, cube_list, path, dst_folder):
         """
