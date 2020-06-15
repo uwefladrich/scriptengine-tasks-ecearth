@@ -54,6 +54,9 @@ class AtmosphereMap(Task):
         annual_avg = iris.util.new_axis(annual_avg, 'time')
 
         annual_avg.var_name = varname
+        if not annual_avg.long_name:
+            annual_avg.long_name = varname
+
         annual_avg = helpers.set_metadata(
             annual_avg,
             title=f'{annual_avg.long_name} (Yearly Average Map)',
