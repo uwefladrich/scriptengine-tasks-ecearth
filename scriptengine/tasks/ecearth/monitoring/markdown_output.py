@@ -4,10 +4,8 @@ import os
 import jinja2
 import yaml
 import iris
-import matplotlib.pyplot as plt
 
 from scriptengine.tasks.base import Task
-from scriptengine.jinja import render as j2render
 from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import cd
 from helpers.cube_plot import plot_time_series, plot_static_map, plot_dynamic_map
@@ -65,7 +63,7 @@ class MarkdownOutput(Task):
                     nc_diagnostics=nc_plots,
                     exp_id=exp_id,
                 ))
-    
+
     def load_yaml(self, yaml_path):
         try:
             with open(yaml_path) as yml_file:
@@ -74,8 +72,6 @@ class MarkdownOutput(Task):
         except FileNotFoundError:
             self.log_warning(f"FileNotFoundError: Ignoring {yaml_path}.")
             return None
-        
-
 
     def load_netcdf(self, path, dst_folder):
         """
@@ -86,12 +82,12 @@ class MarkdownOutput(Task):
         except IOError:
             self.log_warning(f"IOError, file not found: Ignoring {path}.")
             return None
-        
+
         if cubes[0].attributes['type'] == 'time series':
             new_plots = self.load_time_series(cubes, path, dst_folder)
         elif cubes[0].attributes['type'] == 'map':
             new_plots = self.load_map(cubes, path, dst_folder)
-        
+
         return new_plots
 
     def load_time_series(self, cube_list, path, dst_folder):
@@ -118,7 +114,7 @@ class MarkdownOutput(Task):
                 self.log_debug(f"New plot created at {dst_folder}.")
                 plot_list.append(dst_file)
                 long_name_list.append(long_name)
-        
+
         new_plots = {
             'plot': plot_list,
             'long_name': long_name_list,
@@ -126,7 +122,7 @@ class MarkdownOutput(Task):
             'comment': cube_list[0].metadata.attributes["comment"],
         }
         return new_plots
-    
+
     def load_map(self, cube_list, path, dst_folder):
         """
         Load map diagnostic and determine map type.
@@ -154,7 +150,7 @@ class MarkdownOutput(Task):
                     self.log_warning(f"Invalid Map Type: {msg}")
                 else:
                     plot_list.append(new_plot_path)
-                    long_name_list.append(cube.long_name)  
+                    long_name_list.append(cube.long_name)
 
         new_plots = {
             'plot': plot_list,

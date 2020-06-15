@@ -3,7 +3,6 @@
 import yaml
 
 from scriptengine.tasks.base import Task
-from scriptengine.jinja import render as j2render
 
 class WriteScalar(Task):
     """WriteScalar Processing Task"""

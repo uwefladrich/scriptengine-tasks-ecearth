@@ -2,12 +2,10 @@
 
 import os
 
-import numpy as np
 import iris
 import iris_grib
 
 from scriptengine.tasks.base import Task
-from scriptengine.jinja import render as j2render
 import helpers.file_handling as helpers
 
 class AtmosphereMap(Task):
@@ -36,20 +34,24 @@ class AtmosphereMap(Task):
                 f"Diagnostic will not be treated, returning now."
             ))
             return
-        
-        cf_phenomenon = iris_grib.grib_phenom_translation.grib1_phenom_to_cf_info(128, 98, grib_code)
+
+        cf_phenomenon = iris_grib.grib_phenom_translation.grib1_phenom_to_cf_info(
+            128, # table
+            98, # institution: ECMWF
+            grib_code
+        )
         if cf_phenomenon: # is None if not found
             constraint = cf_phenomenon.standard_name
         else:
             constraint = f"UNKNOWN PARAMETER {grib_code}.128"
-        
+
         leg_cube = helpers.load_input_cube(src, constraint)
 
         annual_avg = leg_cube.collapsed(
             'time',
             iris.analysis.MEAN,
         )
-        
+
         # Promote time from scalar to dimension coordinate
         annual_avg = iris.util.new_axis(annual_avg, 'time')
 
@@ -88,7 +90,7 @@ class AtmosphereMap(Task):
     def compute_simulation_avg(self, yearly_averages):
         """
         Compute Time Average for the whole simulation.
-        """ 
+        """
         simulation_avg = yearly_averages.collapsed(
             'time',
             iris.analysis.MEAN,

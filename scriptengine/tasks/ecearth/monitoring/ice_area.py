@@ -8,7 +8,6 @@ import numpy as np
 import cf_units
 
 from scriptengine.tasks.base import Task
-from scriptengine.jinja import render as j2render
 import helpers.file_handling as helpers
 
 class SeaIceArea(Task):
@@ -20,8 +19,8 @@ class SeaIceArea(Task):
             "dst",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Global Ice Area over one leg, "
-                        f"separated into Northern and Southern Hemisphere. ")
+        self.comment = ("Global Ice Area over one leg, "
+                        "separated into Northern and Southern Hemisphere. ")
         self.type = "time series"
         self.long_name = "Global Sea Ice Area"
 
@@ -77,7 +76,7 @@ class SeaIceArea(Task):
             # Suppress warning about insufficient metadata.
             warnings.filterwarnings(
                 'ignore',
-                "Collapsing a multi-dimensional coordinate.", 
+                "Collapsing a multi-dimensional coordinate.",
                 UserWarning,
                 )
             nh_weighted_sum = nh_cube.collapsed(

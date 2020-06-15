@@ -2,11 +2,9 @@
 
 import os
 
-import numpy as np
 import iris
 
 from scriptengine.tasks.base import Task
-from scriptengine.jinja import render as j2render
 import helpers.file_handling as helpers
 
 class OceanMap(Task):
@@ -35,7 +33,6 @@ class OceanMap(Task):
             return
 
         leg_cube = helpers.load_input_cube(src, varname)
-        leg_cube.data = np.ma.masked_equal(leg_cube.data, 0) # mask land cells
 
         # Remove auxiliary time coordinate before collapsing cube
         leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
@@ -46,7 +43,7 @@ class OceanMap(Task):
             iris.analysis.MEAN,
             weights=month_weights
         )
-        
+
         # Promote time from scalar to dimension coordinate
         annual_avg = iris.util.new_axis(annual_avg, 'time')
 
@@ -81,7 +78,7 @@ class OceanMap(Task):
     def compute_simulation_avg(self, yearly_averages):
         """
         Compute Time Average for the whole simulation.
-        """ 
+        """
         time_weights = helpers.compute_time_weights(yearly_averages, yearly_averages.shape)
         simulation_avg = yearly_averages.collapsed(
             'time',
