@@ -33,7 +33,7 @@ def convert_to_yaml(diagnostic, destination):
         mon_id = diagnostic["mon_id"]
     except (TypeError, KeyError):
         mon_id = ""
-    
+
     with open(f"{filename(mon_id, destination)}.yml", 'w') as outfile:
         yaml.dump(diagnostic, outfile, sort_keys=False)
 
@@ -59,7 +59,7 @@ def compute_time_weights(monthly_data_cube, cube_shape=None):
     month_weights = np.array([bound[1] - bound[0] for bound in time_dim.bounds])
     if cube_shape:
         weight_shape = np.ones(cube_shape[1:])
-        month_weights = np.array([ time_weight * weight_shape for time_weight in month_weights ])
+        month_weights = np.array([time_weight * weight_shape for time_weight in month_weights])
     return month_weights
 
 def load_input_cube(src, varname):
@@ -67,8 +67,8 @@ def load_input_cube(src, varname):
     with warnings.catch_warnings():
         # Suppress psu warning
         warnings.filterwarnings(
-            action='ignore', 
-            message="Ignoring netCDF variable", 
+            action='ignore',
+            message="Ignoring netCDF variable",
             category=UserWarning,
             )
         month_cubes = iris.load(src, varname)
@@ -87,7 +87,7 @@ def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs)
         }
     for key, value in kwargs.items():
         metadata[f'{key}'] = value
-    
+
     metadata_to_discard = [
         'description',
         'interval_operation',

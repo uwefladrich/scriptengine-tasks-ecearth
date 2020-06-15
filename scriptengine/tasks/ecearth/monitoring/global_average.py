@@ -3,11 +3,9 @@
 import os
 import warnings
 
-import numpy as np
 import iris
 
 from scriptengine.tasks.base import Task
-from scriptengine.jinja import render as j2render
 import helpers.file_handling as helpers
 
 class GlobalAverage(Task):
@@ -45,7 +43,7 @@ class GlobalAverage(Task):
             # Suppress warning about insufficient metadata.
             warnings.filterwarnings(
                 'ignore',
-                "Collapsing a multi-dimensional coordinate.", 
+                "Collapsing a multi-dimensional coordinate.",
                 UserWarning,
                 )
             spatial_avg = leg_cube.collapsed(
@@ -62,7 +60,7 @@ class GlobalAverage(Task):
             weights=month_weights)
         # Promote time from scalar to dimension coordinate
         ann_spatial_avg = iris.util.new_axis(ann_spatial_avg, 'time')
-        
+
         ann_spatial_avg = helpers.set_metadata(
             ann_spatial_avg,
             title=f'{ann_spatial_avg.long_name} (Global Average Time Series)',

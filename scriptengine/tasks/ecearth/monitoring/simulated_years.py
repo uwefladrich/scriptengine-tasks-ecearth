@@ -1,9 +1,7 @@
 """Processing Task that writes out the number of so far simulated years."""
 
-import yaml # temporary until base class Task has getarg() function
 from dateutil.relativedelta import relativedelta
 
-from scriptengine.jinja import render as j2render
 from .write_scalar import WriteScalar
 
 class SimulatedYears(WriteScalar):

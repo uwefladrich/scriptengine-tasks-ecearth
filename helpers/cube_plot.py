@@ -3,11 +3,10 @@
 import os
 import imageio
 
+import math
 import iris.quickplot as qplt
 import matplotlib.pyplot as plt
 import cftime
-import cf_units as unit
-import math
 import numpy as np
 
 from helpers.file_handling import cd
@@ -27,11 +26,12 @@ def _title(name, units=None):
     return title
 
 def fmt_units(units):
+    """Format Cube Units as String"""
     if not (
-        units == None 
-        or units.is_unknown() 
-        or units.is_no_unit()
-    ):
+            units is None
+            or units.is_unknown()
+            or units.is_no_unit()
+        ):
         if qplt._use_symbol(units):
             return units.symbol
         else:
@@ -55,7 +55,7 @@ def plot_time_series(ts_cube, dst_folder, dst_file):
         for date in dates:
             fmt_dates.append(date.strftime("%Y-%m"))
 
-    fig = plt.figure(figsize=(6,4), dpi=300)
+    fig = plt.figure(figsize=(6, 4), dpi=300)
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(fmt_dates, ts_cube.data, marker='o')
     fig.autofmt_xdate()
@@ -69,7 +69,7 @@ def plot_time_series(ts_cube, dst_folder, dst_file):
     ax.set_xticks(fmt_dates[::major_step])
     ax.set_xticks(fmt_dates[::minor_step], minor=True)
     ax.set_xticklabels(fmt_dates[::major_step])
-    ax.ticklabel_format(axis='y', style='sci', scilimits=(-3,6), useOffset=False, useMathText=True)
+    ax.ticklabel_format(axis='y', style='sci', scilimits=(-3, 6), useOffset=False, useMathText=True)
     ax.set_title(_title(ts_cube.long_name))
     ax.set_xlabel(_title(time_coord.name()))
     ax.set_ylabel(_title(ts_cube.name(), ts_cube.units))
@@ -118,8 +118,8 @@ def plot_dynamic_map(map_cube, report_folder, base_name):
     with cd(report_folder):
         if not os.path.isdir(png_dir):
             os.mkdir(png_dir)
-        number_of_pngs = len([name for name in os.listdir(png_dir)])
-    
+        number_of_pngs = len(os.listdir(png_dir))
+
     mean = np.ma.mean(map_cube[0].data)
     delta = abs(np.ma.max(map_cube[0].data)) - abs(mean)
     value_range = [
@@ -146,7 +146,7 @@ def plot_dynamic_map(map_cube, report_folder, base_name):
                 units=unit_text,
             )
             fig.savefig(f"./{base_name}-{time_step:03}.png", bbox_inches="tight")
-            plt.close(fig)   
+            plt.close(fig)
         images = []
         for file_name in sorted(os.listdir(".")):
             images.append(imageio.imread(file_name))

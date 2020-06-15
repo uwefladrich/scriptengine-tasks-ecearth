@@ -3,7 +3,6 @@
 import os
 import yaml
 
-from scriptengine.jinja import render as j2render
 from .write_scalar import WriteScalar
 
 class SimulatedLegs(WriteScalar):
