@@ -55,9 +55,10 @@ def plot_time_series(ts_cube, dst_folder, dst_file):
         for date in dates:
             fmt_dates.append(date.strftime("%Y-%m"))
 
-    fig, ax = plt.subplots()
+    fig = plt.figure(figsize=(6,4), dpi=300)
+    ax = fig.add_subplot(1, 1, 1)
     ax.plot(fmt_dates, ts_cube.data, marker='o')
-    fig.autofmt_xdate()    
+    fig.autofmt_xdate()
     minor_step = math.ceil(len(fmt_dates) / 40)
     if len(fmt_dates) < 10:
         major_step = minor_step
@@ -69,13 +70,13 @@ def plot_time_series(ts_cube, dst_folder, dst_file):
     ax.set_xticks(fmt_dates[::minor_step], minor=True)
     ax.set_xticklabels(fmt_dates[::major_step])
     ax.ticklabel_format(axis='y', style='sci', scilimits=(-3,6), useOffset=False, useMathText=True)
+    ax.set_title(_title(ts_cube.long_name))
+    ax.set_xlabel(_title(time_coord.name()))
+    ax.set_ylabel(_title(ts_cube.name(), ts_cube.units))
     plt.tight_layout()
-    plt.title(_title(ts_cube.long_name))
-    plt.xlabel(_title(time_coord.name()))
-    plt.ylabel(_title(ts_cube.name(), ts_cube.units))
     with cd(dst_folder):
-        plt.savefig(dst_file, bbox_inches="tight")
-        plt.close()
+        fig.savefig(dst_file, bbox_inches="tight")
+        plt.close(fig)
 
 def plot_static_map(map_cube, report_folder, base_name):
     """
@@ -106,7 +107,6 @@ def plot_static_map(map_cube, report_folder, base_name):
     with cd(report_folder):
         fig.savefig(dst, bbox_inches="tight")
         plt.close(fig)
-    
     return dst
 
 def plot_dynamic_map(map_cube, report_folder, base_name):

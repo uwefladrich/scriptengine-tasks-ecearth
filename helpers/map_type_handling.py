@@ -51,8 +51,8 @@ def global_ocean_plot(cube, title=None, value_range=None, units=None):
     return fig
 
 def global_atmosphere_plot(cube, title=None, value_range=None, units=None):
-    plt.figure(dpi=300)
-    ax = plt.subplot(projection=ccrs.PlateCarree())
+    fig = plt.figure(figsize=(6,4), dpi=300)
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
     longitude = cube.coord('longitude').points
     latitude = cube.coord('latitude').points
     data = cube.data
@@ -60,12 +60,13 @@ def global_atmosphere_plot(cube, title=None, value_range=None, units=None):
         longitude,
         latitude,
         c=data,
+        axes=ax,
         vmin = value_range[0],
         vmax = value_range[1],
         transform=ccrs.PlateCarree(),
     )
-    bar = plt.colorbar(im, orientation='horizontal')
+    bar = fig.colorbar(im, orientation='horizontal')
     bar.set_label(units)
     ax.set_title(title)
     ax.coastlines()
-    
+    return fig
