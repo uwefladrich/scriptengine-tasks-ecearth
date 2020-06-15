@@ -96,7 +96,7 @@ def plot_static_map(map_cube, report_folder, base_name):
     start_year = dates[0].strftime("%Y")
     end_year = dates[-1].strftime("%Y")
     plot_title = f"{_title(map_cube.long_name)} {start_year} - {end_year}"
-    map_handler(
+    fig = map_handler(
         map_cube[0],
         title=plot_title,
         value_range=value_range,
@@ -104,8 +104,8 @@ def plot_static_map(map_cube, report_folder, base_name):
     )
     dst = f"./{base_name}.png"
     with cd(report_folder):
-        plt.savefig(dst, bbox_inches="tight")
-        plt.close()
+        fig.savefig(dst, bbox_inches="tight")
+        plt.close(fig)
     
     return dst
 
@@ -119,12 +119,12 @@ def plot_dynamic_map(map_cube, report_folder, base_name):
         if not os.path.isdir(png_dir):
             os.mkdir(png_dir)
         number_of_pngs = len([name for name in os.listdir(png_dir)])
-    if number_of_pngs == number_of_time_steps:
-        return
     
+    mean = np.ma.mean(map_cube[0].data)
+    delta = abs(np.ma.max(map_cube[0].data)) - abs(mean)
     value_range = [
-        np.ma.min(map_cube.data),
-        np.ma.max(map_cube.data),
+        mean - 1.3 * delta,
+        mean + 1.3 * delta,
     ]
     map_type = map_cube.attributes['map_type']
     map_handler = type_handling.function_mapper(map_type)
@@ -139,14 +139,14 @@ def plot_dynamic_map(map_cube, report_folder, base_name):
             date = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
             year = date.strftime("%Y")
             plot_title = f"{_title(map_cube.long_name)} {year}"
-            map_handler(
+            fig = map_handler(
                 map_cube[time_step],
                 title=plot_title,
                 value_range=value_range,
                 units=unit_text,
             )
-            plt.savefig(f"./{base_name}-{time_step:03}.png", bbox_inches="tight")
-            plt.close()   
+            fig.savefig(f"./{base_name}-{time_step:03}.png", bbox_inches="tight")
+            plt.close(fig)   
         images = []
         for file_name in sorted(os.listdir(".")):
             images.append(imageio.imread(file_name))

@@ -18,8 +18,8 @@ def function_mapper(map_type_string):
     return mapper.get(map_type_string, None)
 
 def global_ocean_plot(cube, title=None, value_range=None, units=None):
-    plt.figure(dpi=300)
-    ax = plt.subplot(projection=ccrs.PlateCarree())
+    fig = plt.figure(figsize=(6,4), dpi=300)
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
     with warnings.catch_warnings():
         warnings.filterwarnings(
             action='ignore', 
@@ -40,11 +40,13 @@ def global_ocean_plot(cube, title=None, value_range=None, units=None):
         im = iplt.pcolormesh(
             projected_cube,
             axes=ax,
-            clim=value_range
+            vmin=value_range[0],
+            vmax=value_range[1],
             )
-    bar = plt.colorbar(im, orientation='horizontal')
+    bar = fig.colorbar(im, orientation='horizontal')
     bar.set_label(units)
     ax.set_title(title)
     ax.coastlines()
+    return fig
 
     
