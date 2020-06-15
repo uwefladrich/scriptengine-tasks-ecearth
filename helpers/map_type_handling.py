@@ -14,6 +14,7 @@ import cartopy.crs as ccrs
 def function_mapper(map_type_string):
     mapper = {
         'global ocean': global_ocean_plot,
+        'global atmosphere': global_atmosphere_plot,
     }
     return mapper.get(map_type_string, None)
 
@@ -49,4 +50,22 @@ def global_ocean_plot(cube, title=None, value_range=None, units=None):
     ax.coastlines()
     return fig
 
+def global_atmosphere_plot(cube, title=None, value_range=None, units=None):
+    plt.figure(dpi=300)
+    ax = plt.subplot(projection=ccrs.PlateCarree())
+    longitude = cube.coord('longitude').points
+    latitude = cube.coord('latitude').points
+    data = cube.data
+    im = plt.scatter(
+        longitude,
+        latitude,
+        c=data,
+        vmin = value_range[0],
+        vmax = value_range[1],
+        transform=ccrs.PlateCarree(),
+    )
+    bar = plt.colorbar(im, orientation='horizontal')
+    bar.set_label(units)
+    ax.set_title(title)
+    ax.coastlines()
     
