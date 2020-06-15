@@ -39,7 +39,6 @@ class GlobalAverage(Task):
             return
 
         leg_cube = helpers.load_input_cube(src, varname)
-        leg_cube.data = np.ma.masked_equal(leg_cube.data, 0) # mask land cells
 
         cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape)
         with warnings.catch_warnings():

@@ -35,7 +35,6 @@ class OceanMap(Task):
             return
 
         leg_cube = helpers.load_input_cube(src, varname)
-        leg_cube.data = np.ma.masked_equal(leg_cube.data, 0) # mask land cells
 
         # Remove auxiliary time coordinate before collapsing cube
         leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
