@@ -40,7 +40,7 @@ class OceanMap(Task):
         # Remove auxiliary time coordinate before collapsing cube
         leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
 
-        month_weights = helpers.compute_month_weights(leg_cube, leg_cube.shape)
+        month_weights = helpers.compute_time_weights(leg_cube, leg_cube.shape)
         annual_avg = leg_cube.collapsed(
             'time',
             iris.analysis.MEAN,
@@ -82,9 +82,11 @@ class OceanMap(Task):
         """
         Compute Time Average for the whole simulation.
         """ 
+        time_weights = helpers.compute_time_weights(yearly_averages, yearly_averages.shape)
         simulation_avg = yearly_averages.collapsed(
             'time',
             iris.analysis.MEAN,
+            weights=time_weights,
         )
         simulation_avg.var_name = simulation_avg.var_name + '_sim_avg'
         simulation_avg.coord('time').var_name = 'time_value'

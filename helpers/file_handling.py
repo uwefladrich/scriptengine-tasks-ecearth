@@ -53,7 +53,7 @@ def compute_spatial_weights(domain_src, array_shape):
     cell_weights = np.broadcast_to(cell_areas.data, array_shape)
     return cell_weights
 
-def compute_month_weights(monthly_data_cube, cube_shape=None):
+def compute_time_weights(monthly_data_cube, cube_shape=None):
     """Compute weights for the different month lengths"""
     time_dim = monthly_data_cube.coord('time', dim_coords=True)
     month_weights = np.array([bound[1] - bound[0] for bound in time_dim.bounds])

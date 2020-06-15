@@ -54,7 +54,7 @@ class GlobalAverage(Task):
                 iris.analysis.MEAN,
                 weights=cell_weights,
                 )
-        month_weights = helpers.compute_month_weights(spatial_avg)
+        month_weights = helpers.compute_time_weights(spatial_avg)
         # Remove auxiliary time coordinate before collapsing cube
         spatial_avg.remove_coord(spatial_avg.coord('time', dim_coords=False))
         ann_spatial_avg = spatial_avg.collapsed(
