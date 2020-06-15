@@ -113,7 +113,7 @@ def plot_dynamic_map(map_cube, report_folder, base_name):
     """
     Plot a monitoring map cube as an animated GIF.
     """
-    png_dir = f"{base_name}_frames"
+    png_dir = f"{base_name}-{map_cube.var_name}_frames"
     number_of_time_steps = len(map_cube.coord('time').points)
     with cd(report_folder):
         if not os.path.isdir(png_dir):
@@ -132,7 +132,7 @@ def plot_dynamic_map(map_cube, report_folder, base_name):
         raise InvalidMapTypeException(map_type)
     unit_text = f"{fmt_units(map_cube.units)}"
 
-    dst = f"./{base_name}.gif"
+    dst = f"./{base_name}-{map_cube.var_name}.gif"
     with cd(f"{report_folder}/{png_dir}"):
         for time_step in range(number_of_pngs, number_of_time_steps):
             time_coord = map_cube[time_step].coord('time')
@@ -145,7 +145,7 @@ def plot_dynamic_map(map_cube, report_folder, base_name):
                 value_range=value_range,
                 units=unit_text,
             )
-            fig.savefig(f"./{base_name}-{time_step:03}.png", bbox_inches="tight")
+            fig.savefig(f"./{base_name}-{map_cube.var_name}-{time_step:03}.png", bbox_inches="tight")
             plt.close(fig)   
         images = []
         for file_name in sorted(os.listdir(".")):
