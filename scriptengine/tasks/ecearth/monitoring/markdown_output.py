@@ -41,14 +41,10 @@ class MarkdownOutput(Task):
         scalars = [scalar for scalar in scalars if scalar]
         nc_plots = [nc_plot for nc_plot in nc_plots if nc_plot]
 
-        try:
-            exp_id_index = next(
-                (index for (index, d) in enumerate(scalars) if d["long_name"] == "Experiment ID"),
-                None,
-                )
-            scalars.insert(0, scalars.pop(exp_id_index))
-        except TypeError: # TypeError if exp_id_index == None
-            self.log_debug('No scalar with long_name "Experiment ID" given.')
+        exp_id = None
+        for scalar in scalars:
+            if scalar["long_name"] == "Experiment ID":
+                exp_id = scalar["data"]
 
         search_path = ['.', 'templates']
         if "_se_cmd_cwd" in context:
@@ -67,6 +63,7 @@ class MarkdownOutput(Task):
                 md_out.write(md_template.render(
                     scalar_diagnostics=scalars,
                     nc_diagnostics=nc_plots,
+                    exp_id=exp_id,
                 ))
     
     def load_yaml(self, yaml_path):
@@ -146,14 +143,18 @@ class MarkdownOutput(Task):
                     new_plot_path = plot_static_map(cube, dst_folder, base_name)
                 except exceptions.InvalidMapTypeException as msg:
                     self.log_warning(f"Invalid Map Type: {msg}")
+                else:
+                    plot_list.append(new_plot_path)
+                    long_name_list.append(cube.long_name)
             else:
                 self.log_debug(f"New dynamic map: {cube.var_name}")
                 try:
                     new_plot_path = plot_dynamic_map(cube, dst_folder, base_name)
                 except exceptions.InvalidMapTypeException as msg:
                     self.log_warning(f"Invalid Map Type: {msg}")
-            plot_list.append(new_plot_path)
-            long_name_list.append(cube.long_name)
+                else:
+                    plot_list.append(new_plot_path)
+                    long_name_list.append(cube.long_name)  
 
         new_plots = {
             'plot': plot_list,
