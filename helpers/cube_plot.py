@@ -102,7 +102,7 @@ def plot_static_map(map_cube, report_folder, base_name):
         value_range=value_range,
         units=unit_text,
     )
-    dst = f"./{base_name}.png"
+    dst = f"./{base_name}-{map_cube.var_name}.png"
     with cd(report_folder):
         fig.savefig(dst, bbox_inches="tight")
         plt.close(fig)
