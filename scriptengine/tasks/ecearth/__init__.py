@@ -13,6 +13,7 @@ from .monitoring.ice_volume import SeaIceVolume
 from .monitoring.ice_area import SeaIceArea
 from .monitoring.ocean_map import OceanMap
 from .monitoring.atmosphere_map import AtmosphereMap
+from .monitoring.atmosphere_time_series import AtmosphereTimeSeries
 from .slurm import Sbatch
 
 def task_loader_map():
@@ -28,4 +29,5 @@ def task_loader_map():
         'ece.mon.ice_area': SeaIceArea,
         'ece.mon.ocean_map': OceanMap,
         'ece.mon.atmosphere_map': AtmosphereMap,
+        'ece.mon.atmosphere_ts': AtmosphereTimeSeries,
         }

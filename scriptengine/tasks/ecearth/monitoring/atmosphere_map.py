@@ -43,7 +43,7 @@ class AtmosphereMap(Task):
         if cf_phenomenon: # is None if not found
             constraint = cf_phenomenon.standard_name
         else:
-            constraint = f"UNKNOWN PARAMETER {grib_code}.128"
+            constraint = f"UNKNOWN LOCAL PARAM {grib_code}.128"
 
         leg_cube = helpers.load_input_cube(src, constraint)
 
@@ -66,6 +66,8 @@ class AtmosphereMap(Task):
             diagnostic_type=self.type,
             map_type=self.map_type,
         )
+        if annual_avg.units.name == 'kelvin':
+            annual_avg.convert_units('degC')
         self.save_cube(annual_avg, varname, dst)
 
     def save_cube(self, new_cube, varname, dst):
