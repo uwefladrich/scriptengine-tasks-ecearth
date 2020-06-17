@@ -83,7 +83,7 @@ def polar_ice_sheet_plot(cube, title=None, value_range=None, units=None):
         center = 90.0
     else:
         center = -90.0
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.AzimuthalEquidistant(central_latitude=center))
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Orthographic(central_latitude=center))
     with warnings.catch_warnings():
         warnings.filterwarnings(
             action='ignore', 
@@ -104,8 +104,8 @@ def polar_ice_sheet_plot(cube, title=None, value_range=None, units=None):
         im = iplt.pcolormesh(
             projected_cube,
             axes=ax,
-            vmin=0,
-            vmax=1,
+            vmin=value_range[0],
+            vmax=value_range[1],
             )
     bar = fig.colorbar(im, orientation='horizontal')
     if units != "1":
