@@ -1,4 +1,4 @@
-"""Processing Task that creates a 2D map of a given extensive ocean quantity."""
+"""Processing Task that creates a 2D dynamic map of a given extensive atmosphere quantity."""
 
 import os
 
@@ -8,25 +8,23 @@ import iris_grib
 from scriptengine.tasks.base import Task
 import helpers.file_handling as helpers
 
-class AtmosphereMap(Task):
-    """AtmosphereMap Processing Task"""
+class AtmosphereDynamicMap(Task):
+    """AtmosphereDynamicMap Processing Task"""
     def __init__(self, parameters):
         required = [
             "src",
             "dst",
             "grib_code",
-            "varname",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Map of **{self.varname}**.")
-        self.type = "map"
+        self.comment = (f"Yearly Average Dynamic Map of **{self.grib_code}**.")
+        self.type = "dynamic map"
         self.map_type = "global atmosphere"
 
     def run(self, context):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         grib_code = self.getarg('grib_code', context)
-        varname = self.getarg('varname', context)
 
         if not dst.endswith(".nc"):
             self.log_warning((
@@ -55,13 +53,13 @@ class AtmosphereMap(Task):
         # Promote time from scalar to dimension coordinate
         annual_avg = iris.util.new_axis(annual_avg, 'time')
 
-        annual_avg.var_name = varname
+        annual_avg.var_name = f"param_{grib_code}"
         if not annual_avg.long_name:
-            annual_avg.long_name = varname
+            annual_avg.long_name = annual_avg.var_name
 
         annual_avg = helpers.set_metadata(
             annual_avg,
-            title=f'{annual_avg.long_name} (Yearly Average Map)',
+            title=f'{annual_avg.long_name.title()} {self.type.title()}',
             comment=self.comment,
             diagnostic_type=self.type,
             map_type=self.map_type,
