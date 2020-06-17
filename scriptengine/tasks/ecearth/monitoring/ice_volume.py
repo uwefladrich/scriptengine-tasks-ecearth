@@ -17,22 +17,20 @@ class SeaIceVolume(Task):
             "src",
             "domain",
             "dst",
+            "hemisphere",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = ("Global Ice Volume over one leg, "
-                        "separated into Northern and Southern Hemisphere. ")
+        self.comment = (f"Sum of Sea-Ice Volume/**sithic** in March and September"
+                        f" on {self.hemisphere.title()}ern Hemisphere.")
         self.type = "time series"
-        self.long_name = "Global Sea Ice Volume"
+        self.long_name = "Sea-Ice Volume"
 
     def run(self, context):
         """run function of SeaIceVolume Processing Task"""
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         domain = self.getarg('domain', context)
-        #try:
-        #    src = ast.literal_eval(src)
-        #except ValueError:
-        #    src = ast.literal_eval(f'"{src}"')
+        hemisphere = self.getarg('hemisphere', context)
 
         if not dst.endswith(".nc"):
             self.log_warning((
@@ -59,18 +57,22 @@ class SeaIceVolume(Task):
         leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
         leg_cube = helpers.set_metadata(
             leg_cube,
-            title=self.long_name.title(),
+            title=f"{self.long_name} {self.type.title()},
             comment=self.comment,
             diagnostic_type=self.type,
         )
         leg_cube.standard_name = "sea_ice_volume"
         leg_cube.units = cf_units.Unit('m3')
         leg_cube.convert_units('1e3 km3')
+        if hemisphere == "north":
+            leg_cube.data = np.ma.masked_where(latitudes < 0, leg_cube.data)
+            leg_cube.long_name = self.long_name + " North"
+            leg_cube.var_name = "sivoln"
+        elif hemisphere == "south":
+            leg_cube.data = np.ma.masked_where(latitudes > 0, leg_cube.data)
+            leg_cube.long_name = self.long_name + " South"
+            leg_cube.var_name = "sivols"
 
-        nh_cube = leg_cube.copy()
-        sh_cube = leg_cube.copy()
-        nh_cube.data = np.ma.masked_where(latitudes < 0, leg_cube.data)
-        sh_cube.data = np.ma.masked_where(latitudes > 0, leg_cube.data)
         with warnings.catch_warnings():
             # Suppress warning about insufficient metadata.
             warnings.filterwarnings(
@@ -78,42 +80,28 @@ class SeaIceVolume(Task):
                 "Collapsing a multi-dimensional coordinate.",
                 UserWarning,
                 )
-            nh_weighted_sum = nh_cube.collapsed(
+            hemispheric_weighted_sum = leg_cube.collapsed(
                 ['latitude', 'longitude'],
                 iris.analysis.SUM,
                 weights=cell_weights,
                 )
-            sh_weighted_sum = sh_cube.collapsed(
-                ['latitude', 'longitude'],
-                iris.analysis.SUM,
-                weights=cell_weights,
-                )
-        nh_weighted_sum.long_name = self.long_name + " on Northern Hemisphere"
-        sh_weighted_sum.long_name = self.long_name + " on Southern Hemisphere"
-        nh_weighted_sum.var_name = 'sivoln'
-        sh_weighted_sum.var_name = 'sivols'
 
-        self.save_cubes(nh_weighted_sum, sh_weighted_sum, dst)
+        self.save_cube(hemispheric_weighted_sum, dst)
 
-    def save_cubes(self, new_sivoln, new_sivols, dst):
-        """save sea ice volume cubes in netCDF file"""
+    def save_cube(self, new_sivol, dst):
+        """save sea ice volume cube in netCDF file"""
         try:
-            current_sivoln = iris.load_cube(dst, 'sivoln')
-            current_sivols = iris.load_cube(dst, 'sivols')
-            current_bounds = current_sivoln.coord('time').bounds
-            new_bounds = new_sivoln.coord('time').bounds
+            current_sivol = iris.load_cube(dst)
+            current_bounds = current_sivol.coord('time').bounds
+            new_bounds = new_sivol.coord('time').bounds
             if current_bounds[-1][-1] > new_bounds[0][0]:
                 self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
             else:
-                sivoln_list = iris.cube.CubeList([current_sivoln, new_sivoln])
-                sivols_list = iris.cube.CubeList([current_sivols, new_sivols])
-                sivoln = sivoln_list.concatenate_cube()
-                sivols = sivols_list.concatenate_cube()
-                sivol_global = iris.cube.CubeList([sivoln, sivols])
-                iris.save(sivol_global, f"{dst}-copy.nc")
+                sivol_list = iris.cube.CubeList([current_sivol, new_sivol])
+                sivol = sivol_list.concatenate_cube()
+                iris.save(sivol, f"{dst}-copy.nc")
                 os.remove(dst)
                 os.rename(f"{dst}-copy.nc", dst)
         except OSError: # file does not exist yet.
-            sivol_global = iris.cube.CubeList([new_sivoln, new_sivols])
-            iris.save(sivol_global, dst)
+            iris.save(new_sivol, dst)
         

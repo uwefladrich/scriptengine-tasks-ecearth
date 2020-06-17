@@ -57,7 +57,7 @@ class SeaIceArea(Task):
         leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
         leg_cube = helpers.set_metadata(
             leg_cube,
-            title=self.long_name + self.type.title(),
+            title=f"{self.long_name} {self.type.title()},
             comment=self.comment,
             diagnostic_type=self.type,
         )
