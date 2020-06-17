@@ -11,7 +11,8 @@ from .monitoring.global_average import GlobalAverage
 from .monitoring.disk_usage import DiskUsage
 from .monitoring.ice_volume import SeaIceVolume
 from .monitoring.ice_area import SeaIceArea
-from .monitoring.ocean_map import OceanMap
+from .monitoring.ocean_static_map import OceanStaticMap
+from .monitoring.ocean_dynamic_map import OceanDynamicMap
 from .monitoring.atmosphere_map import AtmosphereMap
 from .monitoring.sithic_static_map import SithicStaticMap
 from .monitoring.siconc_dynamic_map import SiconcDynamicMap
@@ -29,7 +30,8 @@ def task_loader_map():
         'ece.mon.disk_usage': DiskUsage,
         'ece.mon.ice_volume': SeaIceVolume,
         'ece.mon.ice_area': SeaIceArea,
-        'ece.mon.ocean_map': OceanMap,
+        'ece.mon.ocean_static_map': OceanStaticMap,
+        'ece.mon.ocean_dynamic_map': OceanDynamicMap,
         'ece.mon.atmosphere_map': AtmosphereMap,
         'ece.mon.sithic_static_map': SithicStaticMap,
         'ece.mon.siconc_dynamic_map': SiconcDynamicMap,
