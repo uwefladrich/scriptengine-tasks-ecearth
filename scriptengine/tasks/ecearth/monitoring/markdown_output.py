@@ -1,11 +1,13 @@
 """Presentation Task that saves Data and Plots to a Markdown File."""
 
 import os
+
 import jinja2
 import yaml
 import iris
 import cftime
 import matplotlib.pyplot as plt
+import imageio
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import filters as j2filters
@@ -159,10 +161,65 @@ class MarkdownOutput(Task):
         with cd(dst_folder):
             fig.savefig(dst, bbox_inches="tight")
             plt.close(fig)
-        new_plots = {
+        new_plot = {
             'plot': [dst],
             'long_name': [static_map_cube.long_name],
             'title': static_map_cube.metadata.attributes["title"],
             'comment': static_map_cube.metadata.attributes["comment"],
         }
-        return new_plots
+        return new_plot
+    
+    def load_dynamic_map(self, dyn_map_cube, path, dst_folder):
+        """
+        Load map diagnostic and determine map type.
+        """
+        dyn_map_cube = dyn_map_cube[0]
+        self.log_debug(f"Loading dynamic map diagnostic {path}")
+        # get file name without extension
+        base_name = os.path.splitext(os.path.basename(path))[0]
+        map_type = dyn_map_cube.attributes['map_type']
+        try:
+            map_handler = type_handling.function_mapper(map_type)
+        except exceptions.InvalidMapTypeException as msg:
+            self.log_warning(f"Invalid Map Type: {msg}")
+            return
+        
+        png_dir = f"{base_name}-{dyn_map_cube.var_name}_frames"
+        number_of_time_steps = len(dyn_map_cube.coord('time').points)
+        with cd(dst_folder):
+            if not os.path.isdir(png_dir):
+                os.mkdir(png_dir)
+            number_of_pngs = len(os.listdir(png_dir))
+        
+        value_range = [
+            dyn_map_cube.attributes["presentation_min"],
+            dyn_map_cube.attributes["presentation_max"]
+        ]
+        unit_text = f"{fmt_units(dyn_map_cube.units)}"
+        dst = f"./{base_name}.gif"
+        with cd(f"{dst_folder}/{png_dir}"):
+            for time_step in range(number_of_pngs, number_of_time_steps):
+                time_coord = dyn_map_cube[time_step].coord('time')
+                date = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
+                year = date.strftime("%Y")
+                plot_title = f"{_title(dyn_map_cube.long_name)} {year}"
+                fig = map_handler(
+                    dyn_map_cube[time_step],
+                    title=plot_title,
+                    value_range=value_range,
+                    units=unit_text,
+                )
+                fig.savefig(f"./{base_name}-{time_step:03}.png", bbox_inches="tight")
+                plt.close(fig)   
+            images = []
+            for file_name in sorted(os.listdir(".")):
+                images.append(imageio.imread(file_name))
+            imageio.mimsave(f'.{dst}', images, fps=2)
+
+        new_plot = {
+            'plot': [dst],
+            'long_name': [dyn_map_cube.long_name],
+            'title': dyn_map_cube.metadata.attributes["title"],
+            'comment': dyn_map_cube.metadata.attributes["comment"],
+        }
+        return new_plot
