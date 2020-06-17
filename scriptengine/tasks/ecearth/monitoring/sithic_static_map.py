@@ -1,4 +1,4 @@
-"""Processing Task that creates a 2D map of sea ice concentration."""
+"""Processing Task that creates a 2D map of sea ice thickness."""
 
 import os
 
@@ -6,6 +6,8 @@ import numpy as np
 import iris
 import iris_grib
 import cftime
+import cf_units
+from iris.experimental.equalise_cubes import equalise_attributes
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import render as j2render
@@ -53,6 +55,7 @@ class SithicStaticMap(Task):
 
         # Remove auxiliary time coordinate
         month_cube.remove_coord(month_cube.coord('time', dim_coords=False))
+        month_cube.data = month_cube.data.astype('float64')
         month_cube = helpers.set_metadata(
             month_cube,
             title=f'{month_cube.long_name} (Simulation Average)',
@@ -74,6 +77,8 @@ class SithicStaticMap(Task):
             if current_bounds[-1][-1] > new_bounds[0][0]:
                 self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
             else:
+                saved_diagnostic.cell_methods += month_cube.cell_methods
+                month_cube.cell_methods = saved_diagnostic.cell_methods
                 cube_list = iris.cube.CubeList([saved_diagnostic, month_cube])
                 single_cube = cube_list.concatenate_cube()
                 time_weights = self.compute_time_weights(single_cube, current_bounds)
@@ -82,6 +87,8 @@ class SithicStaticMap(Task):
                     iris.analysis.MEAN,
                     weights=time_weights,
                 )
+                # Promote time from scalar to dimension coordinate
+                simulation_average = iris.util.new_axis(simulation_average, 'time')
                 iris.save(simulation_average, f"{dst}-copy.nc")
                 os.remove(dst)
                 os.rename(f"{dst}-copy.nc", dst)
