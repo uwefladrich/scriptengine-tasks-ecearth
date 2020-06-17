@@ -15,6 +15,7 @@ from .monitoring.ocean_map import OceanMap
 from .monitoring.atmosphere_map import AtmosphereMap
 from .monitoring.sithic_static_map import SithicStaticMap
 from .monitoring.siconc_dynamic_map import SiconcDynamicMap
+from .monitoring.atmosphere_time_series import AtmosphereTimeSeries
 from .slurm import Sbatch
 
 def task_loader_map():
@@ -32,4 +33,5 @@ def task_loader_map():
         'ece.mon.atmosphere_map': AtmosphereMap,
         'ece.mon.sithic_static_map': SithicStaticMap,
         'ece.mon.siconc_dynamic_map': SiconcDynamicMap,
+        'ece.mon.atmosphere_ts': AtmosphereTimeSeries,
         }
