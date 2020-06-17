@@ -1,14 +1,15 @@
-"""Processing Task that creates a 2D map of a given extensive ocean quantity."""
+"""Processing Task that creates a 2D dynamic map of a given extensive ocean quantity."""
 
 import os
 
 import iris
+import numpy as np
 
 from scriptengine.tasks.base import Task
 import helpers.file_handling as helpers
 
 class OceanDynamicMap(Task):
-    """OceanMap Processing Task"""
+    """OceanDynamicMap Processing Task"""
     def __init__(self, parameters):
         required = [
             "src",
@@ -16,8 +17,8 @@ class OceanDynamicMap(Task):
             "varname",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Map of **{self.varname}**.")
-        self.type = "map"
+        self.comment = (f"Annual Average Dynamic Map of **{self.varname}**.")
+        self.type = "dynamic map"
         self.map_type = "global ocean"
 
     def run(self, context):
@@ -49,7 +50,7 @@ class OceanDynamicMap(Task):
 
         annual_avg = helpers.set_metadata(
             annual_avg,
-            title=f'{annual_avg.long_name} (Yearly Average Map)',
+            title=f'{annual_avg.long_name.title()} {self.type.title()}',
             comment=self.comment,
             diagnostic_type=self.type,
             map_type=self.map_type,
@@ -65,28 +66,23 @@ class OceanDynamicMap(Task):
             if current_bounds[-1][-1] > new_bounds[0][0]:
                 self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
             else:
+                new_cube.attributes["presentation_min"] = current_cube.attributes["presentation_min"]
+                new_cube.attributes["presentation_max"] = current_cube.attributes["presentation_max"]
                 cube_list = iris.cube.CubeList([current_cube, new_cube])
                 yearly_averages = cube_list.concatenate_cube()
-                simulation_avg = self.compute_simulation_avg(yearly_averages)
-                iris.save([yearly_averages, simulation_avg], f"{dst}-copy.nc")
+                iris.save(yearly_averages, f"{dst}-copy.nc")
                 os.remove(dst)
                 os.rename(f"{dst}-copy.nc", dst)
         except OSError: # file does not exist yet.
+            vmin, vmax = self.compute_presentation_value_range(new_cube)
+            new_cube.attributes["presentation_min"] = vmin
+            new_cube.attributes["presentation_max"] = vmax
             iris.save(new_cube, dst)
             return
-
-    def compute_simulation_avg(self, yearly_averages):
-        """
-        Compute Time Average for the whole simulation.
-        """
-        time_weights = helpers.compute_time_weights(yearly_averages, yearly_averages.shape)
-        simulation_avg = yearly_averages.collapsed(
-            'time',
-            iris.analysis.MEAN,
-            weights=time_weights,
-        )
-        simulation_avg.var_name = simulation_avg.var_name + '_sim_avg'
-        simulation_avg.coord('time').var_name = 'time_value'
-        # Promote time from scalar to dimension coordinate
-        simulation_avg = iris.util.new_axis(simulation_avg, 'time')
-        return simulation_avg
+    
+    def compute_presentation_value_range(self, cube):
+        mean = np.ma.mean(cube.data)
+        delta = np.ma.max(cube.data) - mean
+        vmin = mean - 1.2 * delta
+        vmax = mean + 1.2 * delta
+        return vmin, vmax
