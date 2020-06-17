@@ -22,7 +22,7 @@ def function_mapper(map_type_string):
     except KeyError:
         raise exceptions.InvalidMapTypeException(map_type_string)
 
-def global_ocean_plot(cube, title=None, value_range=None, units=None):
+def global_ocean_plot(cube, title=None, units=None, min_value=None, max_value=None):
     """Map Type Handling for Global Ocean Maps"""
     fig = plt.figure(figsize=(6, 4), dpi=300)
     ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
@@ -46,8 +46,8 @@ def global_ocean_plot(cube, title=None, value_range=None, units=None):
         im = iplt.pcolormesh(
             projected_cube,
             axes=ax,
-            vmin=value_range[0],
-            vmax=value_range[1],
+            vmin=min_value,
+            vmax=max_value,
             )
     cbar = fig.colorbar(im, orientation='horizontal')
     cbar.set_label(units)
@@ -55,7 +55,7 @@ def global_ocean_plot(cube, title=None, value_range=None, units=None):
     ax.coastlines()
     return fig
 
-def global_atmosphere_plot(cube, title=None, value_range=None, units=None):
+def global_atmosphere_plot(cube, title=None, min_value=None, max_value=None, units=None):
     """Map Type Handling for Global Atmosphere Maps"""
     fig = plt.figure(figsize=(6, 4), dpi=300)
     ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
@@ -67,8 +67,8 @@ def global_atmosphere_plot(cube, title=None, value_range=None, units=None):
         latitude,
         c=data,
         axes=ax,
-        vmin=value_range[0],
-        vmax=value_range[1],
+        vmin=min_value,
+        vmax=max_value,
         transform=ccrs.PlateCarree(),
     )
     cbar = fig.colorbar(im, orientation='horizontal')
@@ -77,7 +77,7 @@ def global_atmosphere_plot(cube, title=None, value_range=None, units=None):
     ax.coastlines()
     return fig
 
-def polar_ice_sheet_plot(cube, title=None, value_range=None, units=None):
+def polar_ice_sheet_plot(cube, title=None, min_value=None, max_value=None, units=None):
     fig = plt.figure(figsize=(6,4), dpi=300)
     if cube.var_name.endswith('n'):
         center = 90.0
@@ -104,8 +104,8 @@ def polar_ice_sheet_plot(cube, title=None, value_range=None, units=None):
         im = iplt.pcolormesh(
             projected_cube,
             axes=ax,
-            vmin=value_range[0],
-            vmax=value_range[1],
+            vmin=min_value,
+            vmax=max_value,
             )
     bar = fig.colorbar(im, orientation='horizontal')
     if units != "1":
