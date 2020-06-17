@@ -4,12 +4,15 @@ import os
 import jinja2
 import yaml
 import iris
+import cftime
+import matplotlib.pyplot as plt
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import cd
-from helpers.cube_plot import plot_time_series, plot_static_map, plot_dynamic_map
+from helpers.cube_plot import plot_time_series, fmt_units, _title
 import helpers.exceptions as exceptions
+import helpers.map_type_handling as type_handling
 
 class MarkdownOutput(Task):
     """MarkdownOutput Presentation Task"""
@@ -85,8 +88,10 @@ class MarkdownOutput(Task):
 
         if cubes[0].attributes['type'] == 'time series':
             new_plots = self.load_time_series(cubes, path, dst_folder)
-        elif cubes[0].attributes['type'] == 'map':
-            new_plots = self.load_map(cubes, path, dst_folder)
+        elif cubes[0].attributes['type'] == 'static map':
+            new_plots = self.load_static_map(cubes, path, dst_folder)
+        elif cubes[0].attributes['type'] == 'dynamic map':
+            new_plots = self.load_dynamic_map(cubes, path, dst_folder)
 
         return new_plots
 
@@ -123,39 +128,41 @@ class MarkdownOutput(Task):
         }
         return new_plots
 
-    def load_map(self, cube_list, path, dst_folder):
+    def load_static_map(self, static_map_cube, path, dst_folder):
         """
         Load map diagnostic and determine map type.
         """
-        self.log_debug(f"Loading map diagnostic {path}")
+        static_map_cube = static_map_cube[0]
+        self.log_debug(f"Loading static map diagnostic {path}")
         # get file name without extension
         base_name = os.path.splitext(os.path.basename(path))[0]
-        plot_list = []
-        long_name_list = []
-        for cube in cube_list:
-            if cube.var_name.endswith('_sim_avg'):
-                self.log_debug(f"New static map: {cube.var_name}")
-                try:
-                    new_plot_path = plot_static_map(cube, dst_folder, base_name)
-                except exceptions.InvalidMapTypeException as msg:
-                    self.log_warning(f"Invalid Map Type: {msg}")
-                else:
-                    plot_list.append(new_plot_path)
-                    long_name_list.append(cube.long_name)
-            else:
-                self.log_debug(f"New dynamic map: {cube.var_name}")
-                try:
-                    new_plot_path = plot_dynamic_map(cube, dst_folder, base_name)
-                except exceptions.InvalidMapTypeException as msg:
-                    self.log_warning(f"Invalid Map Type: {msg}")
-                else:
-                    plot_list.append(new_plot_path)
-                    long_name_list.append(cube.long_name)
-
+        map_type = static_map_cube.attributes['map_type']
+        try:
+            map_handler = type_handling.function_mapper(map_type)
+        except exceptions.InvalidMapTypeException as msg:
+            self.log_warning(f"Invalid Map Type: {msg}")
+            return
+        
+        unit_text = f"{fmt_units(static_map_cube.units)}"
+        time_coord = static_map_cube.coord('time')
+        dates = cftime.num2pydate(time_coord.bounds[0], time_coord.units.name)
+        start_year = dates[0].strftime("%Y")
+        end_year = dates[-1].strftime("%Y")
+        plot_title = f"{_title(static_map_cube.long_name)} {start_year} - {end_year}"
+        fig = map_handler(
+            static_map_cube[0],
+            title=plot_title,
+            value_range=[None,None],
+            units=unit_text,
+        )
+        dst = f"./{base_name}.png"
+        with cd(dst_folder):
+            fig.savefig(dst, bbox_inches="tight")
+            plt.close(fig)
         new_plots = {
-            'plot': plot_list,
-            'long_name': long_name_list,
-            'title': cube_list[0].metadata.attributes["title"],
-            'comment': cube_list[0].metadata.attributes["comment"],
+            'plot': [dst],
+            'long_name': [static_map_cube.long_name],
+            'title': static_map_cube.metadata.attributes["title"],
+            'comment': static_map_cube.metadata.attributes["comment"],
         }
         return new_plots

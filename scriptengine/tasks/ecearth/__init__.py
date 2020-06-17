@@ -13,7 +13,7 @@ from .monitoring.ice_volume import SeaIceVolume
 from .monitoring.ice_area import SeaIceArea
 from .monitoring.ocean_map import OceanMap
 from .monitoring.atmosphere_map import AtmosphereMap
-from .monitoring.ice_map import SeaIceMap
+from .monitoring.sithic_static_map import SithicStaticMap
 from .slurm import Sbatch
 
 def task_loader_map():
@@ -29,5 +29,5 @@ def task_loader_map():
         'ece.mon.ice_area': SeaIceArea,
         'ece.mon.ocean_map': OceanMap,
         'ece.mon.atmosphere_map': AtmosphereMap,
-        'ece.mon.ice_map': SeaIceMap,
+        'ece.mon.sithic_static_map': SithicStaticMap,
         }

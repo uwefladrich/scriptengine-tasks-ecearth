@@ -9,13 +9,18 @@ import cftime
 import cf_units as unit
 import cartopy.crs as ccrs
 
+import helpers.exceptions as exceptions
+
 def function_mapper(map_type_string):
     mapper = {
         'global ocean': global_ocean_plot,
         'global atmosphere': global_atmosphere_plot,
         'polar ice sheet': polar_ice_sheet_plot,
     }
-    return mapper.get(map_type_string, None)
+    try:
+        return mapper[map_type_string]
+    except KeyError:
+        raise exceptions.InvalidMapTypeException(map_type_string)
 
 def global_ocean_plot(cube, title=None, value_range=None, units=None):
     """Map Type Handling for Global Ocean Maps"""
