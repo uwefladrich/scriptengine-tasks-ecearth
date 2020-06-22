@@ -21,7 +21,7 @@ def _title(name, units=None):
     """
     title = name.replace("_", " ").title()
     unit_text = fmt_units(units)
-    if unit_text:
+    if unit_text and unit_text != "1":
         title += " / {}".format(unit_text)
     return title
 

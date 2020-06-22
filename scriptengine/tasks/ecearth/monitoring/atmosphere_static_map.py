@@ -57,7 +57,7 @@ class AtmosphereStaticMap(Task):
 
         annual_avg.var_name = f"param_{grib_code}"
         if not annual_avg.long_name:
-            annual_avg.long_name = annual_avg.var_name
+            annual_avg.long_name = f"UNKNOWN LOCAL PARAM {grib_code}.128"
 
         annual_avg = helpers.set_metadata(
             annual_avg,

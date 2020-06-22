@@ -109,7 +109,7 @@ def polar_ice_sheet_plot(cube, title=None, min_value=None, max_value=None, units
             vmax=max_value,
             )
     bar = fig.colorbar(im, orientation='horizontal')
-    if units != "1":
+    if units:
         bar.set_label(units)
     time_coord = cube.coord('time')
     date = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
