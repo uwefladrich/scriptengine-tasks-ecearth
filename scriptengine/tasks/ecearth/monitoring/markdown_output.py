@@ -69,12 +69,22 @@ class MarkdownOutput(Task):
                 return {'presentation_type': 'image', **make_time_series(src, dst_folder, loaded_cube)}
             elif loaded_cube.attributes["type"] == "static map":
                 self.log_debug(f"Loading static map diagnostic {src}")
-                return {'presentation_type': 'image', **make_static_map(src, dst_folder, loaded_cube)}
+                try:
+                    map_plot_dict = make_static_map(src, dst_folder, loaded_cube)
+                except exceptions.InvalidMapTypeException as msg:
+                    self.log_error(f"Invalid Map Type {msg}")
+                    return None
+                return {'presentation_type': 'image', **map_plot_dict}
             elif loaded_cube.attributes["type"] == "dynamic map":
                 self.log_debug(f"Loading dynamic map diagnostic {src}")
-                return {'presentation_type': 'image', **make_dynamic_map(src, dst_folder, loaded_cube)}
+                try:
+                    map_plot_dict = make_dynamic_map(src, dst_folder, loaded_cube)
+                except exceptions.InvalidMapTypeException as msg:
+                    self.log_error(f"Invalid Map Type {msg}")
+                    return None
+                return {'presentation_type': 'image', **map_plot_dict}
             else:
-                self.log_error(f"Invalid diag_type {loaded_cube.attributes['diag_type']}")
+                self.log_error(f"Invalid diagnostic type {loaded_cube.attributes['type']}")
         else:
             self.log_error(f"Invalid file extension of {src}")
         return None
@@ -135,6 +145,8 @@ def make_static_map(src_path, dst_folder, static_map_cube):
     base_name = os.path.splitext(os.path.basename(src_path))[0]
     map_type = static_map_cube.attributes['map_type']
     map_handler = type_handling.function_mapper(map_type)
+    if map_handler is None:
+        raise exceptions.InvalidMapTypeException(map_type)
     
     unit_text = f"{fmt_units(static_map_cube.units)}"
     time_coord = static_map_cube.coord('time')
@@ -167,6 +179,8 @@ def make_dynamic_map(src_path, dst_folder, dyn_map_cube):
     base_name = os.path.splitext(os.path.basename(src_path))[0]
     map_type = dyn_map_cube.attributes['map_type']
     map_handler = type_handling.function_mapper(map_type)
+    if map_handler is None:
+        raise exceptions.InvalidMapTypeException(map_type)
     
     png_dir = f"{base_name}_frames"
     number_of_time_steps = len(dyn_map_cube.coord('time').points)
