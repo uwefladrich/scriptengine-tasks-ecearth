@@ -48,5 +48,7 @@ setuptools.setup(
         "numpy>=1.16.1",
         "pytest>5.0",
         "imageio>=2.0",
+        "scitools-iris>=2.3",
+        "iris-grib>=0.15",
     ],
 )
