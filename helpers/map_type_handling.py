@@ -65,7 +65,7 @@ def global_atmosphere_plot(cube, title=None, min_value=None, max_value=None, uni
     im = plt.scatter(
         longitude,
         latitude,
-        s=0.5,
+        s=1,
         c=data,
         axes=ax,
         vmin=min_value,

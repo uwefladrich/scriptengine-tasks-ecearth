@@ -4,6 +4,7 @@ import os
 
 import iris
 import iris_grib
+import numpy as np
 
 from scriptengine.tasks.base import Task
 import helpers.file_handling as helpers
@@ -66,37 +67,38 @@ class AtmosphereDynamicMap(Task):
         )
         if annual_avg.units.name == 'kelvin':
             annual_avg.convert_units('degC')
-        self.save_cube(annual_avg, varname, dst)
 
-    def save_cube(self, new_cube, varname, dst):
+        iris.save(annual_avg, 'temp.nc')
+        annual_avg = iris.load_cube('temp.nc')
+        self.save_cube(annual_avg, dst)
+        os.remove('temp.nc')
+
+    def save_cube(self, new_cube, dst):
         """save global average cubes in netCDF file"""
         try:
-            current_cube = iris.load_cube(dst, varname)
+            current_cube = iris.load_cube(dst)
             current_bounds = current_cube.coord('time').bounds
             new_bounds = new_cube.coord('time').bounds
             if current_bounds[-1][-1] > new_bounds[0][0]:
                 self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
             else:
+                new_cube.attributes["presentation_min"] = current_cube.attributes["presentation_min"]
+                new_cube.attributes["presentation_max"] = current_cube.attributes["presentation_max"]
                 cube_list = iris.cube.CubeList([current_cube, new_cube])
                 yearly_averages = cube_list.concatenate_cube()
-                simulation_avg = self.compute_simulation_avg(yearly_averages)
-                iris.save([yearly_averages, simulation_avg], f"{dst}-copy.nc")
+                iris.save(yearly_averages, f"{dst}-copy.nc")
                 os.remove(dst)
                 os.rename(f"{dst}-copy.nc", dst)
         except OSError: # file does not exist yet.
+            vmin, vmax = self.compute_presentation_value_range(new_cube)
+            new_cube.attributes["presentation_min"] = vmin
+            new_cube.attributes["presentation_max"] = vmax
             iris.save(new_cube, dst)
             return
-
-    def compute_simulation_avg(self, yearly_averages):
-        """
-        Compute Time Average for the whole simulation.
-        """
-        simulation_avg = yearly_averages.collapsed(
-            'time',
-            iris.analysis.MEAN,
-        )
-        simulation_avg.var_name = simulation_avg.var_name + '_sim_avg'
-        simulation_avg.coord('time').var_name = 'time_value'
-        # Promote time from scalar to dimension coordinate
-        simulation_avg = iris.util.new_axis(simulation_avg, 'time')
-        return simulation_avg
+    
+    def compute_presentation_value_range(self, cube):
+        mean = np.ma.mean(cube.data)
+        delta = np.ma.max(cube.data) - mean
+        vmin = mean - 1.2 * delta
+        vmax = mean + 1.2 * delta
+        return vmin, vmax
