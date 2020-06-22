@@ -5,6 +5,7 @@ import warnings
 import iris
 import iris.plot as iplt
 import matplotlib.pyplot as plt
+import matplotlib.cm as mpl_cm
 import cftime
 import cf_units as unit
 import cartopy.crs as ccrs
@@ -43,6 +44,7 @@ def global_ocean_plot(cube, title=None, units=None, min_value=None, max_value=No
             axes=ax,
             vmin=min_value,
             vmax=max_value,
+            cmap='RdBu_r',
             )
     cbar = fig.colorbar(im, orientation='horizontal')
     cbar.set_label(units)
@@ -66,6 +68,7 @@ def global_atmosphere_plot(cube, title=None, min_value=None, max_value=None, uni
         vmin=min_value,
         vmax=max_value,
         transform=ccrs.PlateCarree(),
+        cmap='RdBu_r',
     )
     cbar = fig.colorbar(im, orientation='horizontal')
     cbar.set_label(units)
@@ -102,6 +105,7 @@ def polar_ice_sheet_plot(cube, title=None, min_value=None, max_value=None, units
             axes=ax,
             vmin=min_value,
             vmax=max_value,
+            cmap='RdBu_r',
             )
     bar = fig.colorbar(im, orientation='horizontal')
     if units:
