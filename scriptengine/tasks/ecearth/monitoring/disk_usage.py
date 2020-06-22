@@ -18,6 +18,7 @@ class DiskUsage(WriteScalar):
     def run(self, context):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
+        self.log_info(f"Write disk usage to {dst}")
 
         value = round(self.get_directory_size(src) * 1e-9, 1)
 

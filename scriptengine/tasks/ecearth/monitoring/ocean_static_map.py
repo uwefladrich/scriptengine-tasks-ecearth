@@ -24,6 +24,8 @@ class OceanStaticMap(Task):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         varname = self.getarg('varname', context)
+        self.log_info(f"Create static map for ocean variable {varname} at {dst}.")
+        self.log_debug(f"Source file(s): {src}")
 
         if not dst.endswith(".nc"):
             self.log_warning((

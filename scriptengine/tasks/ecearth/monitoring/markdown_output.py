@@ -31,6 +31,8 @@ class MarkdownOutput(Task):
         sources = self.getarg('src', context)
         dst_folder = self.getarg('dst', context)
         template = self.getarg('template', context)
+        self.log_info(f"Create Markdown report at {dst_folder}.")
+        self.log_debug(f"Template: {template}, Source File(s): {sources}")
 
         presentation_list = []
         for src in sources:

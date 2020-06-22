@@ -19,13 +19,13 @@ class WriteScalar(Task):
         title = self.getarg('title', context)
         value = self.getarg('value', context)
         dst = self.getarg('dst', context)
+        self.log_info(f"Write scalar diagnostic to {dst}")
 
         self.save(dst, title=title, data=value, type=self.type)
 
     def save(self, dst, **kwargs):
         """Saves a scalar diagnostic in a YAML file."""
         if dst.endswith(".yml") or dst.endswith(".yaml"):
-            self.log_info(f"Saving Scalar diagnostic as {dst}")
             with open(dst, 'w') as outfile:
                 yaml.dump(kwargs, outfile, sort_keys=False)
         else:

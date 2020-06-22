@@ -21,6 +21,7 @@ class SimulatedYears(WriteScalar):
         dst = self.getarg('dst', context)
         start = self.getarg('start', context)
         end = self.getarg('end', context)
+        self.log_info(f"Write simulated years to {dst}")
 
         value = relativedelta(end, start).years
 

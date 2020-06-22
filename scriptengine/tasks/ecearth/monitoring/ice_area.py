@@ -31,6 +31,8 @@ class SeaIceArea(Task):
         dst = self.getarg('dst', context)
         domain = self.getarg('domain', context)
         hemisphere = self.getarg('hemisphere', context)
+        self.log_info(f"Create sea ice area time series for {hemisphere}ern hemisphere at {dst}.")
+        self.log_debug(f"Domain: {domain}, Source file(s): {src}")
 
         if not dst.endswith(".nc"):
             self.log_warning((

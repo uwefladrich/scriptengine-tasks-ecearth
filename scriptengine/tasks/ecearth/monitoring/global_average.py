@@ -28,6 +28,8 @@ class GlobalAverage(Task):
         dst = self.getarg('dst', context)
         domain = self.getarg('domain', context)
         varname = self.getarg('varname', context)
+        self.log_info(f"Create time series for ocean variable {varname} at {dst}.")
+        self.log_debug(f"Domain: {domain}, Source file(s): {src}")
 
         if not dst.endswith(".nc"):
             self.log_warning((

@@ -26,6 +26,8 @@ class AtmosphereTimeSeries(Task):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         grib_code = self.getarg('grib_code', context)
+        self.log_info(f"Create time series for atmosphere variable {grib_code} at {dst}.")
+        self.log_debug(f"Source file(s): {src}")
 
         if not dst.endswith(".nc"):
             self.log_warning((

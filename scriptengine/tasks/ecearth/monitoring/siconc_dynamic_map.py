@@ -29,6 +29,8 @@ class SiconcDynamicMap(Task):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         hemisphere = self.getarg('hemisphere', context)
+        self.log_info(f"Create dynamic siconc map for {hemisphere}ern hemisphere at {dst}.")
+        self.log_debug(f"Source file(s): {src}")
 
         if not dst.endswith(".nc"):
             self.log_warning((

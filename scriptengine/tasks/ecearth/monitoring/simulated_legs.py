@@ -20,6 +20,7 @@ class SimulatedLegs(WriteScalar):
     def run(self, context):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
+        self.log_info(f"Write simulated legs to {dst}")
 
         value = self.count_leg_folders(src)
 
