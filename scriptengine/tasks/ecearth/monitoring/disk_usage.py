@@ -11,7 +11,7 @@ class DiskUsage(WriteScalar):
             "dst",
         ]
         super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
-        self.long_name = "Disk Usage in GB"
+        self.title = "Disk Usage in GB"
         self.comment = "Current size of output directory."
         self.type = "scalar"
 
@@ -23,7 +23,7 @@ class DiskUsage(WriteScalar):
 
         self.save(
             dst,
-            long_name=self.long_name,
+            title=self.title,
             comment=self.comment,
             data=value,
             type=self.type,

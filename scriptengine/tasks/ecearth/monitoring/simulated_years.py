@@ -13,7 +13,7 @@ class SimulatedYears(WriteScalar):
             "end",
         ]
         super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
-        self.long_name = "Simulated Years"
+        self.title = "Simulated Years"
         self.comment = "Current number of simulated years."
         self.type = "scalar"
 
@@ -26,7 +26,7 @@ class SimulatedYears(WriteScalar):
 
         self.save(
             dst,
-            long_name=self.long_name,
+            title=self.title,
             comment=self.comment,
             data=value,
             type=self.type,

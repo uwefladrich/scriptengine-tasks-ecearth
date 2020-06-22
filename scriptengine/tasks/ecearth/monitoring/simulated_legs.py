@@ -13,7 +13,7 @@ class SimulatedLegs(WriteScalar):
             "dst",
         ]
         super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
-        self.long_name = "Simulated Legs"
+        self.title = "Simulated Legs"
         self.comment = "Current amount of folders in output directory."
         self.type = "scalar"
 
@@ -25,7 +25,7 @@ class SimulatedLegs(WriteScalar):
 
         self.save(
             dst,
-            long_name=self.long_name,
+            title=self.title,
             comment=self.comment,
             data=value,
             type=self.type,

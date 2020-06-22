@@ -8,7 +8,7 @@ class WriteScalar(Task):
     """WriteScalar Processing Task"""
     def __init__(self, parameters):
         required = [
-            "long_name",
+            "title",
             "value",
             "dst",
         ]
@@ -16,11 +16,11 @@ class WriteScalar(Task):
         self.type = "scalar"
 
     def run(self, context):
-        long_name = self.getarg('long_name', context)
+        title = self.getarg('title', context)
         value = self.getarg('value', context)
         dst = self.getarg('dst', context)
 
-        self.save(dst, long_name=long_name, data=value, type=self.type)
+        self.save(dst, title=title, data=value, type=self.type)
 
     def save(self, dst, **kwargs):
         """Saves a scalar diagnostic in a YAML file."""
