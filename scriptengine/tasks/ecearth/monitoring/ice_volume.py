@@ -20,7 +20,7 @@ class SeaIceVolume(Task):
             "hemisphere",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Sum of Sea-Ice Volume/**sithic** in March and September"
+        self.comment = (f"Sum of Sea-Ice Volume/**sivolu** in March and September"
                         f" on {self.hemisphere.title()}ern Hemisphere.")
         self.type = "time series"
         self.long_name = "Sea-Ice Volume"
