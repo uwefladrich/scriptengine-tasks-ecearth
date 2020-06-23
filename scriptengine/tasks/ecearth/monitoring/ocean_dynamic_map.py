@@ -17,11 +17,12 @@ class OceanDynamicMap(Task):
             "varname",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Annual Average Dynamic Map of **{self.varname}**.")
+        self.comment = (f"Dynamic Map of **{self.varname}**.")
         self.type = "dynamic map"
         self.map_type = "global ocean"
 
     def run(self, context):
+        create_leg_mean = True
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         varname = self.getarg('varname', context)
@@ -40,24 +41,32 @@ class OceanDynamicMap(Task):
         # Remove auxiliary time coordinate before collapsing cube
         leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
 
-        month_weights = helpers.compute_time_weights(leg_cube, leg_cube.shape)
-        annual_avg = leg_cube.collapsed(
-            'time',
-            iris.analysis.MEAN,
-            weights=month_weights
-        )
-
-        # Promote time from scalar to dimension coordinate
-        annual_avg = iris.util.new_axis(annual_avg, 'time')
-
-        annual_avg = helpers.set_metadata(
-            annual_avg,
-            title=f'{annual_avg.long_name.title()} {self.type.title()}',
-            comment=self.comment,
-            diagnostic_type=self.type,
-            map_type=self.map_type,
-        )
-        self.save_cube(annual_avg, varname, dst)
+        if create_leg_mean:
+            month_weights = helpers.compute_time_weights(leg_cube, leg_cube.shape)
+            leg_average = leg_cube.collapsed(
+                'time',
+                iris.analysis.MEAN,
+                weights=month_weights
+            )
+            # Promote time from scalar to dimension coordinate
+            leg_average = iris.util.new_axis(leg_average, 'time')
+            leg_average = helpers.set_metadata(
+                leg_average,
+                title=f'{leg_average.long_name.title()} {self.type.title()}',
+                comment=f"Annual Average {self.comment}",
+                diagnostic_type=self.type,
+                map_type=self.map_type,
+            )
+            self.save_cube(leg_average, varname, dst)
+        else:
+            leg_cube = helpers.set_metadata(
+                leg_cube,
+                title=f'{leg_cube.long_name.title()} {self.type.title()}',
+                comment=f"Monthly Average {self.comment}",
+                diagnostic_type=self.type,
+                map_type=self.map_type,
+            )
+            self.save_cube(leg_cube, varname, dst)
 
     def save_cube(self, new_cube, varname, dst):
         """save global average cubes in netCDF file"""

@@ -18,11 +18,12 @@ class AtmosphereDynamicMap(Task):
             "grib_code",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Yearly Average Dynamic Map of **{self.grib_code}**.")
+        self.comment = (f"Dynamic Map of **{self.grib_code}**.")
         self.type = "dynamic map"
         self.map_type = "global atmosphere"
 
     def run(self, context):
+        create_leg_mean = True
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         grib_code = self.getarg('grib_code', context)
@@ -48,32 +49,45 @@ class AtmosphereDynamicMap(Task):
 
         leg_cube = helpers.load_input_cube(src, constraint)
 
-        annual_avg = leg_cube.collapsed(
-            'time',
-            iris.analysis.MEAN,
-        )
+        if create_leg_mean:
+            annual_avg = leg_cube.collapsed(
+                'time',
+                iris.analysis.MEAN,
+            )
 
-        # Promote time from scalar to dimension coordinate
-        annual_avg = iris.util.new_axis(annual_avg, 'time')
+            # Promote time from scalar to dimension coordinate
+            annual_avg = iris.util.new_axis(annual_avg, 'time')
 
-        annual_avg.var_name = f"param_{grib_code}"
-        if not annual_avg.long_name:
-            annual_avg.long_name = annual_avg.var_name
+            annual_avg.var_name = f"param_{grib_code}"
+            if not annual_avg.long_name:
+                annual_avg.long_name = annual_avg.var_name
 
-        annual_avg = helpers.set_metadata(
-            annual_avg,
-            title=f'{annual_avg.long_name.title()} {self.type.title()}',
-            comment=self.comment,
-            diagnostic_type=self.type,
-            map_type=self.map_type,
-        )
-        if annual_avg.units.name == 'kelvin':
-            annual_avg.convert_units('degC')
+            annual_avg = helpers.set_metadata(
+                annual_avg,
+                title=f'{annual_avg.long_name.title()} {self.type.title()}',
+                comment=f'Annual Average {self.comment}',
+                diagnostic_type=self.type,
+                map_type=self.map_type,
+            )
+            if annual_avg.units.name == 'kelvin':
+                annual_avg.convert_units('degC')
 
-        iris.save(annual_avg, 'temp.nc')
-        annual_avg = iris.load_cube('temp.nc')
-        self.save_cube(annual_avg, dst)
-        os.remove('temp.nc')
+            iris.save(annual_avg, 'temp.nc')
+            annual_avg = iris.load_cube('temp.nc')
+            self.save_cube(annual_avg, dst)
+            os.remove('temp.nc')
+        else:
+            leg_cube = helpers.set_metadata(
+                leg_cube,
+                title=f'{leg_cube.long_name.title()} {self.type.title()}',
+                comment=f'Monthly Average {self.comment}',
+                diagnostic_type=self.type,
+                map_type=self.map_type,
+            )
+            iris.save(leg_cube, 'temp.nc')
+            leg_cube = iris.load_cube('temp.nc')
+            self.save_cube(leg_cube, dst)
+            os.remove('temp.nc')
 
     def save_cube(self, new_cube, dst):
         """save global average cubes in netCDF file"""
