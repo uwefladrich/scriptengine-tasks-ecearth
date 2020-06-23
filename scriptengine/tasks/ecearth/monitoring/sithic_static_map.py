@@ -22,7 +22,7 @@ class SithicStaticMap(Task):
             "hemisphere",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Static Map of Sea Ice Thickness on {self.hemisphere.capitalize()}ern Hemisphere.")
+        self.comment = (f"Static Map of Sea Ice Thickness/**sivolu** on {self.hemisphere.capitalize()}ern Hemisphere.")
         self.type = "static map"
         self.map_type = "polar ice sheet"
         self.long_name = "Sea Ice Thickness"
@@ -31,7 +31,7 @@ class SithicStaticMap(Task):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         hemisphere = self.getarg('hemisphere', context)
-        self.log_info(f"Create static sithic map for {hemisphere}ern hemisphere at {dst}.")
+        self.log_info(f"Create static sivolu map for {hemisphere}ern hemisphere at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
         if not dst.endswith(".nc"):
@@ -41,18 +41,18 @@ class SithicStaticMap(Task):
             ))
             return
 
-        month_cube = iris.load_cube(src, 'sithic')
+        month_cube = iris.load_cube(src, 'sivolu')
         month_cube.attributes.pop('uuid')
         month_cube.attributes.pop('timeStamp')
         latitudes = np.broadcast_to(month_cube.coord('latitude').points, month_cube.shape)
         if hemisphere == "north":
             month_cube.data = np.ma.masked_where(latitudes < 0, month_cube.data)
             month_cube.long_name = self.long_name + " Northern Hemisphere"
-            month_cube.var_name = "sithickn"
+            month_cube.var_name = "sivoln"
         elif hemisphere == "south":
             month_cube.data = np.ma.masked_where(latitudes > 0, month_cube.data)
             month_cube.long_name = self.long_name + " Southern Hemisphere"
-            month_cube.var_name = "sithicks"
+            month_cube.var_name = "sivols"
         month_cube.data = np.ma.masked_equal(month_cube.data, 0)
         
 
