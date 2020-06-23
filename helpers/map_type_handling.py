@@ -21,7 +21,11 @@ def function_mapper(map_type_string):
 def global_ocean_plot(cube, title=None, units=None, min_value=None, max_value=None):
     """Map Type Handling for Global Ocean Maps"""
     fig = plt.figure(figsize=(6, 4), dpi=300)
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+    ax = fig.add_subplot(
+        1, 1, 1,
+        projection=ccrs.PlateCarree(),
+        facecolor='#d3d3d3',
+        )
     with warnings.catch_warnings():
         warnings.filterwarnings(
             action='ignore',
@@ -55,7 +59,11 @@ def global_ocean_plot(cube, title=None, units=None, min_value=None, max_value=No
 def global_atmosphere_plot(cube, title=None, min_value=None, max_value=None, units=None):
     """Map Type Handling for Global Atmosphere Maps"""
     fig = plt.figure(figsize=(6, 4), dpi=300)
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+    ax = fig.add_subplot(
+        1, 1, 1,
+        projection=ccrs.PlateCarree(),
+        facecolor='#d3d3d3',
+        )
     longitude = cube.coord('longitude').points
     latitude = cube.coord('latitude').points
     data = cube.data
@@ -82,7 +90,11 @@ def polar_ice_sheet_plot(cube, title=None, min_value=None, max_value=None, units
         center = 90.0
     else:
         center = -90.0
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Orthographic(central_latitude=center))
+    ax = fig.add_subplot(
+        1, 1, 1,
+        projection=ccrs.Orthographic(central_latitude=center),
+        facecolor='#d3d3d3',
+        )
     with warnings.catch_warnings():
         warnings.filterwarnings(
             action='ignore', 

@@ -51,6 +51,7 @@ class SiconcDynamicMap(Task):
             month_cube.data = np.ma.masked_where(latitudes > 0, month_cube.data)
             month_cube.long_name = self.long_name + " Southern Hemisphere"
             month_cube.var_name = "siconcs"
+        month_cube.data = np.ma.masked_equal(month_cube.data, 0)
 
 
         # Remove auxiliary time coordinate
