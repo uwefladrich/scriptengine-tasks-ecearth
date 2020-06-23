@@ -150,13 +150,17 @@ def make_static_map(src_path, dst_folder, static_map_cube):
     
     unit_text = f"{fmt_units(static_map_cube.units)}"
     time_coord = static_map_cube.coord('time')
-    dates = cftime.num2pydate(time_coord.bounds[0], time_coord.units.name)
-    start_year = dates[0].strftime("%Y")
-    end_year = dates[-1].strftime("%Y")
-    plot_title = f"{_title(static_map_cube.long_name)} {start_year} - {end_year}"
+    time_bounds = [
+        time_coord.bounds[0][0],
+        time_coord.bounds[0][-1] - 1,
+    ]
+    dates = cftime.num2pydate(time_bounds, time_coord.units.name)
+    plot_title = _title(static_map_cube.long_name)
+    date_title = f"averaged over {dates[0].strftime('%d-%m-%Y')} - {dates[-1].strftime('%d-%m-%Y')}"
     fig = map_handler(
         static_map_cube[0],
         title=plot_title,
+        dates=date_title,
         units=unit_text,
     )
     dst_file = f"./{base_name}.png"
@@ -197,13 +201,18 @@ def make_dynamic_map(src_path, dst_folder, dyn_map_cube):
     dst_file = f"./{base_name}.gif"
     with cd(f"{dst_folder}/{png_dir}"):
         for time_step in range(number_of_pngs, number_of_time_steps):
-            time_coord = dyn_map_cube[time_step].coord('time')
-            date = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
-            year = date.strftime("%Y")
-            plot_title = f"{_title(dyn_map_cube.long_name)} {year}"
+            time_coord = dyn_map_cube.coord('time')
+            time_bounds = [
+                time_coord.bounds[time_step][0],
+                time_coord.bounds[time_step][-1] - 1,
+            ]
+            dates = cftime.num2pydate(time_bounds, time_coord.units.name)
+            date_title = f"averaged over {dates[0].strftime('%d-%m-%Y')} - {dates[-1].strftime('%d-%m-%Y')}"
+            plot_title = _title(dyn_map_cube.long_name)
             fig = map_handler(
                 dyn_map_cube[time_step],
                 title=plot_title,
+                dates=date_title,
                 min_value=value_range[0],
                 max_value=value_range[1],
                 units=unit_text,

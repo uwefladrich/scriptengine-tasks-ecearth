@@ -18,9 +18,10 @@ def function_mapper(map_type_string):
     }
     return mapper.get(map_type_string, None)
 
-def global_ocean_plot(cube, title=None, units=None, min_value=None, max_value=None):
+def global_ocean_plot(cube, title=None, dates=None, units=None, min_value=None, max_value=None):
     """Map Type Handling for Global Ocean Maps"""
     fig = plt.figure(figsize=(6, 4), dpi=300)
+    fig.suptitle(title)
     ax = fig.add_subplot(
         1, 1, 1,
         projection=ccrs.PlateCarree(),
@@ -52,13 +53,14 @@ def global_ocean_plot(cube, title=None, units=None, min_value=None, max_value=No
             )
     cbar = fig.colorbar(im, orientation='horizontal')
     cbar.set_label(units)
-    ax.set_title(title)
+    ax.set_title(dates, fontdict={'fontsize': 8, 'fontweight': 'medium'})
     ax.coastlines()
     return fig
 
-def global_atmosphere_plot(cube, title=None, min_value=None, max_value=None, units=None):
+def global_atmosphere_plot(cube, title=None, dates=None, min_value=None, max_value=None, units=None):
     """Map Type Handling for Global Atmosphere Maps"""
     fig = plt.figure(figsize=(6, 4), dpi=300)
+    fig.suptitle(title)
     ax = fig.add_subplot(
         1, 1, 1,
         projection=ccrs.PlateCarree(),
@@ -80,12 +82,13 @@ def global_atmosphere_plot(cube, title=None, min_value=None, max_value=None, uni
     )
     cbar = fig.colorbar(im, orientation='horizontal')
     cbar.set_label(units)
-    ax.set_title(title)
+    ax.set_title(dates, fontdict={'fontsize': 8, 'fontweight': 'medium'})
     ax.coastlines()
     return fig
 
-def polar_ice_sheet_plot(cube, title=None, min_value=None, max_value=None, units=None):
+def polar_ice_sheet_plot(cube, title=None, dates=None, min_value=None, max_value=None, units=None):
     fig = plt.figure(figsize=(6,4), dpi=300)
+    fig.suptitle(title)
     if cube.var_name.endswith('n'):
         center = 90.0
     else:
@@ -122,9 +125,6 @@ def polar_ice_sheet_plot(cube, title=None, min_value=None, max_value=None, units
     bar = fig.colorbar(im, orientation='horizontal')
     if units:
         bar.set_label(units)
-    time_coord = cube.coord('time')
-    date = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
-    month = date.strftime("%m")
-    ax.set_title(f"{title} ({month})")
+    ax.set_title(dates, fontdict={'fontsize': 8, 'fontweight': 'medium'})
     ax.coastlines()
     return fig
