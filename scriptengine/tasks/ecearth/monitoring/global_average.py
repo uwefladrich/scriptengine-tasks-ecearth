@@ -1,4 +1,4 @@
-"""Processing Task that calculates the global yearly average of a given extensive quantity."""
+"""Processing Task that calculates the annual global average of a given extensive quantity."""
 
 import os
 import warnings
