@@ -8,6 +8,7 @@ import iris_grib
 import numpy as np
 
 from scriptengine.tasks.base import Task
+from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
 
 class AtmosphereTimeSeries(Task):
@@ -19,7 +20,7 @@ class AtmosphereTimeSeries(Task):
             "grib_code",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Yearly Average of **{self.grib_code}**.")
+        self.comment = (f"Annual global mean of **{self.grib_code}**.")
         self.type = "time series"
 
     def run(self, context):
@@ -30,38 +31,37 @@ class AtmosphereTimeSeries(Task):
         self.log_debug(f"Source file(s): {src}")
 
         if not dst.endswith(".nc"):
-            self.log_warning((
+            self.log_error((
                 f"{dst} does not end in valid netCDF file extension. "
                 f"Diagnostic will not be treated, returning now."
             ))
             return
 
+        update_grib_mappings()
         cf_phenomenon = iris_grib.grib_phenom_translation.grib1_phenom_to_cf_info(
             128, # table
             98, # institution: ECMWF
             grib_code
         )
-        if cf_phenomenon: # is None if not found
-            constraint = cf_phenomenon.standard_name
-        else:
-            constraint = f"UNKNOWN LOCAL PARAM {grib_code}.128"
+        if not cf_phenomenon:
+            self.log_error(f"CF Phenomenon for {grib_code} not found. Update local table?")
+            return
+        self.log_debug(f"Getting variable {cf_phenomenon.standard_name}")
+        leg_cube = helpers.load_input_cube(src, cf_phenomenon.standard_name)
 
-        leg_cube = helpers.load_input_cube(src, constraint)
-        
-        self.log_debug("Averaging over year.")
-        with warnings.catch_warnings():
-            # Suppress warning about insufficient metadata.
-            warnings.filterwarnings(
-                'ignore',
-                "Collapsing a non-contiguous coordinate.",
-                UserWarning,
-                )
-            annual_avg = leg_cube.collapsed(
-                'time',
-                iris.analysis.MEAN,
-            )
+        time_coord = leg_cube.coord('time')
+        step = time_coord.points[1] - time_coord.points[0]
+        time_coord.bounds = np.array([[point - step, point] for point in time_coord.points])
 
-        area_weights = self.get_area_weights(annual_avg)
+        self.log_debug("Averaging over the leg.")
+        leg_mean = leg_cube.collapsed(
+            'time',
+            iris.analysis.MEAN,
+        )
+        leg_mean.cell_methods = ()
+        leg_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 leg'))
+
+        area_weights = self.get_area_weights(leg_mean)
         self.log_debug("Averaging over space.")
         with warnings.catch_warnings():
             # Suppress warning about insufficient metadata.
@@ -70,32 +70,29 @@ class AtmosphereTimeSeries(Task):
                 "Collapsing a non-contiguous coordinate.",
                 UserWarning,
                 )
-            spatial_avg = annual_avg.collapsed(
+            spatial_mean = leg_mean.collapsed(
                 ['latitude', 'longitude'],
                 iris.analysis.MEAN,
                 weights=area_weights,
             )
 
         # Promote time from scalar to dimension coordinate
-        spatial_avg = iris.util.new_axis(spatial_avg, 'time')
+        spatial_mean = iris.util.new_axis(spatial_mean, 'time')
 
-        spatial_avg.var_name = f'param_{grib_code}'
-        if not spatial_avg.long_name:
-            spatial_avg.long_name = f'Parameter {grib_code}'
+        spatial_mean.long_name.replace("_", " ")
 
-        spatial_avg = helpers.set_metadata(
-            spatial_avg,
-            title=f'{spatial_avg.long_name} (Global Average Time Series)',
+        spatial_mean = helpers.set_metadata(
+            spatial_mean,
+            title=f'{spatial_mean.long_name} {self.type.title()}',
             comment=self.comment,
             diagnostic_type=self.type,
         )
-        spatial_avg.remove_coord('originating_centre')
-        spatial_avg.remove_coord('forecast_period')
-        if spatial_avg.units.name == 'kelvin':
-            spatial_avg.convert_units('degC')
-        iris.save(spatial_avg, 'temp.nc') # Iris changes metadata when saving/loading cube
-        spatial_avg = iris.load_cube('temp.nc')
-        self.save_cube(spatial_avg, dst)
+
+        if spatial_mean.units.name == 'kelvin':
+            spatial_mean.convert_units('degC')
+        iris.save(spatial_mean, 'temp.nc') # Iris changes metadata when saving/loading cube
+        spatial_mean = iris.load_cube('temp.nc')
+        self.save_cube(spatial_mean, dst)
         os.remove('temp.nc')
 
     def save_cube(self, new_cube, dst):
@@ -117,15 +114,16 @@ class AtmosphereTimeSeries(Task):
             return
 
     def get_area_weights(self, cube):
+        """compute area weights for the reduced gaussian grid"""
         self.log_debug("Getting area weights.")
         nh_latitudes = np.ma.masked_less(cube.coord('latitude').points, 0)
-        unique_lats, counts = np.unique(nh_latitudes, return_counts=True)
-        unique_lats, counts = unique_lats[0:-1], counts[0:-1]
+        unique_lats, gridpoints_per_lat = np.unique(nh_latitudes, return_counts=True)
+        unique_lats, gridpoints_per_lat = unique_lats[0:-1], gridpoints_per_lat[0:-1]
         areas = []
         last_angle = 0
         earth_radius = 6371
-        for lat, amount in zip(unique_lats, counts):
-            delta = lat - last_angle
+        for latitude, amount in zip(unique_lats, gridpoints_per_lat):
+            delta = latitude - last_angle
             current_angle = last_angle + 2 * delta
             sin_diff = np.sin(np.deg2rad(current_angle)) - np.sin(np.deg2rad(last_angle))
             ring_area = 2 * np.pi * earth_radius**2 * sin_diff

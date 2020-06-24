@@ -7,6 +7,7 @@ import iris_grib
 import numpy as np
 
 from scriptengine.tasks.base import Task
+from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
 
 class AtmosphereDynamicMap(Task):
@@ -18,12 +19,11 @@ class AtmosphereDynamicMap(Task):
             "grib_code",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Dynamic Map of **{self.grib_code}**.")
+        self.comment = (f"Leg Mean Dynamic Map of **{self.grib_code}**.")
         self.type = "dynamic map"
         self.map_type = "global atmosphere"
 
     def run(self, context):
-        create_leg_mean = True
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         grib_code = self.getarg('grib_code', context)
@@ -31,66 +31,57 @@ class AtmosphereDynamicMap(Task):
         self.log_debug(f"Source file(s): {src}")
 
         if not dst.endswith(".nc"):
-            self.log_warning((
+            self.log_error((
                 f"{dst} does not end in valid netCDF file extension. "
                 f"Diagnostic will not be treated, returning now."
             ))
             return
 
+        update_grib_mappings()
         cf_phenomenon = iris_grib.grib_phenom_translation.grib1_phenom_to_cf_info(
             128, # table
             98, # institution: ECMWF
             grib_code
         )
-        if cf_phenomenon: # is None if not found
-            constraint = cf_phenomenon.standard_name
-        else:
-            constraint = f"UNKNOWN LOCAL PARAM {grib_code}.128"
+        if not cf_phenomenon:
+            self.log_error(f"CF Phenomenon for {grib_code} not found. Update local table?")
+            return
+        self.log_debug(f"Getting variable {cf_phenomenon.standard_name}")
+        leg_cube = helpers.load_input_cube(src, cf_phenomenon.standard_name)
 
-        leg_cube = helpers.load_input_cube(src, constraint)
+        leg_cube.long_name.replace("_", " ")
 
-        if create_leg_mean:
-            annual_avg = leg_cube.collapsed(
-                'time',
-                iris.analysis.MEAN,
-            )
+        if leg_cube.units.name == 'kelvin':
+            leg_cube.convert_units('degC')
 
-            # Promote time from scalar to dimension coordinate
-            annual_avg = iris.util.new_axis(annual_avg, 'time')
+        time_coord = leg_cube.coord('time')
+        step = time_coord.points[1] - time_coord.points[0]
+        time_coord.bounds = np.array([[point - step, point] for point in time_coord.points])
 
-            annual_avg.var_name = f"param_{grib_code}"
-            if not annual_avg.long_name:
-                annual_avg.long_name = annual_avg.var_name
+        leg_mean = leg_cube.collapsed(
+            'time',
+            iris.analysis.MEAN,
+        )
+        leg_mean.cell_methods = ()
+        leg_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 leg'))
+        # Promote time from scalar to dimension coordinate
+        leg_mean = iris.util.new_axis(leg_mean, 'time')
 
-            annual_avg = helpers.set_metadata(
-                annual_avg,
-                title=f'{annual_avg.long_name.title()} {self.type.title()}',
-                comment=f'Annual Average {self.comment}',
-                diagnostic_type=self.type,
-                map_type=self.map_type,
-            )
-            if annual_avg.units.name == 'kelvin':
-                annual_avg.convert_units('degC')
+        leg_mean = helpers.set_metadata(
+            leg_mean,
+            title=f'{leg_mean.long_name.title()} {self.type.title()}',
+            comment=self.comment,
+            diagnostic_type=self.type,
+            map_type=self.map_type,
+        )
 
-            iris.save(annual_avg, 'temp.nc')
-            annual_avg = iris.load_cube('temp.nc')
-            self.save_cube(annual_avg, dst)
-            os.remove('temp.nc')
-        else:
-            leg_cube = helpers.set_metadata(
-                leg_cube,
-                title=f'{leg_cube.long_name.title()} {self.type.title()}',
-                comment=f'Monthly Average {self.comment}',
-                diagnostic_type=self.type,
-                map_type=self.map_type,
-            )
-            iris.save(leg_cube, 'temp.nc')
-            leg_cube = iris.load_cube('temp.nc')
-            self.save_cube(leg_cube, dst)
-            os.remove('temp.nc')
+        iris.save(leg_mean, 'temp.nc')
+        leg_mean = iris.load_cube('temp.nc')
+        self.save_cube(leg_mean, dst)
+        os.remove('temp.nc')
 
     def save_cube(self, new_cube, dst):
-        """save global average cubes in netCDF file"""
+        """save cube in netCDF file"""
         try:
             current_cube = iris.load_cube(dst)
             current_bounds = current_cube.coord('time').bounds
@@ -111,7 +102,7 @@ class AtmosphereDynamicMap(Task):
             new_cube.attributes["presentation_max"] = vmax
             iris.save(new_cube, dst)
             return
-    
+
     def compute_presentation_value_range(self, cube):
         mean = np.ma.mean(cube.data)
         delta = np.ma.max(cube.data) - mean

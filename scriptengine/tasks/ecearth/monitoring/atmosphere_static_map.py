@@ -4,8 +4,10 @@ import os
 
 import iris
 import iris_grib
+import numpy as np
 
 from scriptengine.tasks.base import Task
+from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
 
 class AtmosphereStaticMap(Task):
@@ -29,49 +31,53 @@ class AtmosphereStaticMap(Task):
         self.log_debug(f"Source file(s): {src}")
 
         if not dst.endswith(".nc"):
-            self.log_warning((
+            self.log_error((
                 f"{dst} does not end in valid netCDF file extension. "
                 f"Diagnostic will not be treated, returning now."
             ))
             return
 
+        update_grib_mappings()
         cf_phenomenon = iris_grib.grib_phenom_translation.grib1_phenom_to_cf_info(
             128, # table
             98, # institution: ECMWF
             grib_code
         )
-        if cf_phenomenon: # is None if not found
-            constraint = cf_phenomenon.standard_name
-        else:
-            constraint = f"UNKNOWN LOCAL PARAM {grib_code}.128"
+        if not cf_phenomenon:
+            self.log_error(f"CF Phenomenon for {grib_code} not found. Update local table?")
+            return
+        self.log_debug(f"Getting variable {cf_phenomenon.standard_name}")
+        leg_cube = helpers.load_input_cube(src, cf_phenomenon.standard_name)
 
-        leg_cube = helpers.load_input_cube(src, constraint)
+        time_coord = leg_cube.coord('time')
+        step = time_coord.points[1] - time_coord.points[0]
+        time_coord.bounds = np.array([[point - step, point] for point in time_coord.points])
 
-        annual_avg = leg_cube.collapsed(
+        leg_mean = leg_cube.collapsed(
             'time',
             iris.analysis.MEAN,
         )
+        leg_mean.cell_methods = ()
+        leg_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 leg'))
 
         # Promote time from scalar to dimension coordinate
-        annual_avg = iris.util.new_axis(annual_avg, 'time')
+        leg_mean = iris.util.new_axis(leg_mean, 'time')
 
-        annual_avg.var_name = f"param_{grib_code}"
-        if not annual_avg.long_name:
-            annual_avg.long_name = f"UNKNOWN LOCAL PARAM {grib_code}.128"
+        leg_cube.long_name.replace("_", " ")
 
-        annual_avg = helpers.set_metadata(
-            annual_avg,
-            title=f'{annual_avg.long_name.title()} {self.type.title()}',
+        leg_mean = helpers.set_metadata(
+            leg_mean,
+            title=f'{leg_mean.long_name.title()} {self.type.title()}',
             comment=self.comment,
             diagnostic_type=self.type,
             map_type=self.map_type,
         )
-        if annual_avg.units.name == 'kelvin':
-            annual_avg.convert_units('degC')
-        
-        iris.save(annual_avg, 'temp.nc')
-        annual_avg = iris.load_cube('temp.nc')
-        self.save_cube(annual_avg, dst)
+        if leg_mean.units.name == 'kelvin':
+            leg_mean.convert_units('degC')
+
+        iris.save(leg_mean, 'temp.nc')
+        leg_mean = iris.load_cube('temp.nc')
+        self.save_cube(leg_mean, dst)
         os.remove('temp.nc')
 
     def save_cube(self, new_cube, dst):
