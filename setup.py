@@ -50,5 +50,6 @@ setuptools.setup(
         "imageio>=2.0",
         "scitools-iris>=2.3",
         "iris-grib>=0.15",
+        "coveralls>=1.6.0",
     ],
 )
