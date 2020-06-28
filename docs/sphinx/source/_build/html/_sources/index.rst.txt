@@ -7,11 +7,12 @@ Welcome to EC-Earth Monitoring's documentation!
 ===============================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
    
    usage/installation
    usage/quickstart
+   tasks/ocean-diagnostics
    tasks/processing-tasks
 
 
