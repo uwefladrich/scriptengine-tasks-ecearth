@@ -32,7 +32,7 @@ class GlobalAverage(Task):
         self.log_debug(f"Domain: {domain}, Source file(s): {src}")
 
         if not dst.endswith(".nc"):
-            self.log_warning((
+            self.log_error((
                 f"{dst} does not end in valid netCDF file extension. "
                 f"Diagnostic will not be treated, returning now."
             ))
@@ -89,4 +89,3 @@ class GlobalAverage(Task):
         except OSError: # file does not exist yet.
             iris.save(new_cube, dst)
             return
-        
