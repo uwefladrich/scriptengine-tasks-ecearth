@@ -12,8 +12,8 @@ import imageio
 
 from scriptengine.tasks.base import Task
 from scriptengine.jinja import filters as j2filters
-from helpers.file_handling import cd
-from helpers.cube_plot import fmt_units, _title
+from helpers.file_handling import ChangeDirectory
+from helpers.cube_plot import format_units, format_title
 import helpers.exceptions as exceptions
 import helpers.map_type_handling as type_handling
 
@@ -51,7 +51,7 @@ class MarkdownOutput(Task):
             environment.filters[name] = function
         md_template = environment.get_template(template)
 
-        with cd(dst_folder):
+        with ChangeDirectory(dst_folder):
             with open("./summary.md", 'w') as md_out:
                 md_out.write(md_template.render(
                     presentation_list=presentation_list,
@@ -126,7 +126,7 @@ def make_time_series(src_path, dst_folder, time_series_cube):
     ax.set_xlabel(_title(time_coord.name()))
     ax.set_ylabel(_title(time_series_cube.long_name, time_series_cube.units))
     plt.tight_layout()
-    with cd(dst_folder):
+    with ChangeDirectory(dst_folder):
         fig.savefig(dst_file, bbox_inches="tight")
         plt.close(fig)
 
@@ -148,14 +148,11 @@ def make_static_map(src_path, dst_folder, static_map_cube):
     if map_handler is None:
         raise exceptions.InvalidMapTypeException(map_type)
     
-    unit_text = f"{fmt_units(static_map_cube.units)}"
+    unit_text = f"{format_units(static_map_cube.units)}"
     time_coord = static_map_cube.coord('time')
-    time_bounds = [
-        time_coord.bounds[0][0],
-        time_coord.bounds[0][-1] - 1,
-    ]
+    time_bounds = time_coord.bounds[0]
     dates = cftime.num2pydate(time_bounds, time_coord.units.name)
-    plot_title = _title(static_map_cube.long_name)
+    plot_title = format_title(static_map_cube.long_name)
     date_title = f"averaged over {dates[0].strftime('%d-%m-%Y')} - {dates[-1].strftime('%d-%m-%Y')}"
     fig = map_handler(
         static_map_cube[0],
@@ -164,7 +161,7 @@ def make_static_map(src_path, dst_folder, static_map_cube):
         units=unit_text,
     )
     dst_file = f"./{base_name}.png"
-    with cd(dst_folder):
+    with ChangeDirectory(dst_folder):
         fig.savefig(dst_file, bbox_inches="tight")
         plt.close(fig)
 
@@ -188,7 +185,7 @@ def make_dynamic_map(src_path, dst_folder, dyn_map_cube):
     
     png_dir = f"{base_name}_frames"
     number_of_time_steps = len(dyn_map_cube.coord('time').points)
-    with cd(dst_folder):
+    with ChangeDirectory(dst_folder):
         if not os.path.isdir(png_dir):
             os.mkdir(png_dir)
         number_of_pngs = len(os.listdir(png_dir))
@@ -197,18 +194,15 @@ def make_dynamic_map(src_path, dst_folder, dyn_map_cube):
         dyn_map_cube.attributes["presentation_min"],
         dyn_map_cube.attributes["presentation_max"]
     ]
-    unit_text = f"{fmt_units(dyn_map_cube.units)}"
+    unit_text = f"{format_units(dyn_map_cube.units)}"
     dst_file = f"./{base_name}.gif"
-    with cd(f"{dst_folder}/{png_dir}"):
+    with ChangeDirectory(f"{dst_folder}/{png_dir}"):
         for time_step in range(number_of_pngs, number_of_time_steps):
             time_coord = dyn_map_cube.coord('time')
-            time_bounds = [
-                time_coord.bounds[time_step][0],
-                time_coord.bounds[time_step][-1] - 1,
-            ]
+            time_bounds = time_coord.bounds[time_step]
             dates = cftime.num2pydate(time_bounds, time_coord.units.name)
             date_title = f"averaged over {dates[0].strftime('%d-%m-%Y')} - {dates[-1].strftime('%d-%m-%Y')}"
-            plot_title = _title(dyn_map_cube.long_name)
+            plot_title = format_title(dyn_map_cube.long_name)
             fig = map_handler(
                 dyn_map_cube[time_step],
                 title=plot_title,
