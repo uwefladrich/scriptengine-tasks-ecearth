@@ -56,28 +56,24 @@ class OceanStaticMap(Task):
             diagnostic_type=self.type,
             map_type=self.map_type,
         )
-        self.save_cube(leg_average, varname, dst)
-
-    def save_cube(self, new_average, varname, dst):
-        """save global average cubes in netCDF file"""
         try:
-            current_static_map = iris.load_cube(dst, varname)
+            current_static_map = iris.load_cube(dst)
+        except OSError: # file does not exist yet.
+            iris.save(leg_average, dst)
+            return
+        else: # file exists
             current_bounds = current_static_map.coord('time').bounds
-            new_bounds = new_average.coord('time').bounds
+            new_bounds = leg_average.coord('time').bounds
             if current_bounds[-1][-1] > new_bounds[0][0]:
                 self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
             else:
-                current_static_map.cell_methods += new_average.cell_methods
-                new_average.cell_methods = current_static_map.cell_methods
-                cube_list = iris.cube.CubeList([current_static_map, new_average])
+                current_static_map.cell_methods = leg_average.cell_methods
+                cube_list = iris.cube.CubeList([current_static_map, leg_average])
                 single_cube = cube_list.concatenate_cube()
                 simulation_avg = self.compute_simulation_avg(single_cube)
                 iris.save(simulation_avg, f"{dst}-copy.nc")
                 os.remove(dst)
                 os.rename(f"{dst}-copy.nc", dst)
-        except OSError: # file does not exist yet.
-            iris.save(new_average, dst)
-            return
 
     def compute_simulation_avg(self, concatenated_cube):
         """
@@ -89,7 +85,6 @@ class OceanStaticMap(Task):
             iris.analysis.MEAN,
             weights=time_weights,
         )
-        simulation_avg.var_name = simulation_avg.var_name
         # Promote time from scalar to dimension coordinate
         simulation_avg = iris.util.new_axis(simulation_avg, 'time')
         return simulation_avg
