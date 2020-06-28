@@ -35,3 +35,6 @@ def test_compute_spatial_weights(tmpdir, monkeypatch):
     domain_path = str(tmpdir + "/temp.nc")
     iris.save(cube_list, domain_path)
     assert file_handling.compute_spatial_weights(domain_path, (3,1,1)).all() == np.array([[[2,]],[[2,]],[[2,]]]).all()
+
+def test_load_input_cube():
+    assert 0 == 0
