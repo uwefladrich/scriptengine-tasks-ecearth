@@ -55,33 +55,12 @@ class SeaIceVolume(Task):
             return
 
         leg_cube = helpers.load_input_cube([mar, sep], 'sivolu')
-        latitudes = np.broadcast_to(leg_cube.coord('latitude').points, leg_cube.shape)
         cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape)
-
-        # Treat main cube properties before extracting hemispheres
-        # Remove auxiliary time coordinate
-        leg_cube.remove_coord(leg_cube.coord('time', dim_coords=False))
-        leg_cube = helpers.set_metadata(
-            leg_cube,
-            title=f"{self.long_name} {self.type.title()}",
-            comment=self.comment,
-            diagnostic_type=self.type,
-        )
-        leg_cube.standard_name = "sea_ice_volume"
-        leg_cube.units = cf_units.Unit('m3')
-        leg_cube.convert_units('1e3 km3')
+        latitudes = np.broadcast_to(leg_cube.coord('latitude').points, leg_cube.shape)
         if hemisphere == "north":
             leg_cube.data = np.ma.masked_where(latitudes < 0, leg_cube.data)
-            leg_cube.long_name = self.long_name + " North"
-            leg_cube.var_name = "sivoln"
         elif hemisphere == "south":
             leg_cube.data = np.ma.masked_where(latitudes > 0, leg_cube.data)
-            leg_cube.long_name = self.long_name + " South"
-            leg_cube.var_name = "sivols"
-
-        time_coord = leg_cube.coord('time')
-        time_coord.bounds = self.get_time_bounds(time_coord)
-
         with warnings.catch_warnings():
             # Suppress warning about insufficient metadata.
             warnings.filterwarnings(
@@ -89,13 +68,36 @@ class SeaIceVolume(Task):
                 "Collapsing a multi-dimensional coordinate.",
                 UserWarning,
                 )
-            hemispheric_weighted_sum = leg_cube.collapsed(
+            hemispheric_sum = leg_cube.collapsed(
                 ['latitude', 'longitude'],
                 iris.analysis.SUM,
                 weights=cell_weights,
                 )
 
-        self.save_cube(hemispheric_weighted_sum, dst)
+        # Remove auxiliary time coordinate
+        hemispheric_sum.remove_coord(hemispheric_sum.coord('time', dim_coords=False))
+        hemispheric_sum.standard_name = "sea_ice_volume"
+        hemispheric_sum.units = cf_units.Unit('m3')
+        hemispheric_sum.convert_units('1e3 km3')
+        hemispheric_sum.long_name = f"{self.long_name} {hemisphere.capitalize()}"
+        hemispheric_sum.var_name = "sivol" + hemisphere[0]
+
+        hemispheric_sum = helpers.set_metadata(
+            hemispheric_sum,
+            title=f"{hemispheric_sum.long_name} (Annual Cycle)",
+            comment=self.comment,
+            diagnostic_type=self.type,
+        )
+
+        time_coord = hemispheric_sum.coord('time')
+        time_coord.bounds = self.get_time_bounds(time_coord)
+        hemispheric_sum.cell_methods = ()
+        hemispheric_sum.add_cell_method(iris.coords.CellMethod('point', coords='time'))
+        hemispheric_sum.add_cell_method(
+            iris.coords.CellMethod('sum', coords='area', intervals=f'{hemisphere}ern hemisphere')
+            )
+
+        self.save_cube(hemispheric_sum, dst)
 
     def save_cube(self, new_sivol, dst):
         """save sea ice volume cube in netCDF file"""
