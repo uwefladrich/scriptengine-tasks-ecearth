@@ -61,11 +61,19 @@ class MarkdownOutput(Task):
     
     def presentation_object(self, src, dst_folder):
         if src.endswith('.yml'):
-            with open(src) as yml_file:
-                loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
-            return {'presentation_type': 'text', **loaded_dict}
+            try:
+                with open(src) as yml_file:
+                    loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
+                return {'presentation_type': 'text', **loaded_dict}
+            except FileNotFoundError:
+                self.log_error(f"File not found! Ignoring {src}")
+                return None
         elif src.endswith('.nc'):
-            loaded_cube = iris.load_cube(src)
+            try:
+                loaded_cube = iris.load_cube(src)
+            except OSError:
+                self.log_error(f"File not found! Ignoring {src}")
+                return None
             if loaded_cube.attributes["type"] == "time series":
                 self.log_debug(f"Loading time series diagnostic {src}")
                 return {'presentation_type': 'image', **make_time_series(src, dst_folder, loaded_cube)}
