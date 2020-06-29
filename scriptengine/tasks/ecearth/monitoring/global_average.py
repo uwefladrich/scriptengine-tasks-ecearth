@@ -67,10 +67,14 @@ class GlobalAverage(Task):
 
         ann_spatial_avg = helpers.set_metadata(
             ann_spatial_avg,
-            title=f'{ann_spatial_avg.long_name} (Global Average Time Series)',
+            title=f'{ann_spatial_avg.long_name} (Annual Mean)',
             comment=self.comment,
             diagnostic_type=self.type,
             )
+        
+        ann_spatial_avg.cell_methods = ()
+        ann_spatial_avg.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 month'))
+        ann_spatial_avg.add_cell_method(iris.coords.CellMethod('mean', coords='area'))
 
         self.save_cube(ann_spatial_avg, dst)
 
