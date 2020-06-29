@@ -5,6 +5,7 @@ import os
 import iris
 
 from scriptengine.tasks.base import Task
+from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
 
 class OceanStaticMap(Task):
@@ -20,6 +21,7 @@ class OceanStaticMap(Task):
         self.type = "static map"
         self.map_type = "global ocean"
 
+    @timed_runner
     def run(self, context):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)

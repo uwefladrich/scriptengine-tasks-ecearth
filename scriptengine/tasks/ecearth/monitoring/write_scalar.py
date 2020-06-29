@@ -3,6 +3,7 @@
 import yaml
 
 from scriptengine.tasks.base import Task
+from scriptengine.tasks.base.timing import timed_runner
 
 class WriteScalar(Task):
     """WriteScalar Processing Task"""
@@ -15,6 +16,7 @@ class WriteScalar(Task):
         super().__init__(__name__, parameters, required_parameters=required)
         self.type = "scalar"
 
+    @timed_runner
     def run(self, context):
         title = self.getarg('title', context)
         value = self.getarg('value', context)

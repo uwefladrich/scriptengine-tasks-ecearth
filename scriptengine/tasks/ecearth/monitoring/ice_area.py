@@ -8,6 +8,7 @@ import numpy as np
 import cf_units
 
 from scriptengine.tasks.base import Task
+from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
 
 class SeaIceArea(Task):
@@ -25,6 +26,7 @@ class SeaIceArea(Task):
         self.type = "time series"
         self.long_name = "Sea-Ice Area"
 
+    @timed_runner
     def run(self, context):
         """run function of SeaIceArea Processing Task"""
         src = self.getarg('src', context)

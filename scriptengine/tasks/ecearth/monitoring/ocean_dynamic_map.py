@@ -6,6 +6,7 @@ import iris
 import numpy as np
 
 from scriptengine.tasks.base import Task
+from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
 
 class OceanDynamicMap(Task):
@@ -21,6 +22,7 @@ class OceanDynamicMap(Task):
         self.type = "dynamic map"
         self.map_type = "global ocean"
 
+    @timed_runner
     def run(self, context):
         create_leg_mean = True
         src = self.getarg('src', context)

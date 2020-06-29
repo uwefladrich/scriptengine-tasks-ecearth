@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import imageio
 
 from scriptengine.tasks.base import Task
+from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import ChangeDirectory
 from helpers.cube_plot import format_units, format_title
@@ -27,6 +28,7 @@ class MarkdownOutput(Task):
         ]
         super().__init__(__name__, parameters, required_parameters=required)
 
+    @timed_runner
     def run(self, context):
         sources = self.getarg('src', context)
         dst_folder = self.getarg('dst', context)

@@ -10,6 +10,7 @@ import cf_units
 from iris.experimental.equalise_cubes import equalise_attributes
 
 from scriptengine.tasks.base import Task
+from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import render as j2render
 import helpers.file_handling as helpers
 
@@ -27,6 +28,7 @@ class SithicStaticMap(Task):
         self.map_type = "polar ice sheet"
         self.long_name = "Sea Ice Thickness"
 
+    @timed_runner
     def run(self, context):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)

@@ -8,6 +8,7 @@ import iris_grib
 import numpy as np
 
 from scriptengine.tasks.base import Task
+from scriptengine.tasks.base.timing import timed_runner
 from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
 
@@ -23,6 +24,7 @@ class AtmosphereTimeSeries(Task):
         self.comment = (f"Annual global mean of **{self.grib_code}**.")
         self.type = "time series"
 
+    @timed_runner
     def run(self, context):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)

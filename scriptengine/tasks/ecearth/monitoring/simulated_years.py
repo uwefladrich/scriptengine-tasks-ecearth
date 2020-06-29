@@ -3,6 +3,7 @@
 from dateutil.relativedelta import relativedelta
 
 from .write_scalar import WriteScalar
+from scriptengine.tasks.base.timing import timed_runner
 
 class SimulatedYears(WriteScalar):
     """SimulatedYears Processing Task"""
@@ -17,6 +18,7 @@ class SimulatedYears(WriteScalar):
         self.comment = "Current number of simulated years."
         self.type = "scalar"
 
+    @timed_runner
     def run(self, context):
         dst = self.getarg('dst', context)
         start = self.getarg('start', context)

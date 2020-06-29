@@ -8,6 +8,7 @@ import iris_grib
 import cftime
 
 from scriptengine.tasks.base import Task
+from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import render as j2render
 import helpers.file_handling as helpers
 
@@ -25,6 +26,7 @@ class SiconcDynamicMap(Task):
         self.map_type = "polar ice sheet"
         self.long_name = "Sea Ice Concentration"
 
+    @timed_runner
     def run(self, context):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)

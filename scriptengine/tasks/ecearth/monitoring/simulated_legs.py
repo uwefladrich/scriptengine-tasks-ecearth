@@ -4,6 +4,7 @@ import os
 import yaml
 
 from .write_scalar import WriteScalar
+from scriptengine.tasks.base.timing import timed_runner
 
 class SimulatedLegs(WriteScalar):
     """SimulatedLegs Processing Task."""
@@ -17,6 +18,7 @@ class SimulatedLegs(WriteScalar):
         self.comment = "Current amount of folders in output directory."
         self.type = "scalar"
 
+    @timed_runner
     def run(self, context):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
