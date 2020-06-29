@@ -21,7 +21,9 @@ class AtmosphereTimeSeries(Task):
             "grib_code",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Annual global mean of **{self.grib_code}**.")
+        self.comment = (f"Global average time series of **{self.grib_code}**. "
+                        f"Each data point represents the (spatial and temporal) "
+                        f"average over one leg.")
         self.type = "time series"
 
     @timed_runner
@@ -60,8 +62,6 @@ class AtmosphereTimeSeries(Task):
             'time',
             iris.analysis.MEAN,
         )
-        leg_mean.cell_methods = ()
-        leg_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 leg'))
 
         area_weights = self.get_area_weights(leg_mean)
         self.log_debug("Averaging over space.")
@@ -77,15 +77,19 @@ class AtmosphereTimeSeries(Task):
                 iris.analysis.MEAN,
                 weights=area_weights,
             )
+        
+        spatial_mean.cell_methods = ()
+        spatial_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals=f'{step} seconds'))
+        spatial_mean.add_cell_method(iris.coords.CellMethod('mean', coords='area'))
 
         # Promote time from scalar to dimension coordinate
         spatial_mean = iris.util.new_axis(spatial_mean, 'time')
 
-        spatial_mean.long_name.replace("_", " ")
+        spatial_mean.long_name = spatial_mean.long_name.replace("_", " ")
 
         spatial_mean = helpers.set_metadata(
             spatial_mean,
-            title=f'{spatial_mean.long_name} {self.type.title()}',
+            title=f'{spatial_mean.long_name} (Annual Mean)',
             comment=self.comment,
             diagnostic_type=self.type,
         )
