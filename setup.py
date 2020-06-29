@@ -46,10 +46,8 @@ setuptools.setup(
         "pyYAML>=5.1",
         "netCDF4>=1.5",
         "numpy>=1.16.1",
-        "pytest>5.0",
         "imageio>=2.0",
         "scitools-iris>=2.3",
         "iris-grib>=0.15",
-        "coveralls>=1.6.0",
     ],
 )

@@ -17,7 +17,7 @@ install:
   - conda activate test-environment
   - conda install pip
   - conda install -c conda-forge iris
-  - pip install -r requirements.txt
+  - pip install -r dev_requirements.txt
   - pip install .
 # command to run tests
 script:
