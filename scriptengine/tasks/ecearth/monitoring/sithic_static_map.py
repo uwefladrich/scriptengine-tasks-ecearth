@@ -6,6 +6,7 @@ import numpy as np
 import iris
 import iris_grib
 import cftime
+import datetime
 import cf_units
 from iris.experimental.equalise_cubes import equalise_attributes
 
@@ -69,6 +70,8 @@ class SithicStaticMap(Task):
             map_type=self.map_type,
             #presentation_min=0.0, # sithick can't be less than 0
         )
+        time_coord = month_cube.coord('time')
+        time_coord.bounds = self.get_time_bounds(time_coord)
 
         try:
             saved_diagnostic = iris.load_cube(dst)
@@ -107,3 +110,33 @@ class SithicStaticMap(Task):
         weight_shape = np.ones(cube[0].shape)
         time_weights = np.array([time_weight * weight_shape for time_weight in time_weights])
         return time_weights
+    
+    def get_time_bounds(self, time_coord):
+        """
+        Get contiguous time bounds for sea ice maps
+
+        Creates new time bounds [
+            [01-01-current year, 01-01-next year],
+        ]
+        """
+        dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
+        start = datetime.datetime(
+            year=dt_object.year,
+            month=1,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+        )
+        end = datetime.datetime(
+            year=start.year + 1,
+            month=1,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+        )
+        start_seconds = cftime.date2num(start, time_coord.units.name)
+        end_seconds = cftime.date2num(end, time_coord.units.name)
+        new_bounds = np.array([[start_seconds, end_seconds]])
+        return new_bounds

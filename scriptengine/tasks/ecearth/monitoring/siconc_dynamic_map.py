@@ -6,6 +6,7 @@ import numpy as np
 import iris
 import iris_grib
 import cftime
+import datetime
 
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
@@ -67,6 +68,8 @@ class SiconcDynamicMap(Task):
             presentation_min=0.0,
             presentation_max=1.0,
         )
+        time_coord = month_cube.coord('time')
+        time_coord.bounds = self.get_time_bounds(time_coord)
 
         try:
             saved_diagnostic = iris.load_cube(dst)
@@ -83,3 +86,33 @@ class SiconcDynamicMap(Task):
                 iris.save(single_cube, f"{dst}-copy.nc")
                 os.remove(dst)
                 os.rename(f"{dst}-copy.nc", dst)
+
+    def get_time_bounds(self, time_coord):
+        """
+        Get contiguous time bounds for sea ice maps
+
+        Creates new time bounds [
+            [01-01-current year, 01-01-next year],
+        ]
+        """
+        dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
+        start = datetime.datetime(
+            year=dt_object.year,
+            month=1,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+        )
+        end = datetime.datetime(
+            year=start.year + 1,
+            month=1,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+        )
+        start_seconds = cftime.date2num(start, time_coord.units.name)
+        end_seconds = cftime.date2num(end, time_coord.units.name)
+        new_bounds = np.array([[start_seconds, end_seconds]])
+        return new_bounds

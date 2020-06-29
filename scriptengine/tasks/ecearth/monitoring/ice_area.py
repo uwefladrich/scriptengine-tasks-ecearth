@@ -6,6 +6,8 @@ import warnings
 import iris
 import numpy as np
 import cf_units
+import cftime
+import datetime
 
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
@@ -77,6 +79,9 @@ class SeaIceArea(Task):
             leg_cube.long_name = self.long_name + " South"
             leg_cube.var_name = "siareas"
 
+        time_coord = leg_cube.coord('time')
+        time_coord.bounds = self.get_time_bounds(time_coord)
+
         with warnings.catch_warnings():
             # Suppress warning about insufficient metadata.
             warnings.filterwarnings(
@@ -108,4 +113,47 @@ class SeaIceArea(Task):
                 os.rename(f"{dst}-copy.nc", dst)
         except OSError: # file does not exist yet.
             iris.save(new_siarea, dst)
-        
+    
+    def get_time_bounds(self, time_coord):
+        """
+        Get contiguous time bounds for sea ice time series
+
+        Creates new time bounds [
+            [01-01-current year, 01-07-current year],
+            [01-07-current year, 01-01-next year],
+        ]
+        """
+
+        dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
+        start = datetime.datetime(
+            year=dt_object.year,
+            month=1,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+        )
+        end = datetime.datetime(
+            year=start.year + 1,
+            month=1,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+        )
+        mid_of_year = datetime.datetime(
+            year=dt_object.year,
+            month=7,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+        )
+        start_seconds = cftime.date2num(start, time_coord.units.name)
+        end_seconds = cftime.date2num(end, time_coord.units.name)
+        mid_of_year_seconds = cftime.date2num(mid_of_year, time_coord.units.name)
+        new_bounds = np.array([
+            [start_seconds, mid_of_year_seconds],
+            [mid_of_year_seconds, end_seconds],
+        ])
+        return new_bounds
