@@ -124,9 +124,9 @@ def make_time_series(src_path, dst_folder, time_series_cube):
     ax.set_xticks(fmt_dates[::minor_step], minor=True)
     ax.set_xticklabels(fmt_dates[::major_step])
     ax.ticklabel_format(axis='y', style='sci', scilimits=(-3, 6), useOffset=False, useMathText=True)
-    ax.set_title(_title(time_series_cube.long_name))
-    ax.set_xlabel(_title(time_coord.name()))
-    ax.set_ylabel(_title(time_series_cube.long_name, time_series_cube.units))
+    ax.set_title(format_title(time_series_cube.long_name))
+    ax.set_xlabel(format_title(time_coord.name()))
+    ax.set_ylabel(format_title(time_series_cube.long_name, time_series_cube.units))
     plt.tight_layout()
     with ChangeDirectory(dst_folder):
         fig.savefig(dst_file, bbox_inches="tight")
