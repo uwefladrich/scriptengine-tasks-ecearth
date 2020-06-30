@@ -11,7 +11,7 @@ Global Average Time Series
 
 Diagnostic Type: Time Series
 
-Mapped to: ``ece.mon.ocean_time_series``
+Mapped to: ``ece.mon.global_average``
 
 This processing task computes the temporal and spatial average of an extensive oceanic quantity as a time series. It then saves it either as a new diagnostic file or appends it to the existing diagnostic file.
 
@@ -46,12 +46,12 @@ This method saves the newly computed global average cube in a NetCDF file. If th
 If the file exists already, it gets loaded as an Iris cube. The new cube should get appended to the existing diagnostic on disk. This should not happen if appending would lead to a non-monotonic time axis. This can happen when monitoring leg n+1 finishes before monitoring leg n is completed. When inserting would lead to a non-monotonic time axis for the diagnostic on disk, the cube will not get saved and a warning message will get logged.
 When a monotonic insert is possible, the two cubes (existing diagnostic at ``dst`` and ``new_cube``) get concatenated. Since overwriting Iris cubes currently in memory leads to file corruption, the new version of the diagnostic gets saved as a copy, the old version gets deleted, and the new version is renamed.
 
-Example
--------
+Usage Example
+-------------
 
 ::
 
-    - ece.mon.ocean_time_series:
+    - ece.mon.global_average:
         src: "{{t_files}}"
         dst: "{{mondir}}/tos-time-series.nc"
         domain: "{{rundir}}/domain.nc"
@@ -64,7 +64,7 @@ Ocean Map
 Diagnostic Type: Map
 Map Type: global ocean
 
-Mapped to: ``ece.mon.ocean_map``
+Mapped to: ``ece.mon.ocean_static_map``
 
 This task computes the simulation average of the spatial distribution of an oceanic variable. This results in a map of the global ocean. First, it calculates the time mean of the current leg. If no old version of the simulation average exists, the new annual mean gets saved as the simulation average. Otherwise, the old simulation average and new annual mean get merged into a new simulation average, the old diagnostic on disk is then replaced.
 
@@ -94,3 +94,29 @@ This method saves the newly computed leg average cube in a NetCDF file. If this 
 
 If the file exists already, it gets loaded as an Iris cube. The new cube should get appended to the existing diagnostic on disk. This should not happen if appending would lead to a non-monotonic time axis. This can happen when monitoring leg n+1 finishes before monitoring leg n is completed. When inserting would lead to a non-monotonic time axis for the diagnostic on disk, the cube will not get saved and a warning message will get logged.
 When a monotonic insert is possible, the two cubes (existing diagnostic at ``dst`` and ``new_cube``) get concatenated. Then, ``compute_simulation_avg()`` computes the new simulation average. Since overwriting Iris cubes currently in memory leads to file corruption, the new version of the diagnostic gets saved as a copy, the old version gets deleted, and the new version is renamed.
+
+Usage Example
+-------------
+
+::
+
+    - ece.mon.ocean_static_map:
+        src: "{{t_files}}"
+        dst: "{{mondir}}/tos-climatology.nc"
+        varname: "tos"
+
+
+Ocean Time Map
+==============
+
+Diagnostic Type: Time Map
+Map Type: global ocean
+
+Mapped to: ``ece.mon.ocean_dynamic_map``
+
+::
+
+    - ece.mon.ocean_dynamic_map:
+        src: "{{t_files}}"
+        dst: "{{mondir}}/tos-annual-map.nc"
+        varname: "tos"
