@@ -25,7 +25,7 @@ class SiconcDynamicMap(Task):
         self.comment = (f"Dynamic Map of Sea Ice Concentration on {self.hemisphere.capitalize()}ern Hemisphere.")
         self.type = "dynamic map"
         self.map_type = "polar ice sheet"
-        self.long_name = "Sea Ice Concentration"
+        self.long_name = "Sea-Ice Area Fraction"
 
     @timed_runner
     def run(self, context):
@@ -45,31 +45,36 @@ class SiconcDynamicMap(Task):
         month_cube = iris.load_cube(src, 'siconc')
         month_cube.attributes.pop('uuid')
         month_cube.attributes.pop('timeStamp')
-        latitudes = np.broadcast_to(month_cube.coord('latitude').points, month_cube.shape)
-        if hemisphere == "north":
-            month_cube.data = np.ma.masked_where(latitudes < 0, month_cube.data)
-            month_cube.long_name = self.long_name + " Northern Hemisphere"
-            month_cube.var_name = "siconcn"
-        elif hemisphere == "south":
-            month_cube.data = np.ma.masked_where(latitudes > 0, month_cube.data)
-            month_cube.long_name = self.long_name + " Southern Hemisphere"
-            month_cube.var_name = "siconcs"
-        month_cube.data = np.ma.masked_equal(month_cube.data, 0)
-
-
         # Remove auxiliary time coordinate
         month_cube.remove_coord(month_cube.coord('time', dim_coords=False))
+        time_coord = month_cube.coord('time')
+        time_coord.bounds = self.get_time_bounds(time_coord)
+        latitudes = np.broadcast_to(month_cube.coord('latitude').points, month_cube.shape)
+        if hemisphere == "north":
+            month_cube.data = np.ma.masked_where(latitudes < 0, month_cube.data)   
+        elif hemisphere == "south":
+            month_cube.data = np.ma.masked_where(latitudes > 0, month_cube.data)
+        month_cube.long_name = f"{self.long_name} {hemisphere.capitalize()} {self.get_month(time_coord)}"
+        month_cube.data = np.ma.masked_equal(month_cube.data, 0)
+        month_cube.convert_units('%')
+        
         month_cube = helpers.set_metadata(
             month_cube,
-            title=f'{month_cube.long_name} (Simulation Average)',
+            title=f'{month_cube.long_name}',
             comment=self.comment,
             diagnostic_type=self.type,
             map_type=self.map_type,
-            presentation_min=0.0,
-            presentation_max=1.0,
+            presentation_min=0,
+            presentation_max=100,
         )
-        time_coord = month_cube.coord('time')
-        time_coord.bounds = self.get_time_bounds(time_coord)
+        month_cube.cell_methods = ()
+        month_cube.add_cell_method(iris.coords.CellMethod('point', coords='time'))
+        month_cube.add_cell_method(
+            iris.coords.CellMethod('point',
+            coords='latitude',
+            comments=f'{hemisphere}ern hemisphere'
+        ))
+        month_cube.add_cell_method(iris.coords.CellMethod('point', coords='longitude'))
 
         try:
             saved_diagnostic = iris.load_cube(dst)
@@ -116,3 +121,10 @@ class SiconcDynamicMap(Task):
         end_seconds = cftime.date2num(end, time_coord.units.name)
         new_bounds = np.array([[start_seconds, end_seconds]])
         return new_bounds
+
+    def get_month(self, time_coord):
+        """
+        Returns the month of [0] in time_coord.points as a string
+        """
+        dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
+        return dt_object.strftime('%B')
