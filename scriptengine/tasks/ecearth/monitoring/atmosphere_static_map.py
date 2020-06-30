@@ -20,7 +20,7 @@ class AtmosphereStaticMap(Task):
             "grib_code",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Simulation Average Static Map of **{self.grib_code}**.")
+        self.comment = (f"Simulation Average Map of **{self.grib_code}**.")
         self.type = "static map"
         self.map_type = "global atmosphere"
 
@@ -59,17 +59,17 @@ class AtmosphereStaticMap(Task):
             'time',
             iris.analysis.MEAN,
         )
+        leg_mean.coord('time').climatological = True
         leg_mean.cell_methods = ()
-        leg_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 leg'))
+        leg_mean.add_cell_method(iris.coords.CellMethod('mean within years', coords='time', intervals=f'{step} seconds'))
+        leg_mean.add_cell_method(iris.coords.CellMethod('mean over years', coords='time'))
+        leg_mean.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
 
-        # Promote time from scalar to dimension coordinate
-        leg_mean = iris.util.new_axis(leg_mean, 'time')
-
-        leg_cube.long_name.replace("_", " ")
+        leg_mean.long_name = leg_mean.long_name.replace("_", " ")
 
         leg_mean = helpers.set_metadata(
             leg_mean,
-            title=f'{leg_mean.long_name.title()} {self.type.title()}',
+            title=f'{leg_mean.long_name.title()} (Annual Mean Climatology)',
             comment=self.comment,
             diagnostic_type=self.type,
             map_type=self.map_type,
@@ -91,10 +91,9 @@ class AtmosphereStaticMap(Task):
             if current_bounds[-1][-1] > new_bounds[0][0]:
                 self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
             else:
-                current_cube.cell_methods += new_cube.cell_methods
-                new_cube.cell_methods = current_cube.cell_methods
+                current_cube.cell_methods = new_cube.cell_methods
                 cube_list = iris.cube.CubeList([current_cube, new_cube])
-                single_cube = cube_list.concatenate_cube()
+                single_cube = cube_list.merge_cube()
                 simulation_avg = self.compute_simulation_avg(single_cube)
                 iris.save(simulation_avg, f"{dst}-copy.nc")
                 os.remove(dst)
@@ -114,6 +113,4 @@ class AtmosphereStaticMap(Task):
             weights=time_weights,
         )
         simulation_avg.var_name = simulation_avg.var_name
-        # Promote time from scalar to dimension coordinate
-        simulation_avg = iris.util.new_axis(simulation_avg, 'time')
         return simulation_avg

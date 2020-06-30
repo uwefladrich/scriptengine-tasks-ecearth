@@ -51,7 +51,7 @@ class AtmosphereDynamicMap(Task):
         self.log_debug(f"Getting variable {cf_phenomenon.standard_name}")
         leg_cube = helpers.load_input_cube(src, cf_phenomenon.standard_name)
 
-        leg_cube.long_name.replace("_", " ")
+        leg_cube.long_name = leg_cube.long_name.replace("_", " ")
 
         if leg_cube.units.name == 'kelvin':
             leg_cube.convert_units('degC')

@@ -165,7 +165,7 @@ def make_static_map(src_path, dst_folder, static_map_cube):
     plot_title = format_title(static_map_cube.long_name)
     date_title = f"averaged over {dates[0].strftime('%d-%m-%Y')} - {dates[-1].strftime('%d-%m-%Y')}"
     fig = map_handler(
-        static_map_cube[0],
+        static_map_cube,
         title=plot_title,
         dates=date_title,
         units=unit_text,

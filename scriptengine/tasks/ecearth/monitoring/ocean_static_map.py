@@ -17,7 +17,7 @@ class OceanStaticMap(Task):
             "varname",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Simulation Average Static Map of **{self.varname}**.")
+        self.comment = (f"Simulation Average Map of **{self.varname}**.")
         self.type = "static map"
         self.map_type = "global ocean"
 
@@ -47,13 +47,16 @@ class OceanStaticMap(Task):
             iris.analysis.MEAN,
             weights=time_weights
         )
-
-        # Promote time from scalar to dimension coordinate
-        leg_average = iris.util.new_axis(leg_average, 'time')
+        
+        leg_average.coord('time').climatological = True
+        leg_average.cell_methods = ()
+        leg_average.add_cell_method(iris.coords.CellMethod('mean within years', coords='time', intervals='1 month'))
+        leg_average.add_cell_method(iris.coords.CellMethod('mean over years', coords='time'))
+        leg_average.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
 
         leg_average = helpers.set_metadata(
             leg_average,
-            title=f'{leg_average.long_name.title()} {self.type.title()}',
+            title=f'{leg_average.long_name.title()} (Annual Mean Climatology)',
             comment=self.comment,
             diagnostic_type=self.type,
             map_type=self.map_type,
@@ -71,7 +74,7 @@ class OceanStaticMap(Task):
             else:
                 current_static_map.cell_methods = leg_average.cell_methods
                 cube_list = iris.cube.CubeList([current_static_map, leg_average])
-                single_cube = cube_list.concatenate_cube()
+                single_cube = cube_list.merge_cube()
                 simulation_avg = self.compute_simulation_avg(single_cube)
                 iris.save(simulation_avg, f"{dst}-copy.nc")
                 os.remove(dst)
@@ -87,6 +90,4 @@ class OceanStaticMap(Task):
             iris.analysis.MEAN,
             weights=time_weights,
         )
-        # Promote time from scalar to dimension coordinate
-        simulation_avg = iris.util.new_axis(simulation_avg, 'time')
         return simulation_avg
