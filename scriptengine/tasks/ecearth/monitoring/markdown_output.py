@@ -163,7 +163,7 @@ def make_static_map(src_path, dst_folder, static_map_cube):
     time_bounds = time_coord.bounds[0]
     dates = cftime.num2pydate(time_bounds, time_coord.units.name)
     plot_title = format_title(static_map_cube.long_name)
-    date_title = f"averaged over {dates[0].strftime('%d-%m-%Y')} - {dates[-1].strftime('%d-%m-%Y')}"
+    date_title = f"{dates[0].strftime('%Y')} - {dates[-1].strftime('%Y')}"
     fig = map_handler(
         static_map_cube,
         title=plot_title,
@@ -211,7 +211,7 @@ def make_dynamic_map(src_path, dst_folder, dyn_map_cube):
             time_coord = dyn_map_cube.coord('time')
             time_bounds = time_coord.bounds[time_step]
             dates = cftime.num2pydate(time_bounds, time_coord.units.name)
-            date_title = f"averaged over {dates[0].strftime('%d-%m-%Y')} - {dates[-1].strftime('%d-%m-%Y')}"
+            date_title = f"{dates[0].strftime('%Y')}"
             plot_title = format_title(dyn_map_cube.long_name)
             fig = map_handler(
                 dyn_map_cube[time_step],
