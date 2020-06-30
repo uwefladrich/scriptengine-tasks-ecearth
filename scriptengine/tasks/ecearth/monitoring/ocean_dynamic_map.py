@@ -54,20 +54,24 @@ class OceanDynamicMap(Task):
             leg_average = iris.util.new_axis(leg_average, 'time')
             leg_average = helpers.set_metadata(
                 leg_average,
-                title=f'{leg_average.long_name.title()} {self.type.title()}',
-                comment=f"Annual Average {self.comment}",
+                title=f'{leg_average.long_name.title()} (Annual Mean Map)',
+                comment=f"Leg Mean {self.comment}",
                 diagnostic_type=self.type,
                 map_type=self.map_type,
             )
+            leg_average.cell_methods = ()
+            leg_average.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 month'))
+            leg_average.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
             self.save_cube(leg_average, varname, dst)
         else:
             leg_cube = helpers.set_metadata(
                 leg_cube,
-                title=f'{leg_cube.long_name.title()} {self.type.title()}',
-                comment=f"Monthly Average {self.comment}",
+                title=f'{leg_cube.long_name.title()} (Monthly Mean Map)',
+                comment=f"Monthly Mean {self.comment}",
                 diagnostic_type=self.type,
                 map_type=self.map_type,
             )
+            leg_average.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
             self.save_cube(leg_cube, varname, dst)
 
     def save_cube(self, new_cube, varname, dst):

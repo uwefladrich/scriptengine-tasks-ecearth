@@ -65,13 +65,14 @@ class AtmosphereDynamicMap(Task):
             iris.analysis.MEAN,
         )
         leg_mean.cell_methods = ()
-        leg_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 leg'))
+        leg_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals=f'{step} seconds'))
+        leg_mean.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
         # Promote time from scalar to dimension coordinate
         leg_mean = iris.util.new_axis(leg_mean, 'time')
 
         leg_mean = helpers.set_metadata(
             leg_mean,
-            title=f'{leg_mean.long_name.title()} {self.type.title()}',
+            title=f'{leg_mean.long_name.title()} (Annual Mean Map)',
             comment=self.comment,
             diagnostic_type=self.type,
             map_type=self.map_type,
