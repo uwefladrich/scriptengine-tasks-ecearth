@@ -37,6 +37,11 @@ class SithicStaticMap(Task):
         self.log_info(f"Create static sivolu map for {hemisphere}ern hemisphere at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
+        if not (hemisphere == 'north' or hemisphere == 'south'):
+            self.log_error((
+                f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
+                f"Diagnostic will not be treated, returning now."
+            ))
         if not dst.endswith(".nc"):
             self.log_warning((
                 f"{dst} does not end in valid netCDF file extension. "
@@ -53,7 +58,7 @@ class SithicStaticMap(Task):
         latitudes = np.broadcast_to(month_cube.coord('latitude').points, month_cube.shape)
         if hemisphere == "north":
             month_cube.data = np.ma.masked_where(latitudes < 0, month_cube.data)   
-        elif hemisphere == "south":
+        else:
             month_cube.data = np.ma.masked_where(latitudes > 0, month_cube.data)
 
         month_cube.long_name = f"{self.long_name} {hemisphere.capitalize()} {self.get_month(time_coord)}"
