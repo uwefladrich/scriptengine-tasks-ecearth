@@ -42,9 +42,7 @@ class SiconcDynamicMap(Task):
             ))
             return
 
-        month_cube = iris.load_cube(src, 'siconc')
-        month_cube.attributes.pop('uuid')
-        month_cube.attributes.pop('timeStamp')
+        month_cube = helpers.load_input_cube(src, 'siconc')
         # Remove auxiliary time coordinate
         month_cube.remove_coord(month_cube.coord('time', dim_coords=False))
         time_coord = month_cube.coord('time')

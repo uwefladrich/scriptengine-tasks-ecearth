@@ -46,7 +46,7 @@ def compute_time_weights(monthly_data_cube, cube_shape=None):
     return month_weights
 
 def load_input_cube(src, varname):
-    """Load input files into one cube."""
+    """Load input file(s) into one cube."""
     with warnings.catch_warnings():
         # Suppress psu warning
         warnings.filterwarnings(
@@ -55,6 +55,9 @@ def load_input_cube(src, varname):
             category=UserWarning,
             )
         month_cubes = iris.load(src, varname)
+    if len(month_cubes) == 1:
+        month_cube = remove_unique_attributes(month_cubes[0])
+        return month_cube
     equalise_attributes(month_cubes) # 'timeStamp' and 'uuid' would cause ConcatenateError
     leg_cube = month_cubes.concatenate_cube()
     return leg_cube
@@ -82,4 +85,10 @@ def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs)
         cube.attributes[key] = value
     for key in metadata_to_discard:
         cube.attributes.pop(key, None)
+    return cube
+
+def remove_unique_attributes(cube):
+    # NEMO attributes unique to each file:
+    cube.attributes.pop('uuid', None)
+    cube.attributes.pop('timeStamp', None)
     return cube

@@ -44,12 +44,10 @@ class SithicStaticMap(Task):
             ))
             return
 
-        month_cube = iris.load_cube(src, 'sivolu')
+        month_cube = helpers.load_input_cube(src, 'sivolu')
         # Remove auxiliary time coordinate
         month_cube.remove_coord(month_cube.coord('time', dim_coords=False))
         month_cube = month_cube[0]
-        month_cube.attributes.pop('uuid')
-        month_cube.attributes.pop('timeStamp')
         time_coord = month_cube.coord('time')
         time_coord.bounds = self.get_time_bounds(time_coord)
         latitudes = np.broadcast_to(month_cube.coord('latitude').points, month_cube.shape)
