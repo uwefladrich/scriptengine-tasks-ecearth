@@ -13,7 +13,7 @@ class DiskUsage(WriteScalar):
         ]
         super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
         self.title = "Disk Usage in GB"
-        self.comment = "Current size of output directory."
+        self.comment = f"Current size of {self.dst}."
         self.type = "scalar"
 
     @timed_runner

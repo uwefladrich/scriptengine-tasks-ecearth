@@ -31,6 +31,7 @@ class AtmosphereTimeSeries(Task):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         grib_code = self.getarg('grib_code', context)
+        src = [path for path in src if path.endswith('000000')]
         self.log_info(f"Create time series for atmosphere variable {grib_code} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
