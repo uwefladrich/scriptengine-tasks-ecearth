@@ -42,7 +42,7 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "scriptengine>=0.5",
+        "scriptengine>=0.6",
         "pyYAML>=5.1",
         "netCDF4>=1.5",
         "numpy>=1.16.1",
