@@ -7,3 +7,4 @@ imageio>=2.0
 coveralls>=1.6.0
 coverage==4.5.4
 python-coveralls
+python-eccodes
