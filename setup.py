@@ -47,7 +47,7 @@ setuptools.setup(
         "netCDF4>=1.5",
         "numpy>=1.16.1",
         "imageio>=2.0",
-        "scitools-iris>=2.3",
+        "scitools-iris>=2.4",
         "iris-grib>=0.15",
     ],
 )
