@@ -17,7 +17,7 @@ install:
   - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
   - conda activate test-environment
   - >
-    conda env update -n ${ENV_NAME} --quiet --file test_environment.yml;
+    conda env update -n test-environment --quiet --file test_environment.yml;
     # Check installation of eccodes.
     python -m eccodes selfcheck;
   - conda install pip
