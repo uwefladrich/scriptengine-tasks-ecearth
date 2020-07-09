@@ -23,8 +23,10 @@ install:
   - conda install pip
   - conda install -c conda-forge iris
   - pip install .
-  # Install coveralls for test coverage
+  # Install pytest, coveralls for test coverage
   # -----------------------------------
+  - pip install pytest
+  - pip install coverage
   - pip install coveralls
   # Summarise the environment
   # -------------------------
