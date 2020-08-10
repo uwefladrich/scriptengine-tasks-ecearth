@@ -9,7 +9,7 @@ def test_global_ocean_plot():
     ocean_cube = iris.load_cube("./tests/testdata/tos-climatology.nc")
     assert mth.global_ocean_plot(ocean_cube) is not None
 
-def test_global_ocean_plot():
+def test_ice_sheet_plot():
     ice_cube = iris.load_cube("./tests/testdata/sithic-north-mar.nc")
     assert mth.polar_ice_sheet_plot(ice_cube) is not None
 
