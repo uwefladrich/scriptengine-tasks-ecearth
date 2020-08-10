@@ -14,7 +14,7 @@ from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import ChangeDirectory
-from helpers.cube_plot import format_units, format_title
+from helpers.cube_plot import format_units, format_title, format_dates
 import helpers.exceptions as exceptions
 import helpers.map_type_handling as type_handling
 
@@ -107,33 +107,32 @@ def make_time_series(src_path, dst_folder, time_series_cube):
     # get file name without extension
     base_name = os.path.splitext(os.path.basename(src_path))[0]
     dst_file = f"./{base_name}.png"
-    time_coord = time_series_cube.coord('time')
-    dates = cftime.num2pydate(time_coord.points, time_coord.units.name)
-    fmt_dates = []
-    for date in dates:
-        fmt_dates.append(date.year)
-    if len(set(fmt_dates)) != len(fmt_dates):
-        fmt_dates = []
-        for date in dates:
-            fmt_dates.append(date.strftime("%Y-%m"))
+
+    x_coord = time_series_cube.coords()[0]
+    if x_coord.name() == "time":
+        dates = cftime.num2pydate(x_coord.points, x_coord.units.name)
+        coord_points = format_dates(dates)
+    else:
+        coord_points = x_coord.points
     
     fig = plt.figure(figsize=(6, 4), dpi=300)
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(fmt_dates, time_series_cube.data, marker='o')
-    fig.autofmt_xdate()
-    minor_step = math.ceil(len(fmt_dates) / 40)
-    if len(fmt_dates) < 10:
+    ax.plot(coord_points, time_series_cube.data, marker='o')
+    if x_coord.name() == "time":
+        fig.autofmt_xdate()
+    minor_step = math.ceil(len(coord_points) / 40)
+    if len(coord_points) < 10:
         major_step = minor_step
-    elif len(fmt_dates) < 20:
+    elif len(coord_points) < 20:
         major_step = 2*minor_step
     else:
         major_step = 3*minor_step
-    ax.set_xticks(fmt_dates[::major_step])
-    ax.set_xticks(fmt_dates[::minor_step], minor=True)
-    ax.set_xticklabels(fmt_dates[::major_step])
+    ax.set_xticks(coord_points[::major_step])
+    ax.set_xticks(coord_points[::minor_step], minor=True)
+    ax.set_xticklabels(coord_points[::major_step])
     ax.ticklabel_format(axis='y', style='sci', scilimits=(-3, 6), useOffset=False, useMathText=True)
     ax.set_title(format_title(time_series_cube.long_name))
-    ax.set_xlabel(format_title(time_coord.name()))
+    ax.set_xlabel(format_title(x_coord.name()))
     ax.set_ylabel(format_title(time_series_cube.long_name, time_series_cube.units))
     plt.tight_layout()
     with ChangeDirectory(dst_folder):

@@ -28,3 +28,13 @@ def format_units(units):
             return units
     else:
         return None
+
+def format_dates(dates):
+    fmt_dates = []
+    for date in dates:
+        fmt_dates.append(date.year)
+    if len(set(fmt_dates)) != len(fmt_dates):
+        fmt_dates = []
+        for date in dates:
+            fmt_dates.append(date.strftime("%Y-%m"))
+    return fmt_dates
