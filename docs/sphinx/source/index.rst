@@ -1,20 +1,19 @@
-.. EC-Earth Monitoring documentation master file, created by
-   sphinx-quickstart on Tue May  5 14:22:55 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+ScriptEngine Tasks for EC-Earth 4: Documentation
+=======================================================
 
-Welcome to EC-Earth Monitoring's documentation!
-===============================================
+This package contains ScriptEngine tasks for the EC-Earth 4 climate model.
+Currently, it contains the EC-Earth 4 monitoring tool, as well as the Sbatch task for Slurm job creation.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
    
    usage/installation
-   usage/quickstart
-   tasks/processing-tasks
+   tasks/scalar-diagnostics
    tasks/ocean-diagnostics
+   tasks/sea-ice-diagnostics
    tasks/atmosphere-diagnostics
+   tasks/sbatch
 
 
 

@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'EC-Earth Monitoring'
-copyright = '2020, Valentina Schüller'
-author = 'Valentina Schüller'
+project = 'ScriptEngine Tasks EC-Earth'
+copyright = '2020, Valentina Schüller, Uwe Fladrich'
+author = 'Valentina Schüller, Uwe Fladrich'
 
 # The full version, including alpha/beta/rc tags
 release = '0.1'
