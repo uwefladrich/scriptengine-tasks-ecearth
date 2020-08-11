@@ -48,3 +48,17 @@ Diagnostic Type: Scalar
     - ece.mon.sim_legs:
         src: "{{rundir}}"
         dst: "{{mondir}}/sim-legs.yml"
+
+Simulated Years per Day
+=======================
+
+Diagnostic Type: Time Series
+
+::
+
+    - ece.mon.sypd:
+        leg_start: "{{leg.start}}"
+        leg_end: "{{leg.end}}"
+        elapsed_time: "{{model_elapsed_time}}"
+        leg_num: "{{leg_num}}"
+        dst: "{{mondir}}/sypd.nc"

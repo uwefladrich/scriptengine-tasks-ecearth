@@ -37,4 +37,6 @@ def test_compute_spatial_weights(tmpdir, monkeypatch):
     assert file_handling.compute_spatial_weights(domain_path, (3,1,1)).all() == np.array([[[2,]],[[2,]],[[2,]]]).all()
 
 def test_load_input_cube():
-    assert 0 == 0
+    src = "./tests/testdata/tos-climatology.nc"
+    varname = "tos"
+    assert isinstance(file_handling.load_input_cube(src, varname), iris.cube.Cube)
