@@ -62,7 +62,7 @@ expected_result = [
 
 @pytest.mark.parametrize("init, context, expected_result", zip(init, context, expected_result))
 def test_write_scalar_working(tmpdir, init, context, expected_result):
-    path = str(tmpdir + 'test.yml')
+    path = str(tmpdir + '/test.yml')
     init['dst'] = path
     context['dst'] = path
     write_scalar = WriteScalar(init)
@@ -73,7 +73,7 @@ def test_write_scalar_working(tmpdir, init, context, expected_result):
 
 
 def test_write_scalar_runtime_error(tmpdir):
-    path = str(tmpdir + 'test.yml')
+    path = str(tmpdir + '/test.yml')
     init = {
         'title': 'Title',
         'comment': 'Comment',
@@ -86,7 +86,7 @@ def test_write_scalar_runtime_error(tmpdir):
         )
 
 def test_write_scalar_extension_error(tmpdir):
-    path = str(tmpdir + 'test.nc')
+    path = str(tmpdir + '/test.nc')
     init = {
         'title': 'Title',
         'comment': 'Comment',
