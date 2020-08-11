@@ -43,9 +43,9 @@ class DiskUsage(WriteScalar):
                     total += self.get_directory_size(entry.path)
         except NotADirectoryError:
             self.log_warning(f"{path} is not a directory. Returning -1.")
-            return -1
+            return -1e9
         except PermissionError:
             self.log_warning(f"No permission to open {path}. Returning -1.")
-            return -1
+            return -1e9
 
         return total

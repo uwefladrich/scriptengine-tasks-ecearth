@@ -7,15 +7,15 @@ import helpers.map_type_handling as mth
 
 def test_global_ocean_plot():
     ocean_cube = iris.load_cube("./tests/testdata/tos-climatology.nc")
-    assert mth.global_ocean_plot(ocean_cube) is not None
+    assert isinstance(mth.global_ocean_plot(ocean_cube), plt.Figure)
 
 def test_ice_sheet_plot():
     ice_cube = iris.load_cube("./tests/testdata/sithic-north-mar.nc")
-    assert mth.polar_ice_sheet_plot(ice_cube) is not None
+    assert isinstance(mth.polar_ice_sheet_plot(ice_cube), plt.Figure)
 
 def test_global_atmosphere_plot():
     atmo_cube = iris.load_cube("./tests/testdata/tas-climatology.nc")
-    assert mth.global_atmosphere_plot(atmo_cube) is not None
+    assert isinstance(mth.global_atmosphere_plot(atmo_cube), plt.Figure)
 
 def test_function_mapper():
     assert mth.function_mapper('global ocean') == mth.global_ocean_plot
