@@ -1,0 +1,41 @@
+language: python
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+# command to install dependencies
+install:
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - source "$HOME/miniconda/etc/profile.d/conda.sh"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda config --add channels conda-forge
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+  - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
+  - conda activate test-environment
+  - >
+    conda env update -n test-environment --quiet --file test_environment.yml;
+    # Check installation of eccodes.
+    python -m eccodes selfcheck;
+  - conda install pip
+  - conda install -c conda-forge iris
+  - pip install .
+  # Install pytest, coveralls for test coverage
+  # -----------------------------------
+  - pip install pytest
+  - pip install coverage
+  - pip install coveralls
+  # Summarise the environment
+  # -------------------------
+  - >
+    conda list -n ${ENV_NAME};
+    conda list -n ${ENV_NAME} --explicit;
+    conda info -a;
+# command to run tests
+script:
+  - coverage run -m pytest
+after_success:
+  - coveralls
