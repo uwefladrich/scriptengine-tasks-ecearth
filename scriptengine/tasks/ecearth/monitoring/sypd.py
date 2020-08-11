@@ -14,10 +14,10 @@ class SYPD(Task):
     def __init__(self, parameters):
         required = [
             "dst",
-            "start",
-            "end",
-            "leg",
-            "time",
+            "leg_start",
+            "leg_end",
+            "leg_num",
+            "elapsed_time",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
         self.comment = (f"SYPD development during the current model run.")
@@ -26,12 +26,12 @@ class SYPD(Task):
     @timed_runner
     def run(self, context):
         dst = self.getarg('dst', context)
-        start = self.getarg('start', context)
-        end = self.getarg('end', context)
-        time = self.getarg('time', context)
-        leg = self.getarg('leg', context)
+        leg_start = self.getarg('leg_start', context)
+        leg_end = self.getarg('leg_end', context)
+        elapsed_time = self.getarg('elapsed_time', context)
+        leg_num = self.getarg('leg_num', context)
         self.log_info(f"Create SYPD time series at {dst}.")
-        self.log_debug(f"Start: {start}, End: {end}, elapsed time: {time}, leg: {leg}.")
+        self.log_debug(f"Start: {leg_start}, End: {leg_end}, elapsed time: {elapsed_time}, leg: {leg_num}.")
 
         if not dst.endswith(".nc"):
             self.log_error((
@@ -40,14 +40,14 @@ class SYPD(Task):
             ))
             return
 
-        leg_span = end - start
-        sypd = leg_span.total_seconds()/time/365
+        leg_span = leg_end - leg_start
+        sypd = leg_span.total_seconds()/elapsed_time/365
 
         coord = iris.coords.DimCoord(
-            points=np.array([leg]),
+            points=np.array([leg_num]),
             long_name="leg number",
             var_name="leg",
-            bounds=np.array([[leg - 1, leg]]),
+            bounds=np.array([[leg_num - 1, leg_num]]),
         )
 
         sypd_cube = iris.cube.Cube(

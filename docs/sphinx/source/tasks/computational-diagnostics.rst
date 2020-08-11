@@ -57,8 +57,8 @@ Diagnostic Type: Time Series
 ::
 
     - ece.mon.sypd:
-        start: "{{leg.start}}"
-        end: "{{leg.end}}"
-        time: "{{model_elapsed_time}}"
-        leg: "{{leg_num}}"
+        leg_start: "{{leg.start}}"
+        leg_end: "{{leg.end}}"
+        elapsed_time: "{{model_elapsed_time}}"
+        leg_num: "{{leg_num}}"
         dst: "{{mondir}}/sypd.nc"
