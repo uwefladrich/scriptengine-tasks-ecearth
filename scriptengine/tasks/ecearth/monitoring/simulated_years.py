@@ -2,8 +2,8 @@
 
 from dateutil.relativedelta import relativedelta
 
-from .scalar import Scalar
 from scriptengine.tasks.base.timing import timed_runner
+from .scalar import Scalar
 
 class SimulatedYears(Scalar):
     """SimulatedYears Processing Task"""

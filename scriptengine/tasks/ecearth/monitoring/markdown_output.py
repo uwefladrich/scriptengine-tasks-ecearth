@@ -77,7 +77,7 @@ class MarkdownOutput(Task):
             if loaded_cube.attributes["type"] == "time series":
                 self.log_debug(f"Loading time series diagnostic {src}")
                 return {'presentation_type': 'image', **make_time_series(src, dst_folder, loaded_cube)}
-            elif loaded_cube.attributes["type"] == "static map":
+            if loaded_cube.attributes["type"] == "static map":
                 self.log_debug(f"Loading static map diagnostic {src}")
                 try:
                     map_plot_dict = make_static_map(src, dst_folder, loaded_cube)
@@ -85,7 +85,7 @@ class MarkdownOutput(Task):
                     self.log_error(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}
-            elif loaded_cube.attributes["type"] == "dynamic map":
+            if loaded_cube.attributes["type"] == "dynamic map":
                 self.log_debug(f"Loading dynamic map diagnostic {src}")
                 try:
                     map_plot_dict = make_dynamic_map(src, dst_folder, loaded_cube)

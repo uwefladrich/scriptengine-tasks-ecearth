@@ -1,16 +1,14 @@
 """Processing Task that creates a 2D dynamic map of sea ice concentration."""
 
 import os
+import datetime
 
 import numpy as np
 import iris
-import iris_grib
 import cftime
-import datetime
 
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
-from scriptengine.jinja import render as j2render
 import helpers.file_handling as helpers
 
 class SiconcDynamicMap(Task):
@@ -22,7 +20,7 @@ class SiconcDynamicMap(Task):
             "hemisphere",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Dynamic Map of Sea Ice Concentration on {self.hemisphere.capitalize()}ern Hemisphere.")
+        self.comment = (f"Dynamic Map of Sea Ice Concentration on {self.hemisphere.capitalize()}ern Hemisphere.") #TODO
         self.type = "dynamic map"
         self.map_type = "polar ice sheet"
         self.long_name = "Sea-Ice Area Fraction"
@@ -54,13 +52,13 @@ class SiconcDynamicMap(Task):
         time_coord.bounds = self.get_time_bounds(time_coord)
         latitudes = np.broadcast_to(month_cube.coord('latitude').points, month_cube.shape)
         if hemisphere == "north":
-            month_cube.data = np.ma.masked_where(latitudes < 0, month_cube.data)   
+            month_cube.data = np.ma.masked_where(latitudes < 0, month_cube.data)
         else:
             month_cube.data = np.ma.masked_where(latitudes > 0, month_cube.data)
-        month_cube.long_name = f"{self.long_name} {hemisphere.capitalize()} {self.get_month(time_coord)}"
+        month_cube.long_name = f"{self.long_name} {hemisphere.capitalize()} {self.get_month(time_coord)}" #TODO
         month_cube.data = np.ma.masked_equal(month_cube.data, 0)
         month_cube.convert_units('%')
-        
+
         month_cube = helpers.set_metadata(
             month_cube,
             title=f'{month_cube.long_name}',
@@ -72,11 +70,11 @@ class SiconcDynamicMap(Task):
         )
         month_cube.cell_methods = ()
         month_cube.add_cell_method(iris.coords.CellMethod('point', coords='time'))
-        month_cube.add_cell_method(
-            iris.coords.CellMethod('point',
-            coords='latitude',
-            comments=f'{hemisphere}ern hemisphere'
-        ))
+        month_cube.add_cell_method(iris.coords.CellMethod(
+                'point',
+                coords='latitude',
+                comments=f'{hemisphere}ern hemisphere',
+                ))
         month_cube.add_cell_method(iris.coords.CellMethod('point', coords='longitude'))
 
         try:
