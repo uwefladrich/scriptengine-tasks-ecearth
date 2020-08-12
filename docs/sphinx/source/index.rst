@@ -13,6 +13,7 @@ Currently, it contains the EC-Earth 4 monitoring tool, as well as the Sbatch tas
    tasks/ocean-diagnostics
    tasks/sea-ice-diagnostics
    tasks/atmosphere-diagnostics
+   tasks/computational-diagnostics
    tasks/sbatch
 
 
