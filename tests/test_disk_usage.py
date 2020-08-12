@@ -22,9 +22,7 @@ def test_disk_usage_working(tmpdir):
     disk_usage.run(context)
     with open(path) as file:
         result = yaml.load(file, Loader=yaml.FullLoader)
-    assert result['title'] == disk_usage.title
-    assert result['comment'] == disk_usage.comment
-    assert result['type'] == disk_usage.type
+    assert result['type'] == disk_usage.diagnostic_type
     assert result['data'] == 0.0 # DiskUsage rounds to GB
 
 
@@ -39,9 +37,8 @@ def test_not_a_directory(tmpdir):
     disk_usage = DiskUsage(init)
     disk_usage.run(context)
     expected_result = {
-        'title': disk_usage.title,
-        'comment': disk_usage.comment,
-        'type': disk_usage.type,
+        'title': "Disk Usage in GB",
+        'type': disk_usage.diagnostic_type,
         'data': -1,
     }
     with patch.object(disk_usage, 'log_warning') as mock:
@@ -49,7 +46,9 @@ def test_not_a_directory(tmpdir):
     mock.assert_called_with(f"{path} is not a directory. Returning -1.")
     with open(path) as file:
         result = yaml.load(file, Loader=yaml.FullLoader)
-    assert expected_result == result
+    assert expected_result['title'] == result['title']
+    assert expected_result['type'] == result['type']
+    assert expected_result['data'] == result['data']
 
 def test_permission_error(tmpdir):
     path = str(tmpdir) + '/test.yml'
@@ -62,9 +61,8 @@ def test_permission_error(tmpdir):
     disk_usage = DiskUsage(init)
     disk_usage.run(context)
     expected_result = {
-        'title': disk_usage.title,
-        'comment': disk_usage.comment,
-        'type': disk_usage.type,
+        'title': "Disk Usage in GB",
+        'type': disk_usage.diagnostic_type,
         'data': -1,
     }
     with patch.object(disk_usage, 'log_warning') as mock:
@@ -72,4 +70,6 @@ def test_permission_error(tmpdir):
     mock.assert_called_with(f"No permission to open {forbidden}. Returning -1.")
     with open(path) as file:
         result = yaml.load(file, Loader=yaml.FullLoader)
-    assert expected_result == result
+    assert expected_result['title'] == result['title']
+    assert expected_result['type'] == result['type']
+    assert expected_result['data'] == result['data']
