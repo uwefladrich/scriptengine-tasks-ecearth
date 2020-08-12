@@ -12,9 +12,6 @@ class DiskUsage(Scalar):
             "dst",
         ]
         super(Scalar, self).__init__(__name__, parameters, required_parameters=required)
-        self.title = "Disk Usage in GB"
-        self.comment = f"Current size of {self.dst}."
-        self.type = "scalar"
 
     @timed_runner
     def run(self, context):
@@ -26,10 +23,10 @@ class DiskUsage(Scalar):
 
         self.save(
             dst,
-            title=self.title,
-            comment=self.comment,
+            title="Disk Usage in GB",
+            comment=f"Current size of {src}.",
             data=value,
-            type=self.type,
+            type=self.diagnostic_type,
         )
 
     def get_directory_size(self, path):

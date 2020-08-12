@@ -14,9 +14,6 @@ class SimulatedYears(Scalar):
             "end",
         ]
         super(Scalar, self).__init__(__name__, parameters, required_parameters=required)
-        self.title = "Simulated Years"
-        self.comment = "Current number of simulated years."
-        self.type = "scalar"
 
     @timed_runner
     def run(self, context):
@@ -29,8 +26,8 @@ class SimulatedYears(Scalar):
 
         self.save(
             dst,
-            title=self.title,
-            comment=self.comment,
+            title="Simulated Years",
+            comment="Current number of simulated years.",
             data=value,
-            type=self.type,
+            type=self.diagnostic_type
         )

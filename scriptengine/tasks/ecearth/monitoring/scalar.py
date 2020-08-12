@@ -7,6 +7,9 @@ from scriptengine.tasks.base.timing import timed_runner
 
 class Scalar(Task):
     """Processing Task that writes out a generalized scalar diagnostic."""
+
+    diagnostic_type = "scalar"
+
     def __init__(self, parameters):
         required = [
             "title",
@@ -14,7 +17,6 @@ class Scalar(Task):
             "dst",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.type = "scalar"
 
     @timed_runner
     def run(self, context):
@@ -24,7 +26,7 @@ class Scalar(Task):
         comment = self.getarg('comment', context, default=None)
         self.log_info(f"Write scalar diagnostic to {dst}")
 
-        self.save(dst, title=title, data=value, type=self.type, comment=comment)
+        self.save(dst, title=title, data=value, type=self.diagnostic_type, comment=comment)
 
     def save(self, dst, **kwargs):
         """Saves a scalar diagnostic in a YAML file."""
