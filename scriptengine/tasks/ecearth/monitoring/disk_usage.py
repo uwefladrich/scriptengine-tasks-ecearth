@@ -1,20 +1,17 @@
 """Processing Task that writes out the disk usage of a given folder."""
 import os
 
-from .write_scalar import WriteScalar
 from scriptengine.tasks.base.timing import timed_runner
+from .scalar import Scalar
 
-class DiskUsage(WriteScalar):
+class DiskUsage(Scalar):
     """DiskUsage Processing Task"""
     def __init__(self, parameters):
         required = [
             "src",
             "dst",
         ]
-        super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
-        self.title = "Disk Usage in GB"
-        self.comment = f"Current size of {self.dst}."
-        self.type = "scalar"
+        super(Scalar, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):
@@ -26,10 +23,10 @@ class DiskUsage(WriteScalar):
 
         self.save(
             dst,
-            title=self.title,
-            comment=self.comment,
+            title="Disk Usage in GB",
+            comment=f"Current size of {src}.",
             data=value,
-            type=self.type,
+            type=self.diagnostic_type,
         )
 
     def get_directory_size(self, path):

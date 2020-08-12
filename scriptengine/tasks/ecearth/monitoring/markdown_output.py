@@ -77,7 +77,7 @@ class MarkdownOutput(Task):
             if loaded_cube.attributes["type"] == "time series":
                 self.log_debug(f"Loading time series diagnostic {src}")
                 return {'presentation_type': 'image', **make_time_series(src, dst_folder, loaded_cube)}
-            elif loaded_cube.attributes["type"] == "static map":
+            if loaded_cube.attributes["type"] == "static map":
                 self.log_debug(f"Loading static map diagnostic {src}")
                 try:
                     map_plot_dict = make_static_map(src, dst_folder, loaded_cube)
@@ -85,7 +85,7 @@ class MarkdownOutput(Task):
                     self.log_error(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}
-            elif loaded_cube.attributes["type"] == "dynamic map":
+            if loaded_cube.attributes["type"] == "dynamic map":
                 self.log_debug(f"Loading dynamic map diagnostic {src}")
                 try:
                     map_plot_dict = make_dynamic_map(src, dst_folder, loaded_cube)
@@ -109,7 +109,7 @@ def make_time_series(src_path, dst_folder, time_series_cube):
     dst_file = f"./{base_name}.png"
 
     x_coord = time_series_cube.coords()[0]
-    if x_coord.name() == "time":
+    if "second since" in x_coord.units.name:
         dates = cftime.num2pydate(x_coord.points, x_coord.units.name)
         coord_points = format_dates(dates)
     else:
@@ -118,7 +118,7 @@ def make_time_series(src_path, dst_folder, time_series_cube):
     fig = plt.figure(figsize=(6, 4), dpi=300)
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(coord_points, time_series_cube.data, marker='o')
-    if x_coord.name() == "time":
+    if "second since" in x_coord.units.name:
         fig.autofmt_xdate()
     minor_step = math.ceil(len(coord_points) / 40)
     if len(coord_points) < 10:

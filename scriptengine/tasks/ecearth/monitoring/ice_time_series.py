@@ -1,44 +1,67 @@
-"""Processing Task that calculates the global sea ice area in one leg."""
+"""Processing Task that calculates the seasonal cycle of sea ice variables in one leg."""
 
-import os
+import datetime
 import warnings
 
 import iris
 import numpy as np
 import cf_units
 import cftime
-import datetime
 
-from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
+from .time_series import TimeSeries
 
-class SeaIceArea(Task):
-    """SeaIceArea Processing Task"""
+meta_dict = {
+    'sivolu':
+        {
+            'long_name': 'Sea-Ice Volume',
+            'standard_name': 'sea_ice_volume',
+            'var_name': 'sivol',
+            'old_unit': 'm3',
+            'new_unit': '1e3 m3',
+        },
+    'siconc':
+        {
+            'long_name': 'Sea-Ice Area',
+            'standard_name': 'sea_ice_area',
+            'var_name': 'siarea',
+            'old_unit': 'm2',
+            'new_unit': '1e6 m2',
+        },
+}
+
+class SeaIceTimeSeries(TimeSeries):
+    """SeaIceTimeSeries Processing Task"""
     def __init__(self, parameters):
         required = [
             "src",
             "domain",
             "dst",
             "hemisphere",
+            "varname",
         ]
-        super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Sum of Sea-Ice Area/**siconc** in March and September"
-                        f" on {self.hemisphere.title()}ern Hemisphere.")
-        self.type = "time series"
-        self.long_name = "Sea-Ice Area"
+        super(TimeSeries, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):
-        """run function of SeaIceArea Processing Task"""
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         domain = self.getarg('domain', context)
         hemisphere = self.getarg('hemisphere', context)
-        self.log_info(f"Create sea ice area time series for {hemisphere}ern hemisphere at {dst}.")
+        varname = self.getarg('varname', context)
+        if varname not in meta_dict:
+            self.log_error((
+                f"'varname' must be one of the following: {meta_dict.keys()} "
+                f"Diagnostic will not be treated, returning now."
+            ))
+            return
+        long_name = meta_dict[varname]['long_name']
+
+        self.log_info(f"Create {varname} time series for {hemisphere}ern hemisphere at {dst}.")
         self.log_debug(f"Domain: {domain}, Source file(s): {src}")
 
-        if not (hemisphere == 'north' or hemisphere == 'south'):
+        if not hemisphere in ('north', 'south'):
             self.log_error((
                 f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
                 f"Diagnostic will not be treated, returning now."
@@ -59,7 +82,7 @@ class SeaIceArea(Task):
                               f"Diagnostic can not be created, returning now."))
             return
 
-        leg_cube = helpers.load_input_cube([mar, sep], 'siconc')
+        leg_cube = helpers.load_input_cube([mar, sep], varname)
         cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape)
         latitudes = np.broadcast_to(leg_cube.coord('latitude').points, leg_cube.shape)
         if hemisphere == "north":
@@ -81,47 +104,30 @@ class SeaIceArea(Task):
 
         # Remove auxiliary time coordinate
         hemispheric_sum.remove_coord(hemispheric_sum.coord('time', dim_coords=False))
-        hemispheric_sum.standard_name = "sea_ice_area"
-        hemispheric_sum.units = cf_units.Unit('m2')
-        hemispheric_sum.convert_units('1e6 km2')
-        hemispheric_sum.long_name = f"{self.long_name} {hemisphere.capitalize()}"
-        hemispheric_sum.var_name = "siarea" + hemisphere[0]
-        
-        hemispheric_sum = helpers.set_metadata(
-            hemispheric_sum,
-            title=f"{hemispheric_sum.long_name} (Annual Cycle)",
-            comment=self.comment,
-            diagnostic_type=self.type,
-        )
+        hemispheric_sum.standard_name = meta_dict[varname]['standard_name']
+        hemispheric_sum.units = cf_units.Unit(meta_dict[varname]['old_unit'])
+        hemispheric_sum.convert_units(meta_dict[varname]['new_unit'])
+        hemispheric_sum.long_name = f"{long_name} {hemisphere.capitalize()}"
+        hemispheric_sum.var_name = meta_dict[varname]['var_name'] + hemisphere[0]
+
+        metadata = {
+            'type': self.diagnostic_type,
+            'comment': (f"Sum of {long_name}/**{varname}** in March and "
+                        f"September on {hemisphere.title()}ern Hemisphere."),
+            'title': f"{long_name} (Seasonal Cycle)",
+        }
+        hemispheric_sum = helpers.set_metadata(hemispheric_sum, **metadata)
 
         time_coord = hemispheric_sum.coord('time')
         time_coord.bounds = self.get_time_bounds(time_coord)
-
         hemispheric_sum.cell_methods = ()
         hemispheric_sum.add_cell_method(iris.coords.CellMethod('point', coords='time'))
         hemispheric_sum.add_cell_method(
-            iris.coords.CellMethod('sum', coords='area', comments=f'{hemisphere}ern hemisphere')
+            iris.coords.CellMethod('sum', coords='area', intervals=f'{hemisphere}ern hemisphere')
             )
 
-        self.save_cube(hemispheric_sum, dst)
+        self.save(hemispheric_sum, dst)
 
-    def save_cube(self, new_siarea, dst):
-        """save sea ice area cube in netCDF file"""
-        try:
-            current_siarea = iris.load_cube(dst)
-            current_bounds = current_siarea.coord('time').bounds
-            new_bounds = new_siarea.coord('time').bounds
-            if current_bounds[-1][-1] > new_bounds[0][0]:
-                self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
-            else:
-                siarea_list = iris.cube.CubeList([current_siarea, new_siarea])
-                siarea = siarea_list.concatenate_cube()
-                iris.save(siarea, f"{dst}-copy.nc")
-                os.remove(dst)
-                os.rename(f"{dst}-copy.nc", dst)
-        except OSError: # file does not exist yet.
-            iris.save(new_siarea, dst)
-    
     def get_time_bounds(self, time_coord):
         """
         Get contiguous time bounds for sea ice time series

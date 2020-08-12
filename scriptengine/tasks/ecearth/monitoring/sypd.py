@@ -20,7 +20,7 @@ class SYPD(Task):
             "elapsed_time",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"SYPD development during the current model run.")
+        self.comment = ("SYPD development during the current model run.")
         self.type = "time series"
 
     @timed_runner
@@ -31,7 +31,6 @@ class SYPD(Task):
         elapsed_time = self.getarg('elapsed_time', context)
         leg_num = self.getarg('leg_num', context)
         self.log_info(f"Create SYPD time series at {dst}.")
-        self.log_debug(f"Start: {leg_start}, End: {leg_end}, elapsed time: {elapsed_time}, leg: {leg_num}.")
 
         if not dst.endswith(".nc"):
             self.log_error((
@@ -55,7 +54,7 @@ class SYPD(Task):
             long_name="Simulated Years per Day",
             var_name="sypd",
             units="1",
-            dim_coords_and_dims=[(coord,0)],      
+            dim_coords_and_dims=[(coord, 0)],
         )
 
         sypd_cube = helpers.set_metadata(

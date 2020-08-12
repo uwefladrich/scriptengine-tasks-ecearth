@@ -2,35 +2,24 @@
 Sea-Ice Diagnostics
 *******************
 
-Sea-Ice Area Time Series
+Sea-Ice Time Series
 ========================
 
 Diagnostic Type: Time Series
 
-Mapped to: ``ece.mon.ice_area``
+Mapped to: ``ece.mon.ice_time_series``
+
+varname can be ``sivolu`` or ``siconc``.
 
 ::
 
-    - ece.mon.ice_area:
+    - ece.mon.ice_time_series:
         src: "{{ice_files}}"
         domain: "{{rundir}}/domain_cfg.nc"
         dst: "{{mondir}}/siarea-south.nc"
         hemisphere: south
+        varname: sivolu
 
-Sea-Ice Volume Time Series
-==========================
-
-Diagnostic Type: Time Series
-
-Mapped to: ``ece.mon.ice_volume``
-
-::
-
-    - ece.mon.ice_volume:
-        src: "{{ice_files}}"
-        domain: "{{rundir}}/domain_cfg.nc"
-        dst: "{{mondir}}/sivol-north.nc"
-        hemisphere: north
 
 Sea-Ice Volume per Area Map
 ===========================

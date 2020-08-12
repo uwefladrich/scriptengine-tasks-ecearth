@@ -3,20 +3,17 @@
 import os
 import yaml
 
-from .write_scalar import WriteScalar
 from scriptengine.tasks.base.timing import timed_runner
+from .scalar import Scalar
 
-class SimulatedLegs(WriteScalar):
+class SimulatedLegs(Scalar):
     """SimulatedLegs Processing Task."""
     def __init__(self, parameters):
         required = [
             "src",
             "dst",
         ]
-        super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
-        self.title = "Simulated Legs"
-        self.comment = "Current amount of folders in output directory."
-        self.type = "scalar"
+        super(Scalar, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):
@@ -28,10 +25,10 @@ class SimulatedLegs(WriteScalar):
 
         self.save(
             dst,
-            title=self.title,
-            comment=self.comment,
+            title="Simulated Legs",
+            comment="Current amount of folders in output directory.",
             data=value,
-            type=self.type,
+            type=self.diagnostic_type,
         )
 
     def get_leg_number(self, src):

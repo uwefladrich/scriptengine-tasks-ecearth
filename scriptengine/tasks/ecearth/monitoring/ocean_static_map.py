@@ -47,7 +47,7 @@ class OceanStaticMap(Task):
             iris.analysis.MEAN,
             weights=time_weights
         )
-        
+
         leg_average.coord('time').climatological = True
         leg_average.cell_methods = ()
         leg_average.add_cell_method(iris.coords.CellMethod('mean within years', coords='time', intervals='1 month'))

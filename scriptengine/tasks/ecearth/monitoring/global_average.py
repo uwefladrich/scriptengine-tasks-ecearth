@@ -1,15 +1,14 @@
 """Processing Task that calculates the annual global average of a given extensive quantity."""
 
-import os
 import warnings
 
 import iris
 
-from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
-import helpers.file_handling as helpers
+import helpers.file_handling as hlp
+from .time_series import TimeSeries
 
-class GlobalAverage(Task):
+class GlobalAverage(TimeSeries):
     """GlobalAverage Processing Task"""
     def __init__(self, parameters):
         required = [
@@ -18,11 +17,7 @@ class GlobalAverage(Task):
             "domain",
             "varname",
         ]
-        super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Global average time series of **{self.varname}**. "
-                        f"Each data point represents the (spatial and temporal) "
-                        f"average over one leg.")
-        self.type = "time series"
+        super(TimeSeries, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):
@@ -30,6 +25,9 @@ class GlobalAverage(Task):
         dst = self.getarg('dst', context)
         domain = self.getarg('domain', context)
         varname = self.getarg('varname', context)
+        comment = (f"Global average time series of **{varname}**. "
+                   f"Each data point represents the (spatial and temporal) "
+                   f"average over one leg.")
         self.log_info(f"Create time series for ocean variable {varname} at {dst}.")
         self.log_debug(f"Domain: {domain}, Source file(s): {src}")
 
@@ -40,9 +38,8 @@ class GlobalAverage(Task):
             ))
             return
 
-        leg_cube = helpers.load_input_cube(src, varname)
+        leg_cube = hlp.load_input_cube(src, varname)
 
-        cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape)
         with warnings.catch_warnings():
             # Suppress warning about insufficient metadata.
             warnings.filterwarnings(
@@ -53,45 +50,27 @@ class GlobalAverage(Task):
             spatial_avg = leg_cube.collapsed(
                 ['latitude', 'longitude'],
                 iris.analysis.MEAN,
-                weights=cell_weights,
+                weights=hlp.compute_spatial_weights(domain, leg_cube.shape),
                 )
-        month_weights = helpers.compute_time_weights(spatial_avg)
         # Remove auxiliary time coordinate before collapsing cube
         spatial_avg.remove_coord(spatial_avg.coord('time', dim_coords=False))
         ann_spatial_avg = spatial_avg.collapsed(
             'time',
             iris.analysis.MEAN,
-            weights=month_weights)
+            weights=hlp.compute_time_weights(spatial_avg),
+        )
         # Promote time from scalar to dimension coordinate
         ann_spatial_avg = iris.util.new_axis(ann_spatial_avg, 'time')
 
-        ann_spatial_avg = helpers.set_metadata(
+        ann_spatial_avg = hlp.set_metadata(
             ann_spatial_avg,
             title=f'{ann_spatial_avg.long_name} (Annual Mean)',
-            comment=self.comment,
-            diagnostic_type=self.type,
+            comment=comment,
+            diagnostic_type=self.diagnostic_type,
             )
-        
+
         ann_spatial_avg.cell_methods = ()
         ann_spatial_avg.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 month'))
         ann_spatial_avg.add_cell_method(iris.coords.CellMethod('mean', coords='area'))
 
-        self.save_cube(ann_spatial_avg, dst)
-
-    def save_cube(self, new_cube, dst):
-        """save global average cubes in netCDF file"""
-        try:
-            current_cube = iris.load_cube(dst)
-            current_bounds = current_cube.coord('time').bounds
-            new_bounds = new_cube.coord('time').bounds
-            if current_bounds[-1][-1] > new_bounds[0][0]:
-                self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
-            else:
-                cube_list = iris.cube.CubeList([current_cube, new_cube])
-                merged_cube = cube_list.concatenate_cube()
-                iris.save(merged_cube, f"{dst}-copy.nc")
-                os.remove(dst)
-                os.rename(f"{dst}-copy.nc", dst)
-        except OSError: # file does not exist yet.
-            iris.save(new_cube, dst)
-            return
+        self.save(ann_spatial_avg, dst)
