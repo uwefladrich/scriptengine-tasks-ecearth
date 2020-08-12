@@ -5,11 +5,11 @@ import warnings
 
 import iris
 
-from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
+from .time_series import TimeSeries
 
-class GlobalAverage(Task):
+class GlobalAverage(TimeSeries):
     """GlobalAverage Processing Task"""
     def __init__(self, parameters):
         required = [
@@ -18,7 +18,7 @@ class GlobalAverage(Task):
             "domain",
             "varname",
         ]
-        super().__init__(__name__, parameters, required_parameters=required)
+        super(TimeSeries, self).__init__(__name__, parameters, required_parameters=required)
         self.comment = (f"Global average time series of **{self.varname}**. "
                         f"Each data point represents the (spatial and temporal) "
                         f"average over one leg.")
@@ -76,22 +76,4 @@ class GlobalAverage(Task):
         ann_spatial_avg.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 month'))
         ann_spatial_avg.add_cell_method(iris.coords.CellMethod('mean', coords='area'))
 
-        self.save_cube(ann_spatial_avg, dst)
-
-    def save_cube(self, new_cube, dst):
-        """save global average cubes in netCDF file"""
-        try:
-            current_cube = iris.load_cube(dst)
-            current_bounds = current_cube.coord('time').bounds
-            new_bounds = new_cube.coord('time').bounds
-            if current_bounds[-1][-1] > new_bounds[0][0]:
-                self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
-            else:
-                cube_list = iris.cube.CubeList([current_cube, new_cube])
-                merged_cube = cube_list.concatenate_cube()
-                iris.save(merged_cube, f"{dst}-copy.nc")
-                os.remove(dst)
-                os.rename(f"{dst}-copy.nc", dst)
-        except OSError: # file does not exist yet.
-            iris.save(new_cube, dst)
-            return
+        self.save(ann_spatial_avg, dst)

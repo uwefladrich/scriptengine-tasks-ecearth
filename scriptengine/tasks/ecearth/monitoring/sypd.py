@@ -20,7 +20,7 @@ class SYPD(Task):
             "elapsed_time",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"SYPD development during the current model run.")
+        self.comment = ("SYPD development during the current model run.")
         self.type = "time series"
 
     @timed_runner
@@ -55,7 +55,7 @@ class SYPD(Task):
             long_name="Simulated Years per Day",
             var_name="sypd",
             units="1",
-            dim_coords_and_dims=[(coord,0)],      
+            dim_coords_and_dims=[(coord, 0)],      
         )
 
         sypd_cube = helpers.set_metadata(
