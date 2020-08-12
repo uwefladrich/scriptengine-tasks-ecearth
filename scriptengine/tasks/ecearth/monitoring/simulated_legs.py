@@ -3,8 +3,8 @@
 import os
 import yaml
 
-from .scalar import Scalar
 from scriptengine.tasks.base.timing import timed_runner
+from .scalar import Scalar
 
 class SimulatedLegs(Scalar):
     """SimulatedLegs Processing Task."""

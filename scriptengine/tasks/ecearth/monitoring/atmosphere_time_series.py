@@ -7,12 +7,12 @@ import iris
 import iris_grib
 import numpy as np
 
-from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
+from .time_series import TimeSeries
 
-class AtmosphereTimeSeries(Task):
+class AtmosphereTimeSeries(TimeSeries):
     """AtmosphereMap Processing Task"""
     def __init__(self, parameters):
         required = [
@@ -20,7 +20,7 @@ class AtmosphereTimeSeries(Task):
             "dst",
             "grib_code",
         ]
-        super().__init__(__name__, parameters, required_parameters=required)
+        super(TimeSeries, self).__init__(__name__, parameters, required_parameters=required)
         self.comment = (f"Global average time series of **{self.grib_code}**. "
                         f"Each data point represents the (spatial and temporal) "
                         f"average over one leg.")
@@ -97,28 +97,7 @@ class AtmosphereTimeSeries(Task):
 
         if spatial_mean.units.name == 'kelvin':
             spatial_mean.convert_units('degC')
-        iris.save(spatial_mean, 'temp.nc') # Iris changes metadata when saving/loading cube
-        spatial_mean = iris.load_cube('temp.nc')
-        self.save_cube(spatial_mean, dst)
-        os.remove('temp.nc')
-
-    def save_cube(self, new_cube, dst):
-        """save global average cubes in netCDF file"""
-        try:
-            current_cube = iris.load_cube(dst)
-            current_bounds = current_cube.coord('time').bounds
-            new_bounds = new_cube.coord('time').bounds
-            if current_bounds[-1][-1] > new_bounds[0][0]:
-                self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
-            else:
-                cube_list = iris.cube.CubeList([current_cube, new_cube])
-                merged_cube = cube_list.concatenate_cube()
-                iris.save(merged_cube, f"{dst}-copy.nc")
-                os.remove(dst)
-                os.rename(f"{dst}-copy.nc", dst)
-        except OSError: # file does not exist yet.
-            iris.save(new_cube, dst)
-            return
+        self.save(spatial_mean, dst)
 
     def get_area_weights(self, cube):
         """compute area weights for the reduced gaussian grid"""

@@ -1,8 +1,8 @@
 """Processing Task that writes out the disk usage of a given folder."""
 import os
 
-from .scalar import Scalar
 from scriptengine.tasks.base.timing import timed_runner
+from .scalar import Scalar
 
 class DiskUsage(Scalar):
     """DiskUsage Processing Task"""

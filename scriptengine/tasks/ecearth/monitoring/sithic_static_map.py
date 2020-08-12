@@ -37,7 +37,7 @@ class SithicStaticMap(Task):
         self.log_info(f"Create static sivolu map for {hemisphere}ern hemisphere at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
-        if not (hemisphere == 'north' or hemisphere == 'south'):
+        if not hemisphere in ('north', 'south'):
             self.log_error((
                 f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
                 f"Diagnostic will not be treated, returning now."
