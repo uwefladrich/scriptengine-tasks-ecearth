@@ -1,17 +1,17 @@
 """Processing Task that writes out the disk usage of a given folder."""
 import os
 
-from .write_scalar import WriteScalar
+from .scalar import Scalar
 from scriptengine.tasks.base.timing import timed_runner
 
-class DiskUsage(WriteScalar):
+class DiskUsage(Scalar):
     """DiskUsage Processing Task"""
     def __init__(self, parameters):
         required = [
             "src",
             "dst",
         ]
-        super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
+        super(Scalar, self).__init__(__name__, parameters, required_parameters=required)
         self.title = "Disk Usage in GB"
         self.comment = f"Current size of {self.dst}."
         self.type = "scalar"

@@ -1,12 +1,12 @@
-"""Processing Task that writes out a given scalar value."""
+"""Processing Task that writes out a generalized scalar diagnostic."""
 
 import yaml
 
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 
-class WriteScalar(Task):
-    """WriteScalar Processing Task"""
+class Scalar(Task):
+    """Processing Task that writes out a generalized scalar diagnostic."""
     def __init__(self, parameters):
         required = [
             "title",

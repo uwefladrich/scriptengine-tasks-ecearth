@@ -3,17 +3,17 @@
 import os
 import yaml
 
-from .write_scalar import WriteScalar
+from .scalar import Scalar
 from scriptengine.tasks.base.timing import timed_runner
 
-class SimulatedLegs(WriteScalar):
+class SimulatedLegs(Scalar):
     """SimulatedLegs Processing Task."""
     def __init__(self, parameters):
         required = [
             "src",
             "dst",
         ]
-        super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
+        super(Scalar, self).__init__(__name__, parameters, required_parameters=required)
         self.title = "Simulated Legs"
         self.comment = "Current amount of folders in output directory."
         self.type = "scalar"

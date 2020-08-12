@@ -2,10 +2,10 @@
 
 from dateutil.relativedelta import relativedelta
 
-from .write_scalar import WriteScalar
+from .scalar import Scalar
 from scriptengine.tasks.base.timing import timed_runner
 
-class SimulatedYears(WriteScalar):
+class SimulatedYears(Scalar):
     """SimulatedYears Processing Task"""
     def __init__(self, parameters):
         required = [
@@ -13,7 +13,7 @@ class SimulatedYears(WriteScalar):
             "start",
             "end",
         ]
-        super(WriteScalar, self).__init__(__name__, parameters, required_parameters=required)
+        super(Scalar, self).__init__(__name__, parameters, required_parameters=required)
         self.title = "Simulated Years"
         self.comment = "Current number of simulated years."
         self.type = "scalar"
