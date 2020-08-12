@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/write_scalar.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/scalar.py"""
 
 import os
 
@@ -65,14 +65,14 @@ def test_scalar_working(tmpdir, init, context, expected_result):
     path = str(tmpdir + '/test.yml')
     init['dst'] = path
     context['dst'] = path
-    write_scalar = Scalar(init)
-    write_scalar.run(context)
+    scalar = Scalar(init)
+    scalar.run(context)
     with open(path) as file:
         result = yaml.load(file, Loader=yaml.FullLoader)
     assert expected_result == result
 
 
-def test_write_scalar_runtime_error(tmpdir):
+def test_scalar_runtime_error(tmpdir):
     path = str(tmpdir + '/test.yml')
     init = {
         'title': 'Title',
@@ -85,7 +85,7 @@ def test_write_scalar_runtime_error(tmpdir):
         init,
         )
 
-def test_write_scalar_extension_error(tmpdir):
+def test_scalar_extension_error(tmpdir):
     path = str(tmpdir + '/test.nc')
     init = {
         'title': 'Title',
@@ -94,9 +94,9 @@ def test_write_scalar_extension_error(tmpdir):
         'dst': path,
     }
     context = init
-    write_scalar = Scalar(init)
-    with patch.object(write_scalar, 'log_warning') as mock:
-       write_scalar.run(context)
+    scalar = Scalar(init)
+    with patch.object(scalar, 'log_warning') as mock:
+       scalar.run(context)
     mock.assert_called_with((
                 f"{path} does not end in valid YAML file extension. "
                 f"Diagnostic will not be saved."))
