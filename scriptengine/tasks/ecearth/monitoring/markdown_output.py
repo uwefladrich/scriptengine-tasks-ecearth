@@ -109,7 +109,7 @@ def make_time_series(src_path, dst_folder, time_series_cube):
     dst_file = f"./{base_name}.png"
 
     x_coord = time_series_cube.coords()[0]
-    if x_coord.name() == "time":
+    if "seconds since" in x_coord.name():
         dates = cftime.num2pydate(x_coord.points, x_coord.units.name)
         coord_points = format_dates(dates)
     else:
@@ -118,7 +118,7 @@ def make_time_series(src_path, dst_folder, time_series_cube):
     fig = plt.figure(figsize=(6, 4), dpi=300)
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(coord_points, time_series_cube.data, marker='o')
-    if x_coord.name() == "time":
+    if "seconds since" in x_coord.name():
         fig.autofmt_xdate()
     minor_step = math.ceil(len(coord_points) / 40)
     if len(coord_points) < 10:
