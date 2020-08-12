@@ -1,0 +1,22 @@
+h1. EC-Earth 4: Monitoring
+
+{% for item in presentation_list %}
+
+{%- if item["presentation_type"] == "text" %}
+**{{ item["title"] }}**: {{ item["data"] }}
+{%- if "comment" in item %}
+{{item["comment"]}} 
+{% endif %}
+
+{%- elif item["presentation_type"] == "image" %}
+
+h2. {{item["title"].title()}}
+
+!{{item["path"][2:]}}!
+
+{{item["comment"]}}
+
+{% endif %}
+
+{% endfor %}
+
