@@ -30,15 +30,16 @@ class TimeSeries(Task):
         title = self.getarg('title', context)
         data_value = self.getarg('data_value', context)
         dst = self.getarg('dst', context)
-        coord_value = self.getarg('coord_value', context)
-        # deal with date/datetime
-        coord_value, coord_units = self.value_to_numeric(context, coord_value)
+        coord_value = self.getarg('coord_value', context)        
         data_units = self.getarg('data_units', context, default='1')
         coord_name = self.getarg('coord_name', context, default='time')
         coord_bounds = self.getarg('coord_bounds', context, default=None)
-        # deal with date/datetime
-        coord_bounds = [self.value_to_numeric(context, bound)[0] for bound in coord_bounds]
         comment = self.getarg('comment', context, default=".")
+
+        # deal with date/datetime
+        coord_value, coord_units = self.value_to_numeric(context, coord_value)
+        if coord_bounds is not None:
+            coord_bounds = [self.value_to_numeric(context, bound)[0] for bound in coord_bounds]
 
         self.log_info(f"Create time series at {dst}.")
         self.log_debug(f"Value: {data_value} at time: {coord_value}, title: {title}")
