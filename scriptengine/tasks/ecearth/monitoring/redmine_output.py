@@ -43,13 +43,12 @@ class RedmineOutput(Task):
         issue_description = redmine_template.render(presentation_list=presentation_list)
         
         url = 'https://dev.ec-earth.org'
-        try:
-            redmine = Redmine(url, key=key)
-        except redminelib.exceptions.AuthError:
-            self.log_error("Authentication Error, wrong API key? Aborting.")
-            return
+        redmine = Redmine(url, key=key)
 
         issue = self.get_issue(redmine, issue_subject)
+        if issue is None:
+            return
+        
         self.log_info("Updating the issue.")
 
         issue.description = ""
@@ -156,8 +155,10 @@ class RedmineOutput(Task):
             tracker = next(t for t in redmine.tracker.all() if t.name == tracker_name)
         except redminelib.exceptions.AuthError:
             self.log_error('Could not log in to Redmine server (AuthError)')
+            return
         except StopIteration:
             self.log_error('Redmine tracker for EC-Earth experiments not found')
+            return
 
         # Find issue or create if none exists; define issue's last leg
         for issue in redmine.issue.filter(project_id=project_identifier, tracker_id=tracker.id):
