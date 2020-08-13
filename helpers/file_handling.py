@@ -69,7 +69,7 @@ def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs)
         'comment': comment,
         'type': diagnostic_type,
         'source': 'EC-Earth 4',
-        'Conventions': 'CF-1.7',
+        'Conventions': 'CF-1.8',
         }
     for key, value in kwargs.items():
         metadata[f'{key}'] = value

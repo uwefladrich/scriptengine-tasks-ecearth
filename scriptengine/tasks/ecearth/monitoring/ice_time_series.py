@@ -67,7 +67,7 @@ class SeaIceTimeSeries(TimeSeries):
                 f"Diagnostic will not be treated, returning now."
             ))
         if not dst.endswith(".nc"):
-            self.log_warning((
+            self.log_error((
                 f"{dst} does not end in valid netCDF file extension. "
                 f"Diagnostic can not be saved, returning now."
             ))
@@ -78,8 +78,8 @@ class SeaIceTimeSeries(TimeSeries):
             mar = helpers.get_month_from_src("03", src)
             sep = helpers.get_month_from_src("09", src)
         except FileNotFoundError as error:
-            self.log_warning((f"FileNotFoundError: {error}."
-                              f"Diagnostic can not be created, returning now."))
+            self.log_error((f"FileNotFoundError: {error}."
+                            f"Diagnostic can not be created, returning now."))
             return
 
         leg_cube = helpers.load_input_cube([mar, sep], varname)

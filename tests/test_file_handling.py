@@ -40,3 +40,31 @@ def test_load_input_cube():
     src = "./tests/testdata/tos-climatology.nc"
     varname = "tos"
     assert isinstance(file_handling.load_input_cube(src, varname), iris.cube.Cube)
+
+def test_set_metadata():
+    cube = iris.cube.Cube([1])
+    cube.attributes = {
+        'description': None,
+        'interval_operation': None,
+        'interval_write': None,
+        'name': None,
+        'online_operation': None,
+    }
+    updated_cube = file_handling.set_metadata(cube)
+    assert updated_cube.attributes == {
+        'title': None,
+        'comment': None,
+        'type': None,
+        'source': 'EC-Earth 4',
+        'Conventions': 'CF-1.8'
+        }
+    new_metadata = {
+        'title': 'Title',
+        'comment': 'Comment',
+        'type': 'Type',
+        'source': 'EC-Earth 4',
+        'Conventions': 'CF-1.8',
+        'custom': 'Custom',
+    }
+    updated_cube = file_handling.set_metadata(updated_cube, **new_metadata)
+    assert updated_cube.attributes == new_metadata
