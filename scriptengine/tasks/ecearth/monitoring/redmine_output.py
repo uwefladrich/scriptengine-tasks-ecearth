@@ -1,6 +1,9 @@
-"""Presentation Task that saves Data and Plots to a Markdown File."""
+"""Presentation Task that uploads Data and Plots to the EC-Earth dev portal."""
 
 import os
+
+from redminelib import Redmine
+import redminelib.exceptions
 
 import jinja2
 import yaml
@@ -13,40 +16,66 @@ from helpers.file_handling import ChangeDirectory
 from helpers.presentation_objects import make_time_series, make_static_map, make_dynamic_map
 import helpers.exceptions as exceptions
 
-class MarkdownOutput(Task):
-    """MarkdownOutput Presentation Task"""
+class RedmineOutput(Task):
+    """RedmineOutput Presentation Task"""
     def __init__(self, parameters):
         required = [
             "src",
-            "dst",
+            "local_dst",
+            "subject",
             "template",
+            "api_key",
         ]
         super().__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):
         sources = self.getarg('src', context)
-        dst_folder = self.getarg('dst', context)
+        dst_folder = self.getarg('local_dst', context)
+        issue_subject = self.getarg('subject', context)
         template_path = self.getarg('template', context)
-        self.log_info(f"Create Markdown report at {dst_folder}.")
-        self.log_debug(f"Template: {template_path}, Source File(s): {sources}")
+        key = self.getarg('api_key', context)
+        self.log_info(f"Create new issue '{issue_subject}'.")
+        self.log_debug(f"Template: {template_path}, Source File(s): {sources}, Local storage: {dst_folder}")
 
         presentation_list = self.get_presentation_list(sources, dst_folder)
-        md_template = self.get_template(context, template_path)
+        redmine_template = self.get_template(context, template_path)
+        issue_description = redmine_template.render(presentation_list=presentation_list)
+        
+        url = 'https://dev.ec-earth.org'
+        redmine = Redmine(url, key=key)
 
-        with ChangeDirectory(dst_folder):
-            with open("./summary.md", 'w') as md_out:
-                md_out.write(md_template.render(
-                    presentation_list=presentation_list,
-                ))
+        issue = self.get_issue(redmine, issue_subject)
+        if issue is None:
+            return
+        
+        self.log_info("Updating the issue.")
+
+        issue.description = ""
+        for line in issue_description:
+            issue.description += line
+        
+        issue.uploads = []
+        for item in presentation_list:
+            if item['presentation_type'] == 'image':
+                file_name = os.path.basename(item['path'])
+                try:
+                    for attachment in issue.attachments or []:
+                        if attachment.filename == file_name:
+                            redmine.attachment.delete(attachment.id)
+                except redminelib.exceptions.ResourceNotFoundError:
+                    pass
+                issue.uploads.append({'filename': file_name, 'path': f"{dst_folder}/{file_name}"})
+        issue.save()
 
     def get_presentation_list(self, sources, dst_folder):
         """create a list of presentation objects"""
         presentation_list = []
         for src in sources:
             presentation_list.append(self.presentation_object(src, dst_folder))
-        # remove None objects from list and return
-        return [item for item in presentation_list if item]
+        # remove None objects from list
+        presentation_list = [item for item in presentation_list if item]
+        return presentation_list
 
     def presentation_object(self, src, dst_folder):
         """
@@ -101,8 +130,8 @@ class MarkdownOutput(Task):
         else:
             self.log_error(f"Invalid file extension of {src}")
         return None
-
-    def get_template(self, context, template_path):
+    
+    def get_template(self, context, template):
         """get Jinja2 template file"""
         search_path = ['.', 'templates']
         if "_se_cmd_cwd" in context:
@@ -114,4 +143,32 @@ class MarkdownOutput(Task):
         environment = jinja2.Environment(loader=loader)
         for name, function in j2filters().items():
             environment.filters[name] = function
-        return environment.get_template(template_path)
+        return environment.get_template(template)
+    
+    def get_issue(self, redmine, issue_subject):
+        """Connect to Redmine server, find and return issue corresponding to the experiment ID"""
+
+        project_identifier = 'ec-earth-experiments'
+        tracker_name = 'Experiment'
+
+        try:
+            tracker = next(t for t in redmine.tracker.all() if t.name == tracker_name)
+        except redminelib.exceptions.AuthError:
+            self.log_error('Could not log in to Redmine server (AuthError)')
+            return
+        except StopIteration:
+            self.log_error('Redmine tracker for EC-Earth experiments not found')
+            return
+
+        # Find issue or create if none exists; define issue's last leg
+        for issue in redmine.issue.filter(project_id=project_identifier, tracker_id=tracker.id):
+            if issue.subject == issue_subject:
+                break
+        else:
+            issue = redmine.issue.new()
+            issue.project_id = project_identifier
+            issue.subject = issue_subject
+            issue.tracker_id = tracker.id
+            issue.is_private = False
+
+        return issue

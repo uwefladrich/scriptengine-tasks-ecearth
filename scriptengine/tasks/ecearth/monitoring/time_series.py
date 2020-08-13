@@ -28,20 +28,27 @@ class TimeSeries(Task):
     def run(self, context):
         # load input parameters
         title = self.getarg('title', context)
-        data_value = self.getarg('data_value', context)
         dst = self.getarg('dst', context)
-        coord_value = self.getarg('coord_value', context)
-        data_units = self.getarg('data_units', context, default='1')
+        self.log_info(f"Time series {title} at {dst}.")
+
+        # Convert coordinate value to number and get unit
+        coord_value = self.getarg("coord_value", context, default=None)
+        if type(coord_value) in (datetime.datetime, datetime.date):
+            try:
+                coord_value = (coord_value - datetime.datetime(1900, 1, 1)).total_seconds()
+            except TypeError:
+                coord_value = (coord_value - datetime.date(1900, 1, 1)).total_seconds()
+            coord_unit = "second since 1900-01-01 00:00:00"
+        else:
+            coord_unit = self.getarg("coord_unit", context, default="1")
+        
+        data_value = self.getarg("data_value", context)
+        data_unit = self.getarg("data_unit", context, default="1")
+
         coord_name = self.getarg('coord_name', context, default='time')
-        coord_bounds = self.getarg('coord_bounds', context, default=None)
+        data_name = self.getarg('data_name', context, default=title)
         comment = self.getarg('comment', context, default=".")
-
-        # deal with date/datetime
-        coord_value, coord_units = self.value_to_numeric(context, coord_value)
-        if coord_bounds is not None:
-            coord_bounds = [self.value_to_numeric(context, bound)[0] for bound in coord_bounds]
-
-        self.log_info(f"Create time series at {dst}.")
+        
         self.log_debug(f"Value: {data_value} at time: {coord_value}, title: {title}")
 
         if not dst.endswith(".nc"):
@@ -56,16 +63,15 @@ class TimeSeries(Task):
             points=np.array([coord_value]),
             long_name=coord_name,
             var_name=coord_name.replace(" ", "_"),
-            bounds=np.array([coord_bounds]),
-            units=coord_units,
+            units=coord_unit,
         )
 
         # create cube
         data_cube = iris.cube.Cube(
             data=np.array([data_value]),
-            long_name=title,
-            var_name=title.replace(" ", "_"),
-            units=data_units,
+            long_name=data_name,
+            var_name=data_name.replace(" ", "_"),
+            units=data_unit,
             dim_coords_and_dims=[(coord, 0)],
         )
 
@@ -77,7 +83,6 @@ class TimeSeries(Task):
             type=self.diagnostic_type,
         )
         self.save(data_cube, dst)
-
 
     def save(self, new_cube, dst):
         """save time series cube in netCDF file"""
@@ -99,35 +104,10 @@ class TimeSeries(Task):
             os.remove(dst)
             os.rename(f"{dst}-copy.nc", dst)
         else:
-            self.log_warning("Cube will not be saved.")
+            self.log_warning("Non-monotonic coordinate. Cube will not be saved.")
 
         # remove temporary save
         os.remove('temp.nc')
-
-    def value_to_numeric(self, context, coord_value):
-        """
-        convert coordinate value from date(time) object to numeric value if necessary
-        """
-
-        if isinstance(coord_value, datetime.datetime):
-            since = datetime.datetime(1900, 1, 1)
-            coord_units = "second since 1900-01-01 00:00:00"
-            seconds = (coord_value - since).total_seconds()
-            return seconds, coord_units
-
-        if isinstance(coord_value, datetime.date):
-            since = datetime.datetime(1900, 1, 1)
-            date_time = datetime.datetime(
-                coord_value.year,
-                coord_value.month,
-                coord_value.day,
-                )
-            coord_units = "second since 1900-01-01 00:00:00"
-            seconds = (date_time - since).total_seconds()
-            return seconds, coord_units
-
-        coord_units = self.getarg('coord_units', context, default='1')
-        return coord_value, coord_units
 
     def test_monotonic_increase(self, old_coord, new_coord):
         """Test if coordinate is monotonically increasing."""

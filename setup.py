@@ -49,5 +49,6 @@ setuptools.setup(
         "imageio>=2.0",
         "scitools-iris>=2.4",
         "iris-grib>=0.15",
+        "python-redmine",
     ],
 )

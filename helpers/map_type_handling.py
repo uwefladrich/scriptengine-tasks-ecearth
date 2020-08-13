@@ -20,7 +20,7 @@ def function_mapper(map_type_string):
 
 def global_ocean_plot(cube, title=None, dates=None, units=None, min_value=None, max_value=None):
     """Map Type Handling for Global Ocean Maps"""
-    fig = plt.figure(figsize=(6, 4), dpi=300)
+    fig = plt.figure(figsize=(6, 4), dpi=150)
     fig.suptitle(title)
     ax = fig.add_subplot(
         1, 1, 1,
@@ -59,7 +59,7 @@ def global_ocean_plot(cube, title=None, dates=None, units=None, min_value=None, 
 
 def global_atmosphere_plot(cube, title=None, dates=None, min_value=None, max_value=None, units=None):
     """Map Type Handling for Global Atmosphere Maps"""
-    fig = plt.figure(figsize=(6, 4), dpi=300)
+    fig = plt.figure(figsize=(6, 4), dpi=150)
     fig.suptitle(title)
     ax = fig.add_subplot(
         1, 1, 1,
@@ -87,7 +87,7 @@ def global_atmosphere_plot(cube, title=None, dates=None, min_value=None, max_val
     return fig
 
 def polar_ice_sheet_plot(cube, title=None, dates=None, min_value=None, max_value=None, units=None):
-    fig = plt.figure(figsize=(6,4), dpi=300)
+    fig = plt.figure(figsize=(6,4), dpi=150)
     fig.suptitle(title)
     if "North" in cube.long_name:
         center = 90.0
