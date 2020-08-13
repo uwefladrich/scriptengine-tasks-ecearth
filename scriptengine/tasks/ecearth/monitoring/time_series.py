@@ -104,7 +104,7 @@ class TimeSeries(Task):
             os.remove(dst)
             os.rename(f"{dst}-copy.nc", dst)
         else:
-            self.log_warning("Cube will not be saved.")
+            self.log_warning("Non-monotonic coordinate. Cube will not be saved.")
 
         # remove temporary save
         os.remove('temp.nc')
