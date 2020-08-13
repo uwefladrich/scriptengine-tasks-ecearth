@@ -64,14 +64,10 @@ Required Parameters:
 Optional Parameters:
 
 - comment (default: '.')
-- data_units (default: 1)
-- coord_units (default: 1)
+- data_name (default: title)
+- data_unit (default: 1)
 - coord_name (default: 'time')
-- coord_bounds (default: [coord_value - 1, coord_value])
-
-	- list with two elements
-	- elements can be int/float/double or date/datetime
-
+- coord_unit (default: 1)
 
 Minimal Example
 ###############
@@ -90,17 +86,15 @@ Elaborate Example
 ::
 
     - ece.mon.time_series:
-        title: "Some Diagnostic"
+        title: "An Interesting Title"
         data_value: "{{some_value}}"
-        coord_value: "{{leg_num}}"
+        coord_value: "{{some_other_value}}"
         dst: "{{mondir}}/some-diagnostic.nc"
         comment: "Diagnostic Description."
+        coord_name: "x-axis label"
+        coord_units: "s"
+        data_name: "y-axis label"
         data_units: "m"
-        coord_units: "1"
-        coord_name: "Leg Number"
-        coord_bounds:
-            - "{{leg_num - 1}}"
-            - "{{leg_num}}"
 
 
 SYPD Example
@@ -116,17 +110,3 @@ SYPD Example
         data_value: "{{((schedule.leg.end - schedule.leg.start)/script_elapsed_time/365)}}"
         dst: "{{mondir}}/generic-sypd.nc"
 
-
-Simulated Years per Day
-=======================
-
-Diagnostic Type: Time Series
-
-::
-
-    - ece.mon.sypd:
-        leg_start: "{{leg.start}}"
-        leg_end: "{{leg.end}}"
-        elapsed_time: "{{model_elapsed_time}}"
-        leg_num: "{{leg_num}}"
-        dst: "{{mondir}}/sypd.nc"

@@ -17,7 +17,6 @@ from .monitoring.atmosphere_dynamic_map import AtmosphereDynamicMap
 from .monitoring.sithic_static_map import SithicStaticMap
 from .monitoring.siconc_dynamic_map import SiconcDynamicMap
 from .monitoring.atmosphere_time_series import AtmosphereTimeSeries
-from .monitoring.sypd import SYPD
 from .monitoring.time_series import TimeSeries
 from .monitoring.redmine_output import RedmineOutput
 from .slurm import Sbatch
@@ -39,7 +38,6 @@ def task_loader_map():
         'ece.mon.sithic_static_map': SithicStaticMap,
         'ece.mon.siconc_dynamic_map': SiconcDynamicMap,
         'ece.mon.atmosphere_ts': AtmosphereTimeSeries,
-        'ece.mon.sypd': SYPD,
         'ece.mon.time_series': TimeSeries,
         'ece.mon.redmine_output': RedmineOutput
         }
