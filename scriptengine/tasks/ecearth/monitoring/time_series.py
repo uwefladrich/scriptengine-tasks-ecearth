@@ -43,7 +43,7 @@ class TimeSeries(Task):
             coord_unit = self.getarg("coord_unit", context, default="1")
         
         data_value = self.getarg("data_value", context)
-        data_unit = self.getarg("data_unit", context)
+        data_unit = self.getarg("data_unit", context, default="1")
 
         coord_name = self.getarg('coord_name', context, default='time')
         data_name = self.getarg('data_name', context, default=title)
