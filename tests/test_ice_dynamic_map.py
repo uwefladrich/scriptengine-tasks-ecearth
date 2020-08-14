@@ -55,11 +55,10 @@ def test_ice_dynamic_map_wrong_varname(tmpdir):
                 f"'varname' must be one of the following: {meta_dict.keys()} "
                 f"Diagnostic will not be treated, returning now."))
 
-def test_ice_time_series_wrong_hemisphere(tmpdir):
+def test_ice_dynamic_map_wrong_hemisphere(tmpdir):
     init = {
-        "src": ['./tests/testdata/NEMO_output_sivolu-199003.nc'],
+        "src": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "dst": str(tmpdir) + '/test.nc',
-        "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",
         "hemisphere": "east",
     }

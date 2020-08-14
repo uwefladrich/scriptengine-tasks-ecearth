@@ -79,7 +79,7 @@ class SeaIceDynamicMap(DynamicMap):
             month_cube.convert_units(meta_dict[varname]['convert_to'])
 
         month_cube.long_name = f"{meta_dict[varname]['long_name']} {hemisphere}"
-        comment = f"{meta_dict[varname]['long_name']} on {hemisphere}ern hemisphere."
+        comment = f"{meta_dict[varname]['long_name']} / **{varname}** on {hemisphere}ern hemisphere."
         month_cube = helpers.set_metadata(
             month_cube,
             title=f"{month_cube.long_name} {self.get_month(time_coord)}",
