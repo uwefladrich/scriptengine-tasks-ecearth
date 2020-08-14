@@ -14,7 +14,7 @@ from .monitoring.ocean_static_map import OceanStaticMap
 from .monitoring.ocean_dynamic_map import OceanDynamicMap
 from .monitoring.atmosphere_static_map import AtmosphereStaticMap
 from .monitoring.atmosphere_dynamic_map import AtmosphereDynamicMap
-from .monitoring.sithic_static_map import SithicStaticMap
+from .monitoring.ice_map import SeaIceMap
 from .monitoring.ice_dynamic_map import SeaIceDynamicMap
 from .monitoring.atmosphere_time_series import AtmosphereTimeSeries
 from .monitoring.time_series import TimeSeries
@@ -35,7 +35,7 @@ def task_loader_map():
         'ece.mon.ocean_dynamic_map': OceanDynamicMap,
         'ece.mon.atmosphere_static_map': AtmosphereStaticMap,
         'ece.mon.atmosphere_dynamic_map': AtmosphereDynamicMap,
-        'ece.mon.sithic_static_map': SithicStaticMap,
+        'ece.mon.sithic_static_map': SeaIceMap,
         'ece.mon.ice_dynamic_map': SeaIceDynamicMap,
         'ece.mon.atmosphere_ts': AtmosphereTimeSeries,
         'ece.mon.time_series': TimeSeries,

@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/disk_usage.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/dynamic_map.py"""
 
 import os
 import datetime
