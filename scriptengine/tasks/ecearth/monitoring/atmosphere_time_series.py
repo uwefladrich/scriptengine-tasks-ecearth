@@ -76,7 +76,7 @@ class AtmosphereTimeSeries(TimeSeries):
             )
         
         spatial_mean.cell_methods = ()
-        spatial_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals=f'{step} seconds'))
+        spatial_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals=f'{step} hours'))
         spatial_mean.add_cell_method(iris.coords.CellMethod('mean', coords='area'))
 
         # Promote time from scalar to dimension coordinate
