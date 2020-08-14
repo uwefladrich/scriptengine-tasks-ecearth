@@ -52,9 +52,6 @@ def test_set_metadata():
     }
     updated_cube = file_handling.set_metadata(cube)
     assert updated_cube.attributes == {
-        'title': None,
-        'comment': None,
-        'type': None,
         'source': 'EC-Earth 4',
         'Conventions': 'CF-1.8'
         }

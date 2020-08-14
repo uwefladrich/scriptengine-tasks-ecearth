@@ -82,7 +82,8 @@ def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs)
         'online_operation',
         ]
     for key, value in metadata.items():
-        cube.attributes[key] = value
+        if value is not None:
+            cube.attributes[key] = value
     for key in metadata_to_discard:
         cube.attributes.pop(key, None)
     return cube
