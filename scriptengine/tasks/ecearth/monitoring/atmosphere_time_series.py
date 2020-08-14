@@ -21,10 +21,6 @@ class AtmosphereTimeSeries(TimeSeries):
             "grib_code",
         ]
         super(TimeSeries, self).__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Global average time series of **{self.grib_code}**. "
-                        f"Each data point represents the (spatial and temporal) "
-                        f"average over one leg.")
-        self.type = "time series"
 
     @timed_runner
     def run(self, context):
@@ -84,11 +80,14 @@ class AtmosphereTimeSeries(TimeSeries):
 
         spatial_mean.long_name = spatial_mean.long_name.replace("_", " ")
 
+        comment = (f"Global average time series of **{grib_code}**. "
+                   f"Each data point represents the (spatial and temporal) "
+                   f"average over one leg.")
         spatial_mean = helpers.set_metadata(
             spatial_mean,
             title=f'{spatial_mean.long_name} (Annual Mean)',
-            comment=self.comment,
-            diagnostic_type=self.type,
+            comment=comment,
+            diagnostic_type=self.diagnostic_type,
         )
 
         if spatial_mean.units.name == 'kelvin':
