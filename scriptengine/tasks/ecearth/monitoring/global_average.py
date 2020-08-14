@@ -66,7 +66,9 @@ class GlobalAverage(TimeSeries):
             )
 
         ann_spatial_avg.cell_methods = ()
-        ann_spatial_avg.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 month'))
+        ann_spatial_avg.add_cell_method(
+            iris.coords.CellMethod('mean', coords='time', intervals='1 month')
+            )
         ann_spatial_avg.add_cell_method(iris.coords.CellMethod('mean', coords='area'))
 
         self.save(ann_spatial_avg, dst)

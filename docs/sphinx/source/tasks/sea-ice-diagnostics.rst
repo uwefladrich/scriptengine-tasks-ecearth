@@ -21,21 +21,24 @@ varname can be ``sivolu`` or ``siconc``.
         varname: sivolu
 
 
-Sea-Ice Volume per Area Map
-===========================
+Sea-Ice Map
+============
 
 Diagnostic Type: Map
 
-Mapped to: ``ece.mon.sithic_static_map``
+Mapped to: ``ece.mon.ice_map``
+
+varname can be ``sivolu`` or ``siconc``.
 
 Map Type: polar ice sheet
 
 ::
 
-    - ece.mon.sithic_static_map:
+    - ece.mon.ice_map:
         src: "{{ice_file_sep}}"
-        dst: "{{mondir}}/sithic-south-sep.nc"
+        dst: "{{mondir}}/sivolu-south-sep.nc"
         hemisphere: south
+        varname: sivolu
 
 Sea-Ice Time Map
 ================

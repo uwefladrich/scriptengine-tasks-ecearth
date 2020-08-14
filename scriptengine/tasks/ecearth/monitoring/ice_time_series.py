@@ -117,11 +117,7 @@ class SeaIceTimeSeries(TimeSeries):
 
         time_coord = hemispheric_sum.coord('time')
         time_coord.bounds = self.get_time_bounds(time_coord)
-        hemispheric_sum.cell_methods = ()
-        hemispheric_sum.add_cell_method(iris.coords.CellMethod('point', coords='time'))
-        hemispheric_sum.add_cell_method(
-            iris.coords.CellMethod('sum', coords='area', intervals=f'{hemisphere}ern hemisphere')
-            )
+        hemispheric_sum = self.set_cell_methods(hemispheric_sum, hemisphere)
 
         self.save(hemispheric_sum, dst)
 
@@ -168,3 +164,12 @@ class SeaIceTimeSeries(TimeSeries):
             [mid_of_year_seconds, end_seconds],
         ])
         return new_bounds
+    
+    def set_cell_methods(self, cube, hemisphere):
+        """Set the correct cell methods."""
+        cube.cell_methods = ()
+        cube.add_cell_method(iris.coords.CellMethod('point', coords='time'))
+        cube.add_cell_method(
+            iris.coords.CellMethod('sum', coords='area', intervals=f'{hemisphere}ern hemisphere')
+            )
+        return cube

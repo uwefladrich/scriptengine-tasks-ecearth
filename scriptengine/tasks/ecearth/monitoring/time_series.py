@@ -121,6 +121,7 @@ class TimeSeries(Task):
         return True
 
     def correct_file_extension(self, dst):
+        """check if destination file has a valid netCDF extension"""
         if not dst.endswith(".nc"):
             self.log_error((
                 f"{dst} does not end in valid netCDF file extension. "

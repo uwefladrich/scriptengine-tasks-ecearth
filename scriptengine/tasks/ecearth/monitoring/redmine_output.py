@@ -12,7 +12,6 @@ import iris
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import filters as j2filters
-from helpers.file_handling import ChangeDirectory
 from helpers.presentation_objects import make_time_series, make_static_map, make_dynamic_map
 import helpers.exceptions as exceptions
 
@@ -36,25 +35,25 @@ class RedmineOutput(Task):
         template_path = self.getarg('template', context)
         key = self.getarg('api_key', context)
         self.log_info(f"Create new issue '{issue_subject}'.")
-        self.log_debug(f"Template: {template_path}, Source File(s): {sources}, Local storage: {dst_folder}")
+        self.log_debug(f"Template: {template_path}, Source File(s): {sources}")
 
         presentation_list = self.get_presentation_list(sources, dst_folder)
         redmine_template = self.get_template(context, template_path)
         issue_description = redmine_template.render(presentation_list=presentation_list)
-        
+
         url = 'https://dev.ec-earth.org'
         redmine = Redmine(url, key=key)
 
         issue = self.get_issue(redmine, issue_subject)
         if issue is None:
             return
-        
+
         self.log_info("Updating the issue.")
 
         issue.description = ""
         for line in issue_description:
             issue.description += line
-        
+
         issue.uploads = []
         for item in presentation_list:
             if item['presentation_type'] == 'image':
@@ -100,7 +99,8 @@ class RedmineOutput(Task):
             except FileNotFoundError:
                 self.log_error(f"File not found! Ignoring {src}")
                 return None
-        elif src.endswith('.nc'):
+    
+        if src.endswith('.nc'):
             try:
                 loaded_cube = iris.load_cube(src)
             except OSError:
@@ -125,12 +125,12 @@ class RedmineOutput(Task):
                     self.log_error(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}
-            else:
-                self.log_error(f"Invalid diagnostic type {loaded_cube.attributes['type']}")
-        else:
-            self.log_error(f"Invalid file extension of {src}")
-        return None
+            self.log_error(f"Invalid diagnostic type {loaded_cube.attributes['type']}")
+            return None
     
+        self.log_error(f"Invalid file extension of {src}")
+        return None
+
     def get_template(self, context, template):
         """get Jinja2 template file"""
         search_path = ['.', 'templates']
@@ -144,7 +144,7 @@ class RedmineOutput(Task):
         for name, function in j2filters().items():
             environment.filters[name] = function
         return environment.get_template(template)
-    
+
     def get_issue(self, redmine, issue_subject):
         """Connect to Redmine server, find and return issue corresponding to the experiment ID"""
 

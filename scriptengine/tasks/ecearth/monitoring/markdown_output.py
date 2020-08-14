@@ -71,7 +71,8 @@ class MarkdownOutput(Task):
             except FileNotFoundError:
                 self.log_error(f"File not found! Ignoring {src}")
                 return None
-        elif src.endswith('.nc'):
+    
+        if src.endswith('.nc'):
             try:
                 loaded_cube = iris.load_cube(src)
             except OSError:
@@ -96,10 +97,10 @@ class MarkdownOutput(Task):
                     self.log_error(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}
-            else:
-                self.log_error(f"Invalid diagnostic type {loaded_cube.attributes['type']}")
-        else:
-            self.log_error(f"Invalid file extension of {src}")
+            self.log_error(f"Invalid diagnostic type {loaded_cube.attributes['type']}")
+            return None
+    
+        self.log_error(f"Invalid file extension of {src}")
         return None
 
     def get_template(self, context, template_path):

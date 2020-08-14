@@ -1,15 +1,13 @@
 """Processing Task that creates a 2D static map of a given extensive atmosphere quantity."""
 
-import os
-
 import iris
 import iris_grib
 import numpy as np
 
 from scriptengine.tasks.base.timing import timed_runner
 from helpers.grib_cf_additions import update_grib_mappings
-from .map import Map
 import helpers.file_handling as helpers
+from .map import Map
 
 class AtmosphereStaticMap(Map):
     """AtmosphereStaticMap Processing Task"""

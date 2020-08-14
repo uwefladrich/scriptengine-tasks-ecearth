@@ -1,6 +1,5 @@
 """Tests for scriptengine/tasks/monitoring test_markdown_output.py"""
 
-import pytest
 from unittest.mock import patch, Mock
 
 from scriptengine.tasks.ecearth.monitoring.markdown_output import MarkdownOutput
@@ -8,8 +7,7 @@ from scriptengine.tasks.ecearth.monitoring.markdown_output import MarkdownOutput
 def mock_pres_object(value_1, value_2):
     if value_1 == 1:
         return value_2
-    else:
-        return None
+    return None
 
 def test_presentation_object_file_extension():
     init = {

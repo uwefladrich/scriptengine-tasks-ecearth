@@ -1,14 +1,10 @@
 """Processing Task that creates a 2D dynamic map of a given extensive ocean quantity."""
 
-import os
-
 import iris
-import numpy as np
 
 from scriptengine.tasks.base.timing import timed_runner
-
-from .dynamic_map import DynamicMap
 import helpers.file_handling as helpers
+from .dynamic_map import DynamicMap
 
 class OceanDynamicMap(DynamicMap):
     """OceanDynamicMap Processing Task"""

@@ -1,8 +1,7 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/atmosphere_time_series.py"""
 
-import pytest
-import iris
 from unittest.mock import patch
+import iris
 
 from scriptengine.tasks.ecearth.monitoring.atmosphere_time_series import AtmosphereTimeSeries
 

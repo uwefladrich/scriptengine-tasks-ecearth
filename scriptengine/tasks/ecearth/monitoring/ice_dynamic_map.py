@@ -1,6 +1,5 @@
 """Processing Task that creates a 2D dynamic map of sea ice concentration."""
 
-import os
 import datetime
 
 import numpy as np
@@ -8,9 +7,8 @@ import iris
 import cftime
 
 from scriptengine.tasks.base.timing import timed_runner
-
-from .dynamic_map import DynamicMap
 import helpers.file_handling as helpers
+from .dynamic_map import DynamicMap
 
 meta_dict = {
     'sivolu':
@@ -93,7 +91,7 @@ class SeaIceDynamicMap(DynamicMap):
         month_cube = self.set_cell_methods(month_cube, hemisphere)
 
         self.save(month_cube, dst)
-    
+
     def mask_irrelevant_cells(self, month_cube, hemisphere):
         """
         Mask grid cells without ice and on the 'other' hemisphere.
@@ -128,15 +126,15 @@ class SeaIceDynamicMap(DynamicMap):
         """
         dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
         return dt_object.strftime('%B')
-    
+
     def set_cell_methods(self, cube, hemisphere):
         """Set the correct cell methods."""
         cube.cell_methods = ()
         cube.add_cell_method(iris.coords.CellMethod('point', coords='time'))
         cube.add_cell_method(iris.coords.CellMethod(
-                'point',
-                coords='latitude',
-                comments=f'{hemisphere}ern hemisphere',
-                ))
+            'point',
+            coords='latitude',
+            comments=f'{hemisphere}ern hemisphere',
+            ))
         cube.add_cell_method(iris.coords.CellMethod('point', coords='longitude'))
         return cube

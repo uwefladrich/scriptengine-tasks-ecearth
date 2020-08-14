@@ -1,17 +1,14 @@
 """Processing Task that creates a 2D map of sea ice variables."""
 
-import os
+import datetime
 
 import numpy as np
 import iris
 import cftime
-import datetime
-import cf_units
 
 from scriptengine.tasks.base.timing import timed_runner
-from scriptengine.jinja import render as j2render
-from .map import Map
 import helpers.file_handling as helpers
+from .map import Map
 
 meta_dict = {
     'sivolu': 'Sea-Ice Volume per Area',
@@ -63,7 +60,7 @@ class SeaIceMap(Map):
         time_coord.bounds = self.get_time_bounds(time_coord)
         latitudes = np.broadcast_to(month_cube.coord('latitude').points, month_cube.shape)
         if hemisphere == "north":
-            month_cube.data = np.ma.masked_where(latitudes < 0, month_cube.data)   
+            month_cube.data = np.ma.masked_where(latitudes < 0, month_cube.data)
         else:
             month_cube.data = np.ma.masked_where(latitudes > 0, month_cube.data)
 
@@ -80,13 +77,10 @@ class SeaIceMap(Map):
             map_type=self.map_type,
         )
         time_coord.climatological = True
-        month_cube.cell_methods = ()
-        month_cube.add_cell_method(iris.coords.CellMethod('mean over years', coords='time'))
-        month_cube.add_cell_method(iris.coords.CellMethod('point', coords='latitude', intervals=f'{hemisphere}ern hemisphere'))
-        month_cube.add_cell_method(iris.coords.CellMethod('point', coords='longitude'))
+        month_cube = self.set_cell_methods(month_cube, hemisphere)
 
         self.save(month_cube, dst)
-    
+
     def get_time_bounds(self, time_coord):
         """
         Get contiguous time bounds for sea ice maps
@@ -109,3 +103,13 @@ class SeaIceMap(Map):
         """
         dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
         return dt_object.strftime('%B')
+    
+    def set_cell_methods(self, cube, hemisphere):
+        """Set the correct cell methods."""
+        cube.cell_methods = ()
+        cube.add_cell_method(iris.coords.CellMethod('mean over years', coords='time'))
+        cube.add_cell_method(iris.coords.CellMethod(
+            'point', coords='latitude', intervals=f'{hemisphere}ern hemisphere'
+            ))
+        cube.add_cell_method(iris.coords.CellMethod('point', coords='longitude'))
+        return cube

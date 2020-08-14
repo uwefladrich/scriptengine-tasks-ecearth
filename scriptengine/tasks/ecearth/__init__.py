@@ -35,7 +35,7 @@ def task_loader_map():
         'ece.mon.ocean_dynamic_map': OceanDynamicMap,
         'ece.mon.atmosphere_static_map': AtmosphereStaticMap,
         'ece.mon.atmosphere_dynamic_map': AtmosphereDynamicMap,
-        'ece.mon.sithic_static_map': SeaIceMap,
+        'ece.mon.ice_map': SeaIceMap,
         'ece.mon.ice_dynamic_map': SeaIceDynamicMap,
         'ece.mon.atmosphere_ts': AtmosphereTimeSeries,
         'ece.mon.time_series': TimeSeries,
