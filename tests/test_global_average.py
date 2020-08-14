@@ -9,23 +9,9 @@ from unittest.mock import patch
 
 from scriptengine.tasks.ecearth.monitoring.global_average import GlobalAverage
 
-def test_global_average_dst_error():
-    init = {
-        "src": ["src_file.nc"],
-        "dst": "dst_file.yml",
-        "domain": "domain_file.nc",
-        "varname": "sivolu",
-    }
-    global_avg = GlobalAverage(init)
-    with patch.object(global_avg, 'log_error') as mock:
-       global_avg.run(init)
-    mock.assert_called_with((
-                f"{init['dst']} does not end in valid netCDF file extension. "
-                f"Diagnostic will not be treated, returning now."))
-
 def test_global_average_working(tmpdir):
     init = {
-        "src": ['./tests/testdata/NEMO_output_sivolu-03.nc'],
+        "src": ['./tests/testdata/NEMO_output_sivolu-199003.nc'],
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",

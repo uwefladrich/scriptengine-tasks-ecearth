@@ -66,11 +66,8 @@ class SeaIceTimeSeries(TimeSeries):
                 f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
                 f"Diagnostic will not be treated, returning now."
             ))
-        if not dst.endswith(".nc"):
-            self.log_error((
-                f"{dst} does not end in valid netCDF file extension. "
-                f"Diagnostic can not be saved, returning now."
-            ))
+            return
+        if not self.correct_file_extension(dst):
             return
 
         # Get March and September files from src

@@ -9,24 +9,9 @@ from unittest.mock import patch
 
 from scriptengine.tasks.ecearth.monitoring.ice_time_series import SeaIceTimeSeries, meta_dict
 
-def test_ice_time_series_dst_error():
-    init = {
-        "src": ["src_file.nc"],
-        "dst": "dst_file.yml",
-        "domain": "domain_file.nc",
-        "varname": "sivolu",
-        "hemisphere": "north",
-    }
-    ice_time_series = SeaIceTimeSeries(init)
-    with patch.object(ice_time_series, 'log_error') as mock:
-       ice_time_series.run(init)
-    mock.assert_called_with((
-                f"{init['dst']} does not end in valid netCDF file extension. "
-                f"Diagnostic can not be saved, returning now."))
-
 def test_ice_time_series_working(tmpdir):
     init = {
-        "src": ['./tests/testdata/NEMO_output_sivolu-03.nc', './tests/testdata/NEMO_output_sivolu-09.nc'],
+        "src": ['./tests/testdata/NEMO_output_sivolu-199003.nc', './tests/testdata/NEMO_output_sivolu-199009.nc'],
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",
@@ -46,7 +31,7 @@ def test_ice_time_series_working(tmpdir):
 
 def test_ice_time_series_wrong_varname(tmpdir):
     init = {
-        "src": ['./tests/testdata/NEMO_output_sivolu-03.nc'],
+        "src": ['./tests/testdata/NEMO_output_sivolu-199003.nc'],
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "tos",
@@ -62,7 +47,7 @@ def test_ice_time_series_wrong_varname(tmpdir):
 
 def test_ice_time_series_wrong_hemisphere(tmpdir):
     init = {
-        "src": ['./tests/testdata/NEMO_output_sivolu-03.nc', './tests/testdata/NEMO_output_sivolu-09.nc'],
+        "src": ['./tests/testdata/NEMO_output_sivolu-199003.nc'],
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",
@@ -78,7 +63,7 @@ def test_ice_time_series_wrong_hemisphere(tmpdir):
 
 def test_ice_time_series_wrong_month(tmpdir):
     init = {
-        "src": ['./tests/testdata/NEMO_output_sivolu-02.nc'],
+        "src": ['./tests/testdata/NEMO_output_sivolu-199001.nc'],
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",

@@ -51,11 +51,7 @@ class TimeSeries(Task):
         
         self.log_debug(f"Value: {data_value} at time: {coord_value}, title: {title}")
 
-        if not dst.endswith(".nc"):
-            self.log_error((
-                f"{dst} does not end in valid netCDF file extension. "
-                f"Diagnostic will not be treated, returning now."
-            ))
+        if not self.correct_file_extension(dst):
             return
 
         # create coord
@@ -121,5 +117,14 @@ class TimeSeries(Task):
 
         if old_coord.points[-1] > new_coord.points[0]:
             self.log_warning("Inserting would lead to non-monotonic time axis.")
+            return False
+        return True
+
+    def correct_file_extension(self, dst):
+        if not dst.endswith(".nc"):
+            self.log_error((
+                f"{dst} does not end in valid netCDF file extension. "
+                f"Diagnostic will not be treated, returning now."
+            ))
             return False
         return True
