@@ -1,10 +1,8 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/disk_usage.py"""
 
-import os
-
-import pytest
-import yaml
 from unittest.mock import patch
+
+import yaml
 
 from scriptengine.tasks.ecearth.monitoring.disk_usage import DiskUsage
 
@@ -42,7 +40,7 @@ def test_not_a_directory(tmpdir):
         'data': -1,
     }
     with patch.object(disk_usage, 'log_warning') as mock:
-       disk_usage.run(context)
+        disk_usage.run(context)
     mock.assert_called_with(f"{path} is not a directory. Returning -1.")
     with open(path) as file:
         result = yaml.load(file, Loader=yaml.FullLoader)
@@ -66,7 +64,7 @@ def test_permission_error(tmpdir):
         'data': -1,
     }
     with patch.object(disk_usage, 'log_warning') as mock:
-       disk_usage.run(context)
+        disk_usage.run(context)
     mock.assert_called_with(f"No permission to open {forbidden}. Returning -1.")
     with open(path) as file:
         result = yaml.load(file, Loader=yaml.FullLoader)

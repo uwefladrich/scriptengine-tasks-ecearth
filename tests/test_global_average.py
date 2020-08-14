@@ -1,11 +1,8 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/global_average.py"""
 
-import os
-
-import pytest
-import iris
-import yaml
 from unittest.mock import patch
+
+import iris
 
 from scriptengine.tasks.ecearth.monitoring.global_average import GlobalAverage
 

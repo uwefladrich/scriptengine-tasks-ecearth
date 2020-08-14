@@ -1,6 +1,5 @@
 """Tests for scriptengine/tasks/monitoring test_markdown_output.py"""
 
-import pytest
 from unittest.mock import patch, Mock
 
 from scriptengine.tasks.ecearth.monitoring.redmine_output import RedmineOutput
@@ -8,15 +7,7 @@ from scriptengine.tasks.ecearth.monitoring.redmine_output import RedmineOutput
 def mock_pres_object(value_1, value_2):
     if value_1 == 1:
         return value_2
-    else:
-        return None
-
-class MockTemplate:
-    def __init__(self):
-        pass
-
-    def render(self, **kwargs):
-        pass
+    return None
 
 def test_presentation_list(tmpdir):
     init = {

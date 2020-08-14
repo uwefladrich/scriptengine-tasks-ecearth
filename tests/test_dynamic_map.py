@@ -1,11 +1,8 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/dynamic_map.py"""
 
-import os
-import datetime
-
-import pytest
-import iris
 from unittest.mock import patch
+
+import iris
 
 from scriptengine.tasks.ecearth.monitoring.dynamic_map import DynamicMap
 

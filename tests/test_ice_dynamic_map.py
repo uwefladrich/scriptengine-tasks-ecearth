@@ -1,8 +1,8 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/ice_dynamic_map.py"""
 
-import pytest
-import iris
 from unittest.mock import patch
+
+import iris
 
 from scriptengine.tasks.ecearth.monitoring.ice_dynamic_map import SeaIceDynamicMap, meta_dict
 
@@ -50,7 +50,7 @@ def test_ice_dynamic_map_wrong_varname(tmpdir):
     ice_dynamic_map = SeaIceDynamicMap(init)
     ice_dynamic_map.run(init)
     with patch.object(ice_dynamic_map, 'log_error') as mock:
-       ice_dynamic_map.run(init)
+        ice_dynamic_map.run(init)
     mock.assert_called_with((
                 f"'varname' must be one of the following: {meta_dict.keys()} "
                 f"Diagnostic will not be treated, returning now."))
@@ -65,7 +65,7 @@ def test_ice_dynamic_map_wrong_hemisphere(tmpdir):
     ice_dynamic_map = SeaIceDynamicMap(init)
     ice_dynamic_map.run(init)
     with patch.object(ice_dynamic_map, 'log_error') as mock:
-       ice_dynamic_map.run(init)
+        ice_dynamic_map.run(init)
     mock.assert_called_with((
                 f"'hemisphere' must be 'north' or 'south' but is '{init['hemisphere']}'."
                 f"Diagnostic will not be treated, returning now."))

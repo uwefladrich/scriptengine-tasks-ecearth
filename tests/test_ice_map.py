@@ -1,11 +1,8 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/ice_map.py"""
 
-import os
-import datetime
-
-import pytest
-import iris
 from unittest.mock import patch
+
+import iris
 
 from scriptengine.tasks.ecearth.monitoring.ice_map import SeaIceMap, meta_dict
 
@@ -21,7 +18,7 @@ def test_ice_map_once(tmpdir):
     cube = iris.load_cube(init['dst'])
     assert cube.attributes['map_type'] == ice_map.map_type
     assert cube.attributes['type'] == ice_map.diagnostic_type
-    assert cube.coord('time').climatological == True
+    assert cube.coord('time').climatological
     assert len(cube.coord('time').points) == 1
 
 def test_ice_map_twice(tmpdir):
@@ -44,7 +41,7 @@ def test_ice_map_twice(tmpdir):
     cube = iris.load_cube(init_b['dst'])
     assert cube.attributes['map_type'] == ice_map.map_type
     assert cube.attributes['type'] == ice_map.diagnostic_type
-    assert cube.coord('time').climatological == True
+    assert cube.coord('time').climatological
     assert len(cube.coord('time').points) == 1
 
 def test_ice_map_wrong_varname(tmpdir):
@@ -57,7 +54,7 @@ def test_ice_map_wrong_varname(tmpdir):
     ice_map = SeaIceMap(init)
     ice_map.run(init)
     with patch.object(ice_map, 'log_error') as mock:
-       ice_map.run(init)
+        ice_map.run(init)
     mock.assert_called_with((
                 f"'varname' must be one of the following: {meta_dict.keys()} "
                 f"Diagnostic will not be treated, returning now."))
@@ -72,7 +69,7 @@ def test_ice_map_wrong_hemisphere(tmpdir):
     ice_map = SeaIceMap(init)
     ice_map.run(init)
     with patch.object(ice_map, 'log_error') as mock:
-       ice_map.run(init)
+        ice_map.run(init)
     mock.assert_called_with((
                 f"'hemisphere' must be 'north' or 'south' but is '{init['hemisphere']}'."
                 f"Diagnostic will not be treated, returning now."))
