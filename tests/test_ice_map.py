@@ -24,7 +24,7 @@ def test_ice_map_once(tmpdir):
     assert cube.coord('time').climatological == True
     assert len(cube.coord('time').points) == 1
 
-def test_ocean_map_twice(tmpdir):
+def test_ice_map_twice(tmpdir):
     init_a = {
         "src": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "dst": str(tmpdir) + '/test.nc',
