@@ -34,7 +34,7 @@ class DynamicMap(Task):
 
         current_bounds = current_cube.coord('time').bounds
         new_bounds = new_cube.coord('time').bounds
-        if current_bounds[-1][-1] > new_bounds[0][0]:
+        if not current_bounds[-1][-1] > new_bounds[0][0]:
             new_cube.attributes = current_cube.attributes
             cube_list = iris.cube.CubeList([current_cube, new_cube])
             merged_cube = cube_list.concatenate_cube()
