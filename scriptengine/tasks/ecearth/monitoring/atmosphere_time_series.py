@@ -35,11 +35,7 @@ class AtmosphereTimeSeries(TimeSeries):
         self.log_info(f"Create time series for atmosphere variable {grib_code} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
-        if not dst.endswith(".nc"):
-            self.log_error((
-                f"{dst} does not end in valid netCDF file extension. "
-                f"Diagnostic will not be treated, returning now."
-            ))
+        if not self.correct_file_extension(dst):
             return
 
         update_grib_mappings()

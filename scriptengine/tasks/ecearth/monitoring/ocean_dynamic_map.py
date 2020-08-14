@@ -5,22 +5,23 @@ import os
 import iris
 import numpy as np
 
-from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
+
+from .dynamic_map import DynamicMap
 import helpers.file_handling as helpers
 
-class OceanDynamicMap(Task):
+class OceanDynamicMap(DynamicMap):
     """OceanDynamicMap Processing Task"""
+
+    map_type = "global ocean"
+
     def __init__(self, parameters):
         required = [
             "src",
             "dst",
             "varname",
         ]
-        super().__init__(__name__, parameters, required_parameters=required)
-        self.comment = (f"Dynamic Map of **{self.varname}**.")
-        self.type = "dynamic map"
-        self.map_type = "global ocean"
+        super(DynamicMap, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):
@@ -31,11 +32,7 @@ class OceanDynamicMap(Task):
         self.log_info(f"Create dynamic map for ocean variable {varname} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
-        if not dst.endswith(".nc"):
-            self.log_warning((
-                f"{dst} does not end in valid netCDF file extension. "
-                f"Diagnostic will not be treated, returning now."
-            ))
+        if not self.correct_file_extension(dst):
             return
 
         leg_cube = helpers.load_input_cube(src, varname)
@@ -55,51 +52,21 @@ class OceanDynamicMap(Task):
             leg_average = helpers.set_metadata(
                 leg_average,
                 title=f'{leg_average.long_name.title()} (Annual Mean Map)',
-                comment=f"Leg Mean {self.comment}",
-                diagnostic_type=self.type,
+                comment=f"Leg Mean of **{varname}**.",
+                diagnostic_type=self.diagnostic_type,
                 map_type=self.map_type,
             )
             leg_average.cell_methods = ()
             leg_average.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 month'))
             leg_average.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
-            self.save_cube(leg_average, varname, dst)
+            self.save(leg_average, dst)
         else:
             leg_cube = helpers.set_metadata(
                 leg_cube,
                 title=f'{leg_cube.long_name.title()} (Monthly Mean Map)',
-                comment=f"Monthly Mean {self.comment}",
-                diagnostic_type=self.type,
+                comment=f"Monthly Mean of **{varname}**.",
+                diagnostic_type=self.diagnostic_type,
                 map_type=self.map_type,
             )
             leg_average.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
-            self.save_cube(leg_cube, varname, dst)
-
-    def save_cube(self, new_cube, varname, dst):
-        """save global average cubes in netCDF file"""
-        try:
-            current_cube = iris.load_cube(dst, varname)
-            current_bounds = current_cube.coord('time').bounds
-            new_bounds = new_cube.coord('time').bounds
-            if current_bounds[-1][-1] > new_bounds[0][0]:
-                self.log_warning("Inserting would lead to non-monotonic time axis. Aborting.")
-            else:
-                new_cube.attributes["presentation_min"] = current_cube.attributes["presentation_min"]
-                new_cube.attributes["presentation_max"] = current_cube.attributes["presentation_max"]
-                cube_list = iris.cube.CubeList([current_cube, new_cube])
-                yearly_averages = cube_list.concatenate_cube()
-                iris.save(yearly_averages, f"{dst}-copy.nc")
-                os.remove(dst)
-                os.rename(f"{dst}-copy.nc", dst)
-        except OSError: # file does not exist yet.
-            vmin, vmax = self.compute_presentation_value_range(new_cube)
-            new_cube.attributes["presentation_min"] = vmin
-            new_cube.attributes["presentation_max"] = vmax
-            iris.save(new_cube, dst)
-            return
-    
-    def compute_presentation_value_range(self, cube):
-        mean = np.ma.mean(cube.data)
-        delta = np.ma.max(cube.data) - mean
-        vmin = mean - 1.2 * delta
-        vmax = mean + 1.2 * delta
-        return vmin, vmax
+            self.save(leg_cube, dst)

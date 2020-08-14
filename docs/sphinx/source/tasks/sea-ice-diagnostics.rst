@@ -37,18 +37,21 @@ Map Type: polar ice sheet
         dst: "{{mondir}}/sithic-south-sep.nc"
         hemisphere: south
 
-Sea-Ice Area Fraction Time Map
-==============================
+Sea-Ice Time Map
+================
 
 Diagnostic Type: Time Map
 
-Mapped to: ``ece.mon.siconc_dynamic_map``
+Mapped to: ``ece.mon.ice_dynamic_map``
+
+varname can be ``sivolu`` or ``siconc``.
 
 Map Type: polar ice sheet
 
 ::
 
-    - ece.mon.siconc_dynamic_map:
+    - ece.mon.ice_dynamic_map:
             src: "{{ice_file_mar}}"
             dst: "{{mondir}}/siconc-north-mar.nc"
             hemisphere: north
+            varname: siconc 

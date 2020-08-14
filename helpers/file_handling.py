@@ -69,7 +69,7 @@ def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs)
         'comment': comment,
         'type': diagnostic_type,
         'source': 'EC-Earth 4',
-        'Conventions': 'CF-1.7',
+        'Conventions': 'CF-1.8',
         }
     for key, value in kwargs.items():
         metadata[f'{key}'] = value
@@ -82,7 +82,8 @@ def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs)
         'online_operation',
         ]
     for key, value in metadata.items():
-        cube.attributes[key] = value
+        if value is not None:
+            cube.attributes[key] = value
     for key in metadata_to_discard:
         cube.attributes.pop(key, None)
     return cube

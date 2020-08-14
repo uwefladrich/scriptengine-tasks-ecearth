@@ -17,11 +17,7 @@ def test_time_series_dst_error():
         "coord_value": 0,
     }
     time_series = TimeSeries(init)
-    with patch.object(time_series, 'log_error') as mock:
-       time_series.run(init)
-    mock.assert_called_with((
-                f"{init['dst']} does not end in valid netCDF file extension. "
-                f"Diagnostic will not be treated, returning now."))
+    assert time_series.correct_file_extension(init['dst']) == False
 
 def test_monotonic_increase():
     init = {
