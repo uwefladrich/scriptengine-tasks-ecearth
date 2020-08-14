@@ -3,11 +3,12 @@
 import os
 
 import pytest
+import yaml
 from unittest.mock import patch
 
 from scriptengine.tasks.ecearth.monitoring.simulated_legs import SimulatedLegs
 
-def test_simulated_years_working(tmpdir):
+def test_simulated_legs_working(tmpdir):
     test_path = str(tmpdir)
     init = {
         'src': test_path,
@@ -34,3 +35,20 @@ def test_simulated_years_working(tmpdir):
             data=simulated_legs.count_leg_folders(init['src']),
             type=simulated_legs.diagnostic_type,
         )
+
+def test_simulated_legs_alternative(tmpdir):
+    test_path = str(tmpdir)
+    init = {
+        'src': test_path,
+        'dst': test_path + '/test.yml',
+    }
+    simulated_legs = SimulatedLegs(init)
+
+    leg_info = {'config': {'schedule': {'leg': {'num': 5}}}}
+    with open(test_path + '/leginfo.yml', 'w') as outfile:
+        yaml.dump(leg_info, outfile, sort_keys=False)
+    assert simulated_legs.get_leg_number(init['src']) == 5
+
+    with open(test_path + '/leginfo.yml', 'w') as outfile:
+        yaml.dump(init, outfile, sort_keys=False)
+    assert simulated_legs.get_leg_number(init['src']) == -1
