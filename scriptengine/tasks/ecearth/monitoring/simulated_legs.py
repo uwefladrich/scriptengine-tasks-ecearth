@@ -46,6 +46,12 @@ class SimulatedLegs(Scalar):
 
     def count_leg_folders(self, src):
         """
-        Get leg number by counting leg folders in rundir/output.
+        Get leg number by counting leg folders in src/output.
+        If src does not contain output, count folders in src instead.
         """
-        return len(next(os.walk(f"{src}/output"))[1])
+        try:
+            count = len(next(os.walk(src))[1])
+        except StopIteration:
+            self.log_warning(f"No folder 'output' in {src}. Counting folders in {src} instead.")
+            count = len(next(os.walk(f"{src}/output"))[1])
+        return count
