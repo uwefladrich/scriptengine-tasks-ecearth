@@ -1,7 +1,5 @@
 """Processing Task that creates a 2D static map of a given extensive ocean quantity."""
 
-import os
-
 import iris
 
 from scriptengine.tasks.base.timing import timed_runner
@@ -45,10 +43,7 @@ class OceanStaticMap(Map):
         )
 
         leg_average.coord('time').climatological = True
-        leg_average.cell_methods = ()
-        leg_average.add_cell_method(iris.coords.CellMethod('mean within years', coords='time', intervals='1 month'))
-        leg_average.add_cell_method(iris.coords.CellMethod('mean over years', coords='time'))
-        leg_average.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
+        leg_average = self.set_cell_methods(leg_average)
 
         leg_average = helpers.set_metadata(
             leg_average,
@@ -59,3 +54,17 @@ class OceanStaticMap(Map):
         )
 
         self.save(leg_average, dst)
+    
+    def set_cell_methods(self, cube):
+        """Set the correct cell methods."""
+        cube.cell_methods = ()
+        cube.add_cell_method(
+            iris.coords.CellMethod('mean within years', coords='time', intervals='1 month')
+            )
+        cube.add_cell_method(
+            iris.coords.CellMethod('mean over years', coords='time')
+            )
+        cube.add_cell_method(
+            iris.coords.CellMethod('point', coords=['latitude', 'longitude'])
+            )
+        return cube

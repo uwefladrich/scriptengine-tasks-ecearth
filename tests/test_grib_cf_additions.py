@@ -1,4 +1,5 @@
-import pytest
+"""Tests for helpers/grib_cf_additions.py"""
+
 from iris_grib.grib_phenom_translation import grib1_phenom_to_cf_info
 
 import helpers.grib_cf_additions as additions

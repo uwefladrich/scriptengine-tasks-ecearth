@@ -1,11 +1,6 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/ocean_static_map.py"""
 
-import os
-import datetime
-
-import pytest
 import iris
-from unittest.mock import patch
 
 from scriptengine.tasks.ecearth.monitoring.ocean_static_map import OceanStaticMap
 
@@ -23,7 +18,7 @@ def test_ocean_map_once(tmpdir):
     cube = iris.load_cube(init['dst'])
     assert cube.attributes['map_type'] == ocean_static_map.map_type
     assert cube.attributes['type'] == ocean_static_map.diagnostic_type
-    assert cube.coord('time').climatological == True
+    assert cube.coord('time').climatological
     assert len(cube.coord('time').points) == 1
 
 def test_ocean_map_twice(tmpdir):
@@ -44,5 +39,5 @@ def test_ocean_map_twice(tmpdir):
     cube = iris.load_cube(init_b['dst'])
     assert cube.attributes['map_type'] == ocean_static_name.map_type
     assert cube.attributes['type'] == ocean_static_name.diagnostic_type
-    assert cube.coord('time').climatological == True
+    assert cube.coord('time').climatological
     assert len(cube.coord('time').points) == 1

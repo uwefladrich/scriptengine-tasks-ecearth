@@ -1,16 +1,14 @@
 """Processing Task that creates a 2D dynamic map of a given extensive atmosphere quantity."""
 
-import os
-
 import iris
 import iris_grib
 import numpy as np
 
 from scriptengine.tasks.base.timing import timed_runner
 
-from .dynamic_map import DynamicMap
 from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
+from .dynamic_map import DynamicMap
 
 class AtmosphereDynamicMap(DynamicMap):
     """AtmosphereDynamicMap Processing Task"""
@@ -76,7 +74,7 @@ class AtmosphereDynamicMap(DynamicMap):
         )
 
         self.save(leg_mean, dst)
-    
+
     def set_cell_methods(self, cube, step):
         """Set the correct cell methods."""
         cube.cell_methods = ()

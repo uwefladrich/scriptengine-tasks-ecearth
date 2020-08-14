@@ -3,10 +3,8 @@
 import os
 
 import iris
-import numpy as np
 
 from scriptengine.tasks.base import Task
-from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
 
 class Map(Task):
@@ -17,6 +15,8 @@ class Map(Task):
     def __init__(self, parameters):
         super().__init__(__name__, parameters)
 
+    def run(self, context):
+        pass
 
     def save(self, new_cube, dst):
         """save map cube in netCDF file"""
@@ -47,6 +47,7 @@ class Map(Task):
         os.remove('temp.nc')
 
     def correct_file_extension(self, dst):
+        """check if destination file has a valid netCDF extension"""
         if not dst.endswith(".nc"):
             self.log_error((
                 f"{dst} does not end in valid netCDF file extension. "
@@ -54,7 +55,7 @@ class Map(Task):
             ))
             return False
         return True
-    
+
     def compute_simulation_avg(self, merged_cube):
         """
         Compute Time Average for the whole simulation.

@@ -6,8 +6,6 @@ import iris
 import numpy as np
 
 from scriptengine.tasks.base import Task
-from scriptengine.tasks.base.timing import timed_runner
-import helpers.file_handling as helpers
 
 class DynamicMap(Task):
     """DynamicMap Processing Task"""
@@ -17,6 +15,8 @@ class DynamicMap(Task):
     def __init__(self, parameters):
         super().__init__(__name__, parameters)
 
+    def run(self, context):
+        pass
 
     def save(self, new_cube, dst):
         """save dynamic map cube in netCDF file"""
@@ -59,7 +59,7 @@ class DynamicMap(Task):
         # both are given
         if given_min is not None and given_max is not None:
             return cube
-        
+    
         mean = np.ma.mean(cube.data)
 
         # one is given
@@ -73,7 +73,7 @@ class DynamicMap(Task):
             lower_bound = mean - 1.2 * delta
             cube.attributes['presentation_min'] = lower_bound
             return cube
-        
+
         # none is given
         delta = np.ma.max(cube.data) - mean
         lower_bound = mean - 1.2 * delta
@@ -83,6 +83,7 @@ class DynamicMap(Task):
         return cube
 
     def correct_file_extension(self, dst):
+        """check if destination file has a valid netCDF extension"""
         if not dst.endswith(".nc"):
             self.log_error((
                 f"{dst} does not end in valid netCDF file extension. "
