@@ -29,10 +29,14 @@ def get_month_from_src(month, path_list):
             return path
     raise FileNotFoundError(f"Month {month} not found in {path_list}!")
 
-def compute_spatial_weights(domain_src, array_shape):
+def compute_spatial_weights(domain_src, array_shape, grid):
     "Compute weights for spatial averaging"
     domain_cfg = iris.load(domain_src)
-    cell_areas = domain_cfg.extract('e1t')[0][0] * domain_cfg.extract('e2t')[0][0]
+    scale_factors = [
+        domain_cfg.extract(f'e1{grid.lower()}')[0][0],
+        domain_cfg.extract(f'e2{grid.lower()}')[0][0],
+    ]
+    cell_areas = scale_factors[0] * scale_factors[1]
     cell_weights = np.broadcast_to(cell_areas.data, array_shape)
     return cell_weights
 

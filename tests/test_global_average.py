@@ -12,6 +12,7 @@ def test_global_average_working(tmpdir):
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",
+        "grid": "T",
     }
     global_avg = GlobalAverage(init)
     global_avg.run(init)
@@ -24,4 +25,3 @@ def test_global_average_working(tmpdir):
         iris.coords.CellMethod('mean', coords='time', intervals='1 month'),
         iris.coords.CellMethod('mean', coords='area'),
         )
-

@@ -35,7 +35,8 @@ def test_compute_spatial_weights(tmpdir):
     domain_path = str(tmpdir + "/temp.nc")
     iris.save(cube_list, domain_path)
     result = np.array([[[2]], [[2]], [[2]]])
-    assert file_handling.compute_spatial_weights(domain_path, (3, 1, 1)).all() == result.all()
+    shape = result.shape
+    assert file_handling.compute_spatial_weights(domain_path, shape, 'T').all() == result.all()
 
 def test_load_input_cube():
     src = "./tests/testdata/tos-climatology.nc"

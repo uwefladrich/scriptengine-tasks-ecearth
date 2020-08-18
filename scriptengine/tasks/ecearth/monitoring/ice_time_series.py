@@ -80,7 +80,7 @@ class SeaIceTimeSeries(TimeSeries):
             return
 
         leg_cube = helpers.load_input_cube([mar, sep], varname)
-        cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape)
+        cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape, 'T')
         latitudes = np.broadcast_to(leg_cube.coord('latitude').points, leg_cube.shape)
         if hemisphere == "north":
             leg_cube.data = np.ma.masked_where(latitudes < 0, leg_cube.data)
