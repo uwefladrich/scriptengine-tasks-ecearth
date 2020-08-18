@@ -4,6 +4,13 @@ from unittest.mock import patch, Mock
 
 from scriptengine.tasks.ecearth.monitoring.redmine_output import RedmineOutput
 
+class MockTemplate:
+    def __init__(self):
+        pass
+
+    def render(self, **kwargs):
+        pass
+
 def mock_pres_object(value_1, value_2):
     if value_1 == 1:
         return value_2
