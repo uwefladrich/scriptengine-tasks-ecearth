@@ -30,6 +30,6 @@ def test_atmosphere_time_wrong_code(tmpdir):
         "grib_code": 0,
     }
     atmo_ts = AtmosphereTimeSeries(init)
-    with patch.object(atmo_ts, 'log_error') as mock:
+    with patch.object(atmo_ts, 'log_warning') as mock:
         atmo_ts.run(init)
     mock.assert_called_with(f"CF Phenomenon for {init['grib_code']} not found. Update local table?")

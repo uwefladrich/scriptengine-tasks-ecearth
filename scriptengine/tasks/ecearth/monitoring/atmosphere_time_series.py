@@ -41,7 +41,7 @@ class AtmosphereTimeSeries(TimeSeries):
             grib_code
         )
         if not cf_phenomenon:
-            self.log_error(f"CF Phenomenon for {grib_code} not found. Update local table?")
+            self.log_warning(f"CF Phenomenon for {grib_code} not found. Update local table?")
             return
         self.log_debug(f"Getting variable {cf_phenomenon.standard_name}")
         leg_cube = helpers.load_input_cube(src, cf_phenomenon.standard_name)

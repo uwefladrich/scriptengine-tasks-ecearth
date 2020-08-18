@@ -35,7 +35,8 @@ class SeaIceTimeSeries(TimeSeries):
     """SeaIceTimeSeries Processing Task"""
     def __init__(self, parameters):
         required = [
-            "src",
+            "summer",
+            "winter",
             "domain",
             "dst",
             "hemisphere",
@@ -45,24 +46,28 @@ class SeaIceTimeSeries(TimeSeries):
 
     @timed_runner
     def run(self, context):
-        src = self.getarg('src', context)
         dst = self.getarg('dst', context)
-        domain = self.getarg('domain', context)
-        hemisphere = self.getarg('hemisphere', context)
         varname = self.getarg('varname', context)
+        hemisphere = self.getarg('hemisphere', context)
+
+        self.log_info(f"Create {varname} time series for {hemisphere}ern hemisphere at {dst}.")
+
         if varname not in meta_dict:
-            self.log_error((
+            self.log_warning((
                 f"'varname' must be one of the following: {meta_dict.keys()} "
                 f"Diagnostic will not be treated, returning now."
             ))
             return
         long_name = meta_dict[varname]['long_name']
 
-        self.log_info(f"Create {varname} time series for {hemisphere}ern hemisphere at {dst}.")
-        self.log_debug(f"Domain: {domain}, Source file(s): {src}")
+        summer = self.getarg('summer', context)
+        winter = self.getarg('winter', context)
+        domain = self.getarg('domain', context)
+        
+        self.log_debug(f"Domain: {domain}, Source file(s): {summer} (summer), {winter} (winter")
 
         if not hemisphere in ('north', 'south'):
-            self.log_error((
+            self.log_warning((
                 f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
                 f"Diagnostic will not be treated, returning now."
             ))
@@ -70,16 +75,7 @@ class SeaIceTimeSeries(TimeSeries):
         if not self.correct_file_extension(dst):
             return
 
-        # Get March and September files from src
-        try:
-            mar = helpers.get_month_from_src("03", src)
-            sep = helpers.get_month_from_src("09", src)
-        except FileNotFoundError as error:
-            self.log_error((f"FileNotFoundError: {error}."
-                            f"Diagnostic can not be created, returning now."))
-            return
-
-        leg_cube = helpers.load_input_cube([mar, sep], varname)
+        leg_cube = helpers.load_input_cube([summer, winter], varname)
         cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape, 'T')
         latitudes = np.broadcast_to(leg_cube.coord('latitude').points, leg_cube.shape)
         if hemisphere == "north":

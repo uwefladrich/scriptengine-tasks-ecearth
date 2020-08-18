@@ -27,6 +27,6 @@ def test_atmosphere_dynamic_map_wrong_code(tmpdir):
         "grib_code": 0,
     }
     atmo_dynamic_map = AtmosphereDynamicMap(init)
-    with patch.object(atmo_dynamic_map, 'log_error') as mock:
+    with patch.object(atmo_dynamic_map, 'log_warning') as mock:
         atmo_dynamic_map.run(init)
     mock.assert_called_with(f"CF Phenomenon for {init['grib_code']} not found. Update local table?")

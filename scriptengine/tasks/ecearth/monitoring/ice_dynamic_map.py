@@ -52,13 +52,13 @@ class SeaIceDynamicMap(DynamicMap):
         self.log_debug(f"Source file(s): {src}")
 
         if varname not in meta_dict:
-            self.log_error((
+            self.log_warning((
                 f"'varname' must be one of the following: {meta_dict.keys()} "
                 f"Diagnostic will not be treated, returning now."
             ))
             return
         if not hemisphere in ('north', 'south'):
-            self.log_error((
+            self.log_warning((
                 f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
                 f"Diagnostic will not be treated, returning now."
             ))

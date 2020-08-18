@@ -49,7 +49,7 @@ def test_ice_dynamic_map_wrong_varname(tmpdir):
     }
     ice_dynamic_map = SeaIceDynamicMap(init)
     ice_dynamic_map.run(init)
-    with patch.object(ice_dynamic_map, 'log_error') as mock:
+    with patch.object(ice_dynamic_map, 'log_warning') as mock:
         ice_dynamic_map.run(init)
     mock.assert_called_with((
                 f"'varname' must be one of the following: {meta_dict.keys()} "
@@ -64,7 +64,7 @@ def test_ice_dynamic_map_wrong_hemisphere(tmpdir):
     }
     ice_dynamic_map = SeaIceDynamicMap(init)
     ice_dynamic_map.run(init)
-    with patch.object(ice_dynamic_map, 'log_error') as mock:
+    with patch.object(ice_dynamic_map, 'log_warning') as mock:
         ice_dynamic_map.run(init)
     mock.assert_called_with((
                 f"'hemisphere' must be 'north' or 'south' but is '{init['hemisphere']}'."

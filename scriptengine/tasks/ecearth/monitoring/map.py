@@ -49,7 +49,7 @@ class Map(Task):
     def correct_file_extension(self, dst):
         """check if destination file has a valid netCDF extension"""
         if not dst.endswith(".nc"):
-            self.log_error((
+            self.log_warning((
                 f"{dst} does not end in valid netCDF file extension. "
                 f"Diagnostic will not be treated, returning now."
             ))

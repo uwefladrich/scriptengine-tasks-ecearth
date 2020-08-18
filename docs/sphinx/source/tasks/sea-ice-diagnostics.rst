@@ -14,7 +14,8 @@ varname can be ``sivolu`` or ``siconc``.
 ::
 
     - ece.mon.ice_time_series:
-        src: "{{ice_files}}"
+        summer: "{{feb_file}}"
+        summer: "{{sep_file}}"
         domain: "{{rundir}}/domain_cfg.nc"
         dst: "{{mondir}}/siarea-south.nc"
         hemisphere: south
