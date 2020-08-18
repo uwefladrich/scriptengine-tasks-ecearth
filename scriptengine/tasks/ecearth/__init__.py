@@ -3,7 +3,6 @@
 This module provides SE tasks for the EC-Earth ESM
 """
 
-from .monitoring.simulated_legs import SimulatedLegs
 from .monitoring.simulated_years import SimulatedYears
 from .monitoring.scalar import Scalar
 from .monitoring.markdown_output import MarkdownOutput
@@ -24,7 +23,6 @@ from .slurm import Sbatch
 def task_loader_map():
     return {
         'sbatch': Sbatch,
-        'ece.mon.sim_legs': SimulatedLegs,
         'ece.mon.sim_years': SimulatedYears,
         'ece.mon.scalar': Scalar,
         'ece.mon.markdown_report': MarkdownOutput,
