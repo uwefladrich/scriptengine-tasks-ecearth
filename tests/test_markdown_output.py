@@ -22,7 +22,7 @@ def test_presentation_object_file_extension():
     ]
     markdown_output = MarkdownOutput(init)
 
-    with patch.object(markdown_output, 'log_error') as mock:
+    with patch.object(markdown_output, 'log_warning') as mock:
         for src, msg in zip(init['src'], error_messages):
             markdown_output.presentation_object(src, init['dst'])
             mock.assert_called_with(msg)

@@ -51,7 +51,7 @@ class SeaIceTimeSeries(TimeSeries):
         hemisphere = self.getarg('hemisphere', context)
         varname = self.getarg('varname', context)
         if varname not in meta_dict:
-            self.log_error((
+            self.log_warning((
                 f"'varname' must be one of the following: {meta_dict.keys()} "
                 f"Diagnostic will not be treated, returning now."
             ))
@@ -62,7 +62,7 @@ class SeaIceTimeSeries(TimeSeries):
         self.log_debug(f"Domain: {domain}, Source file(s): {src}")
 
         if not hemisphere in ('north', 'south'):
-            self.log_error((
+            self.log_warning((
                 f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
                 f"Diagnostic will not be treated, returning now."
             ))
@@ -75,7 +75,7 @@ class SeaIceTimeSeries(TimeSeries):
             mar = helpers.get_month_from_src("03", src)
             sep = helpers.get_month_from_src("09", src)
         except FileNotFoundError as error:
-            self.log_error((f"FileNotFoundError: {error}."
+            self.log_warning((f"FileNotFoundError: {error}."
                             f"Diagnostic can not be created, returning now."))
             return
 

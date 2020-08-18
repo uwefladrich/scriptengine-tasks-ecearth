@@ -41,7 +41,7 @@ def test_invalid_key(tmpdir):
     redmine_output.get_presentation_list = Mock(return_value=None)
     mock_template = MockTemplate()
     redmine_output.get_template = Mock(return_value=mock_template)
-    with patch.object(redmine_output, 'log_error') as mock:
+    with patch.object(redmine_output, 'log_warning') as mock:
        redmine_output.run(init)
     mock.assert_called_with("Could not log in to Redmine server (AuthError)")
 
@@ -60,7 +60,7 @@ def test_presentation_object_file_extension():
     ]
     redmine_output = RedmineOutput(init)
 
-    with patch.object(redmine_output, 'log_error') as mock:
+    with patch.object(redmine_output, 'log_warning') as mock:
         for src, msg in zip(init['src'], error_messages):
             redmine_output.presentation_object(src, init['local_dst'])
             mock.assert_called_with(msg)

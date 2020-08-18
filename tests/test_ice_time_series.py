@@ -39,7 +39,7 @@ def test_ice_time_series_wrong_varname(tmpdir):
     }
     ice_time_series = SeaIceTimeSeries(init)
     ice_time_series.run(init)
-    with patch.object(ice_time_series, 'log_error') as mock:
+    with patch.object(ice_time_series, 'log_warning') as mock:
         ice_time_series.run(init)
     mock.assert_called_with((
                 f"'varname' must be one of the following: {meta_dict.keys()} "
@@ -55,7 +55,7 @@ def test_ice_time_series_wrong_hemisphere(tmpdir):
     }
     ice_time_series = SeaIceTimeSeries(init)
     ice_time_series.run(init)
-    with patch.object(ice_time_series, 'log_error') as mock:
+    with patch.object(ice_time_series, 'log_warning') as mock:
         ice_time_series.run(init)
     mock.assert_called_with((
                 f"'hemisphere' must be 'north' or 'south' but is '{init['hemisphere']}'."
@@ -71,7 +71,7 @@ def test_ice_time_series_wrong_month(tmpdir):
     }
     ice_time_series = SeaIceTimeSeries(init)
     ice_time_series.run(init)
-    with patch.object(ice_time_series, 'log_error') as mock:
+    with patch.object(ice_time_series, 'log_warning') as mock:
         ice_time_series.run(init)
     mock.assert_called_with((
                 f"FileNotFoundError: Month 03 not found in {init['src']}!."

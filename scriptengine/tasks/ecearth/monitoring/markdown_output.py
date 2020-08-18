@@ -69,14 +69,14 @@ class MarkdownOutput(Task):
                     loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
                 return {'presentation_type': 'text', **loaded_dict}
             except FileNotFoundError:
-                self.log_error(f"File not found! Ignoring {src}")
+                self.log_warning(f"File not found! Ignoring {src}")
                 return None
     
         if src.endswith('.nc'):
             try:
                 loaded_cube = iris.load_cube(src)
             except OSError:
-                self.log_error(f"File not found! Ignoring {src}")
+                self.log_warning(f"File not found! Ignoring {src}")
                 return None
             if loaded_cube.attributes["type"] == "time series":
                 self.log_debug(f"Loading time series diagnostic {src}")
@@ -86,7 +86,7 @@ class MarkdownOutput(Task):
                 try:
                     map_plot_dict = make_static_map(src, dst_folder, loaded_cube)
                 except exceptions.InvalidMapTypeException as msg:
-                    self.log_error(f"Invalid Map Type {msg}")
+                    self.log_warning(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}
             if loaded_cube.attributes["type"] == "dynamic map":
@@ -94,13 +94,13 @@ class MarkdownOutput(Task):
                 try:
                     map_plot_dict = make_dynamic_map(src, dst_folder, loaded_cube)
                 except exceptions.InvalidMapTypeException as msg:
-                    self.log_error(f"Invalid Map Type {msg}")
+                    self.log_warning(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}
-            self.log_error(f"Invalid diagnostic type {loaded_cube.attributes['type']}")
+            self.log_warning(f"Invalid diagnostic type {loaded_cube.attributes['type']}")
             return None
     
-        self.log_error(f"Invalid file extension of {src}")
+        self.log_warning(f"Invalid file extension of {src}")
         return None
 
     def get_template(self, context, template_path):
