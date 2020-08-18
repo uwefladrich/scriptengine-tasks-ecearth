@@ -8,10 +8,8 @@ from scriptengine.tasks.ecearth.monitoring.ice_time_series import SeaIceTimeSeri
 
 def test_ice_time_series_working(tmpdir):
     init = {
-        "src": [
-            './tests/testdata/NEMO_output_sivolu-199003.nc',
-            './tests/testdata/NEMO_output_sivolu-199009.nc',
-            ],
+        "winter": './tests/testdata/NEMO_output_sivolu-199003.nc',
+        "summer": './tests/testdata/NEMO_output_sivolu-199009.nc',
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",
@@ -31,7 +29,8 @@ def test_ice_time_series_working(tmpdir):
 
 def test_ice_time_series_wrong_varname(tmpdir):
     init = {
-        "src": ['./tests/testdata/NEMO_output_sivolu-199003.nc'],
+        "winter": './tests/testdata/NEMO_output_sivolu-199003.nc',
+        "summer": './tests/testdata/NEMO_output_sivolu-199009.nc',
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "tos",
@@ -47,7 +46,8 @@ def test_ice_time_series_wrong_varname(tmpdir):
 
 def test_ice_time_series_wrong_hemisphere(tmpdir):
     init = {
-        "src": ['./tests/testdata/NEMO_output_sivolu-199003.nc'],
+        "winter": './tests/testdata/NEMO_output_sivolu-199003.nc',
+        "summer": './tests/testdata/NEMO_output_sivolu-199009.nc',
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",
@@ -60,19 +60,3 @@ def test_ice_time_series_wrong_hemisphere(tmpdir):
     mock.assert_called_with((
                 f"'hemisphere' must be 'north' or 'south' but is '{init['hemisphere']}'."
                 f"Diagnostic will not be treated, returning now."))
-
-def test_ice_time_series_wrong_month(tmpdir):
-    init = {
-        "src": ['./tests/testdata/NEMO_output_sivolu-199001.nc'],
-        "dst": str(tmpdir) + '/test.nc',
-        "domain": './tests/testdata/domain_cfg_example.nc',
-        "varname": "sivolu",
-        "hemisphere": "north",
-    }
-    ice_time_series = SeaIceTimeSeries(init)
-    ice_time_series.run(init)
-    with patch.object(ice_time_series, 'log_warning') as mock:
-        ice_time_series.run(init)
-    mock.assert_called_with((
-                f"FileNotFoundError: Month 03 not found in {init['src']}!."
-                f"Diagnostic can not be created, returning now."))

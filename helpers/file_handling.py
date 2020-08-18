@@ -20,15 +20,6 @@ class ChangeDirectory:
     def __exit__(self, etype, value, traceback):
         os.chdir(self.saved_path)
 
-def get_month_from_src(month, path_list):
-    """
-    function to get path for desired month from path_list
-    """
-    for path in path_list:
-        if path[-5:-3] == month:
-            return path
-    raise FileNotFoundError(f"Month {month} not found in {path_list}!")
-
 def compute_spatial_weights(domain_src, array_shape, grid):
     "Compute weights for spatial averaging"
     domain_cfg = iris.load(domain_src)
