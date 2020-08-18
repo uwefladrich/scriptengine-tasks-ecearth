@@ -1,8 +1,8 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/atmosphere_static_map.py"""
 
-import pytest
-import iris
 from unittest.mock import patch
+
+import iris
 
 from scriptengine.tasks.ecearth.monitoring.atmosphere_dynamic_map import AtmosphereDynamicMap
 

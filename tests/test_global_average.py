@@ -1,11 +1,8 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/global_average.py"""
 
-import os
-
-import pytest
-import iris
-import yaml
 from unittest.mock import patch
+
+import iris
 
 from scriptengine.tasks.ecearth.monitoring.global_average import GlobalAverage
 
@@ -15,6 +12,7 @@ def test_global_average_working(tmpdir):
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",
+        "grid": "T",
     }
     global_avg = GlobalAverage(init)
     global_avg.run(init)
@@ -27,4 +25,3 @@ def test_global_average_working(tmpdir):
         iris.coords.CellMethod('mean', coords='time', intervals='1 month'),
         iris.coords.CellMethod('mean', coords='area'),
         )
-

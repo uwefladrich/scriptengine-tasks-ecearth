@@ -1,7 +1,6 @@
 """Tests for helpers/presentation_objects.py"""
 
 import datetime
-from unittest.mock import patch, Mock
 
 import pytest
 import cf_units
@@ -12,11 +11,11 @@ import helpers.presentation_objects as po
 import helpers.exceptions as exceptions
 
 def test_format_title():
-    assert "Test Title" == po.format_title("test_title")
-    unit = cf_units.Unit("1")
-    assert "Test Title" == po.format_title("test_title", units=unit)
-    unit = cf_units.Unit("kilometers")
-    assert "Test Title / 1000 m" == po.format_title("test_title", units=unit)
+    assert po.format_title("test_title") == "Test Title"
+    test_unit = cf_units.Unit("1")
+    assert po.format_title("test_title", units=test_unit) == "Test Title"
+    test_unit = cf_units.Unit("kilometers")
+    assert po.format_title("test_title", units=test_unit) == "Test Title / 1000 m"
 
 unit = [
     None,
@@ -77,21 +76,21 @@ def test_make_dynamic_map(tmpdir, monkeypatch):
     }
     assert result == expected_result
 
-def test_make_dynamic_map_map_handling_exception(tmpdir, monkeypatch):
+def test_make_dynamic_map_map_handling_exception(tmpdir):
     path = './tests/testdata/tos-annual-map.nc'
     dst_folder = str(tmpdir)
     cube = iris.load_cube(path)
     cube.attributes['map_type'] = 'invalid type'
     with pytest.raises(exceptions.InvalidMapTypeException):
-        result = po.make_dynamic_map(path, dst_folder, cube)
+        po.make_dynamic_map(path, dst_folder, cube)
 
-def test_make_static_map_map_handling_exception(tmpdir, monkeypatch):
+def test_make_static_map_map_handling_exception(tmpdir):
     path = './tests/testdata/tos-climatology.nc'
     dst_folder = str(tmpdir)
     cube = iris.load_cube(path)
     cube.attributes['map_type'] = 'invalid type'
     with pytest.raises(exceptions.InvalidMapTypeException):
-        result = po.make_static_map(path, dst_folder, cube)
+        po.make_static_map(path, dst_folder, cube)
 
 def test_make_time_series(tmpdir):
     path = './tests/testdata/tos-global-avg.nc'

@@ -1,6 +1,6 @@
-import pytest
+"""Tests for helpers/map_type_handling.py"""
+
 import iris
-import numpy as np
 import matplotlib.pyplot as plt
 
 import helpers.map_type_handling as mth
@@ -21,4 +21,4 @@ def test_function_mapper():
     assert mth.function_mapper('global ocean') == mth.global_ocean_plot
     assert mth.function_mapper('global atmosphere') == mth.global_atmosphere_plot
     assert mth.function_mapper('polar ice sheet') == mth.polar_ice_sheet_plot
-    assert mth.function_mapper("invalid") == None
+    assert mth.function_mapper("invalid") is None

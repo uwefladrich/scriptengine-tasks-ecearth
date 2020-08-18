@@ -1,8 +1,6 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/ocean_dynamic_map.py"""
 
-import pytest
 import iris
-from unittest.mock import patch
 
 from scriptengine.tasks.ecearth.monitoring.ocean_dynamic_map import OceanDynamicMap
 

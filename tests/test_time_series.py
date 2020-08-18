@@ -1,11 +1,9 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/disk_usage.py"""
 
-import os
 import datetime
-
-import pytest
-import iris
 from unittest.mock import patch
+
+import iris
 
 from scriptengine.tasks.ecearth.monitoring.time_series import TimeSeries
 
@@ -17,7 +15,7 @@ def test_time_series_dst_error():
         "coord_value": 0,
     }
     time_series = TimeSeries(init)
-    assert time_series.correct_file_extension(init['dst']) == False
+    assert not time_series.correct_file_extension(init['dst'])
 
 def test_monotonic_increase():
     init = {
@@ -30,13 +28,13 @@ def test_monotonic_increase():
 
     old_coord = iris.coords.Coord([1])
     new_coord = iris.coords.Coord([2])
-    assert time_series.test_monotonic_increase(old_coord, new_coord) == True
-    assert time_series.test_monotonic_increase(new_coord, old_coord) == False
+    assert time_series.test_monotonic_increase(old_coord, new_coord)
+    assert not time_series.test_monotonic_increase(new_coord, old_coord)
 
     old_coord_with_bounds = iris.coords.Coord([2], bounds=[0.5, 1.5])
     new_coord_with_bounds = iris.coords.Coord([1], bounds=[1.5, 2.5])
-    assert time_series.test_monotonic_increase(old_coord_with_bounds, new_coord_with_bounds) == True
-    assert time_series.test_monotonic_increase(new_coord_with_bounds, old_coord_with_bounds) == False
+    assert time_series.test_monotonic_increase(old_coord_with_bounds, new_coord_with_bounds)
+    assert not time_series.test_monotonic_increase(new_coord_with_bounds, old_coord_with_bounds)
 
 def test_time_series_first_save(tmpdir):
     init = {
@@ -107,7 +105,7 @@ def test_time_series_append_nonmonotonic(tmpdir):
 
     time_series = TimeSeries(init_b)
     with patch.object(time_series, 'log_warning') as mock:
-       time_series.run(init_b)
+        time_series.run(init_b)
     mock.assert_called_with("Non-monotonic coordinate. Cube will not be saved.")
     
 

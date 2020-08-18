@@ -28,13 +28,15 @@ def test_change_directory(tmpdir):
         assert os.getcwd() == nwd
     assert os.getcwd() == cwd
 
-def test_compute_spatial_weights(tmpdir, monkeypatch):
+def test_compute_spatial_weights(tmpdir):
     e1t_cube = iris.cube.Cube([1], var_name='e1t')
     e2t_cube = iris.cube.Cube([2], var_name='e2t')
     cube_list = iris.cube.CubeList([e1t_cube, e2t_cube])
     domain_path = str(tmpdir + "/temp.nc")
     iris.save(cube_list, domain_path)
-    assert file_handling.compute_spatial_weights(domain_path, (3,1,1)).all() == np.array([[[2,]],[[2,]],[[2,]]]).all()
+    result = np.array([[[2]], [[2]], [[2]]])
+    shape = result.shape
+    assert file_handling.compute_spatial_weights(domain_path, shape, 'T').all() == result.all()
 
 def test_load_input_cube():
     src = "./tests/testdata/tos-climatology.nc"

@@ -36,6 +36,7 @@ class GlobalAverage(TimeSeries):
 
         leg_cube = hlp.load_input_cube(src, varname)
 
+        grid = self.getarg('grid', context, default='T')
         with warnings.catch_warnings():
             # Suppress warning about insufficient metadata.
             warnings.filterwarnings(
@@ -46,7 +47,7 @@ class GlobalAverage(TimeSeries):
             spatial_avg = leg_cube.collapsed(
                 ['latitude', 'longitude'],
                 iris.analysis.MEAN,
-                weights=hlp.compute_spatial_weights(domain, leg_cube.shape),
+                weights=hlp.compute_spatial_weights(domain, leg_cube.shape, grid=grid),
                 )
         # Remove auxiliary time coordinate before collapsing cube
         spatial_avg.remove_coord(spatial_avg.coord('time', dim_coords=False))
