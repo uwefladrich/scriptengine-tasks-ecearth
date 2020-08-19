@@ -1,6 +1,10 @@
-"""Tests for scriptengine/tasks/monitoring test_markdown_output.py"""
+"""Tests for scriptengine/tasks/monitoring test_redmine_output.py"""
 
 from unittest.mock import patch, Mock
+
+import pytest
+import iris
+import yaml
 
 from scriptengine.tasks.ecearth.monitoring.redmine_output import RedmineOutput
 
@@ -64,3 +68,98 @@ def test_presentation_object_file_extension():
         for src, msg in zip(init['src'], error_messages):
             redmine_output.presentation_object(src, init['local_dst'])
             mock.assert_called_with(msg)
+
+def test_presentation_object_yaml(tmpdir):
+    init = {
+        "src": [str(tmpdir) + "/test.yml"],
+        "local_dst": "",
+        "template": "./template.txt.j2",
+        "subject": "Test Issue",
+        "api_key": "Invalid Key"
+    }
+    with open(init['src'][0], 'w') as file:
+        yaml.dump(init, file)
+    redmine_output = RedmineOutput(init)
+
+    result = redmine_output.presentation_object(init['src'][0], init['local_dst'])
+    assert result == {'presentation_type': 'text', **init}
+
+def test_presentation_object_time_series(tmpdir, monkeypatch):
+    init = {
+        "src": [str(tmpdir) + "/test.nc"],
+        "local_dst": "",
+        "template": "./template.txt.j2",
+        "subject": "Test Issue",
+        "api_key": "Invalid Key"
+    }
+    def mockreturn(src, dst_folder, loaded_cube):
+        return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
+    redmine_output = RedmineOutput(init)
+
+    cube = iris.cube.Cube([0], attributes={'type': 'time series'})
+    iris.save(cube, init['src'][0])
+    monkeypatch.setattr("helpers.presentation_objects.make_time_series.__code__", mockreturn.__code__)
+    result = redmine_output.presentation_object(init['src'][0], init['local_dst'])
+    assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['local_dst'], cube)}
+
+def test_presentation_object_static_map(tmpdir, monkeypatch):
+    init = {
+        "src": [str(tmpdir) + "/test.nc"],
+        "local_dst": "",
+        "template": "./template.txt.j2",
+        "subject": "Test Issue",
+        "api_key": "Invalid Key"
+    }
+    def mockreturn(src, dst_folder, loaded_cube):
+        return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
+    redmine_output = RedmineOutput(init)
+
+    cube = iris.cube.Cube([0], attributes={'type': 'static map', 'map_type': 'invalid'})
+    iris.save(cube, init['src'][0])
+    result = redmine_output.presentation_object(init['src'][0], init['local_dst'])
+    assert result is None
+
+    cube = iris.cube.Cube([0], attributes={'type': 'static map', 'map_type': 'global ocean'})
+    iris.save(cube, init['src'][0])
+    monkeypatch.setattr("helpers.presentation_objects.make_static_map.__code__", mockreturn.__code__)
+    result = redmine_output.presentation_object(init['src'][0], init['local_dst'])
+    assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['local_dst'], cube)}
+
+def test_presentation_object_dynamic_map(tmpdir, monkeypatch):
+    init = {
+        "src": [str(tmpdir) + "/test.nc"],
+        "local_dst": "",
+        "template": "./template.txt.j2",
+        "subject": "Test Issue",
+        "api_key": "Invalid Key"
+    }
+    def mockreturn(src, dst_folder, loaded_cube):
+        return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
+    redmine_output = RedmineOutput(init)
+
+    cube = iris.cube.Cube([0], attributes={'type': 'dynamic map', 'map_type': 'invalid'})
+    iris.save(cube, init['src'][0])
+    result = redmine_output.presentation_object(init['src'][0], init['local_dst'])
+    assert result is None
+
+    cube = iris.cube.Cube([0], attributes={'type': 'dynamic map', 'map_type': 'global ocean'})
+    iris.save(cube, init['src'][0])
+    monkeypatch.setattr("helpers.presentation_objects.make_dynamic_map.__code__", mockreturn.__code__)
+    result = redmine_output.presentation_object(init['src'][0], init['local_dst'])
+    assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['local_dst'], cube)}
+
+def test_presentation_object_invalid_diagnostic_type(tmpdir, monkeypatch):
+    init = {
+        "src": [str(tmpdir) + "/test.nc"],
+        "local_dst": "",
+        "template": "./template.txt.j2",
+        "subject": "Test Issue",
+        "api_key": "Invalid Key"
+    }
+    redmine_output = RedmineOutput(init)
+
+    cube = iris.cube.Cube([0], attributes={'type': 'invalid'})
+    iris.save(cube, init['src'][0])
+    with patch.object(redmine_output, 'log_warning') as mock:
+        assert redmine_output.presentation_object(init['src'][0], init['local_dst']) is None
+    mock.assert_called_with(f"Invalid diagnostic type {cube.attributes['type']}")
