@@ -128,30 +128,9 @@ class SeaIceTimeSeries(TimeSeries):
         """
 
         dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
-        start = datetime.datetime(
-            year=dt_object.year,
-            month=1,
-            day=1,
-            hour=0,
-            minute=0,
-            second=0,
-        )
-        end = datetime.datetime(
-            year=start.year + 1,
-            month=1,
-            day=1,
-            hour=0,
-            minute=0,
-            second=0,
-        )
-        mid_of_year = datetime.datetime(
-            year=dt_object.year,
-            month=7,
-            day=1,
-            hour=0,
-            minute=0,
-            second=0,
-        )
+        start = datetime.datetime(dt_object.year, 1, 1)
+        end = datetime.datetime(start.year + 1, 1, 1)
+        mid_of_year = datetime.datetime(dt_object.year, 7, 1)
         start_seconds = cftime.date2num(start, time_coord.units.name)
         end_seconds = cftime.date2num(end, time_coord.units.name)
         mid_of_year_seconds = cftime.date2num(mid_of_year, time_coord.units.name)
