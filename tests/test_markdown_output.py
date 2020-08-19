@@ -1,9 +1,11 @@
 """Tests for scriptengine/tasks/monitoring test_markdown_output.py"""
 
 from unittest.mock import patch, Mock
+import os
 
 import pytest
 import iris
+import yaml
 
 from scriptengine.tasks.ecearth.monitoring.markdown_output import MarkdownOutput
 
@@ -11,6 +13,19 @@ def mock_pres_object(value_1, value_2):
     if value_1 == 1:
         return value_2
     return None
+
+def test_markdown_output_full(tmpdir):
+    init = {
+        "src": [str(tmpdir) + "/test.yml"],
+        "dst": str(tmpdir),
+        "template": './docs/templates/monitoring.md.j2',
+    }
+    with open(init['src'][0], 'w') as file:
+        yaml.dump(init, file)
+    markdown_output = MarkdownOutput(init)
+
+    markdown_output.run(init)
+    assert os.path.isfile(init['dst'] + "/summary.md")
 
 def test_presentation_object_file_extension():
     init = {
@@ -29,6 +44,19 @@ def test_presentation_object_file_extension():
         for src, msg in zip(init['src'], error_messages):
             markdown_output.presentation_object(src, init['dst'])
             mock.assert_called_with(msg)
+
+def test_presentation_object_yaml(tmpdir):
+    init = {
+        "src": [str(tmpdir) + "/test.yml"],
+        "dst": "",
+        "template": "/.template.txt.j2",
+    }
+    with open(init['src'][0], 'w') as file:
+        yaml.dump(init, file)
+    markdown_output = MarkdownOutput(init)
+
+    result = markdown_output.presentation_object(init['src'][0], init['dst'])
+    assert result == {'presentation_type': 'text', **init}
 
 def test_presentation_object_time_series(tmpdir, monkeypatch):
     init = {

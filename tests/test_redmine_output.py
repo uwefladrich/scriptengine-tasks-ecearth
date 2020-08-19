@@ -4,6 +4,7 @@ from unittest.mock import patch, Mock
 
 import pytest
 import iris
+import yaml
 
 from scriptengine.tasks.ecearth.monitoring.redmine_output import RedmineOutput
 
@@ -67,6 +68,21 @@ def test_presentation_object_file_extension():
         for src, msg in zip(init['src'], error_messages):
             redmine_output.presentation_object(src, init['local_dst'])
             mock.assert_called_with(msg)
+
+def test_presentation_object_yaml(tmpdir):
+    init = {
+        "src": [str(tmpdir) + "/test.yml"],
+        "local_dst": "",
+        "template": "./template.txt.j2",
+        "subject": "Test Issue",
+        "api_key": "Invalid Key"
+    }
+    with open(init['src'][0], 'w') as file:
+        yaml.dump(init, file)
+    redmine_output = RedmineOutput(init)
+
+    result = redmine_output.presentation_object(init['src'][0], init['local_dst'])
+    assert result == {'presentation_type': 'text', **init}
 
 def test_presentation_object_time_series(tmpdir, monkeypatch):
     init = {
