@@ -11,7 +11,7 @@ from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import ChangeDirectory
 from helpers.presentation_objects import make_time_series, make_static_map, make_dynamic_map
-import helpers.exceptions as exceptions
+from helpers.exceptions import InvalidMapTypeException
 
 class MarkdownOutput(Task):
     """MarkdownOutput Presentation Task"""
@@ -85,7 +85,7 @@ class MarkdownOutput(Task):
                 self.log_debug(f"Loading static map diagnostic {src}")
                 try:
                     map_plot_dict = make_static_map(src, dst_folder, loaded_cube)
-                except exceptions.InvalidMapTypeException as msg:
+                except InvalidMapTypeException as msg:
                     self.log_warning(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}
@@ -93,7 +93,7 @@ class MarkdownOutput(Task):
                 self.log_debug(f"Loading dynamic map diagnostic {src}")
                 try:
                     map_plot_dict = make_dynamic_map(src, dst_folder, loaded_cube)
-                except exceptions.InvalidMapTypeException as msg:
+                except InvalidMapTypeException as msg:
                     self.log_warning(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}

@@ -2,6 +2,9 @@
 
 from unittest.mock import patch, Mock
 
+import pytest
+import iris
+
 from scriptengine.tasks.ecearth.monitoring.markdown_output import MarkdownOutput
 
 def mock_pres_object(value_1, value_2):
@@ -26,6 +29,78 @@ def test_presentation_object_file_extension():
         for src, msg in zip(init['src'], error_messages):
             markdown_output.presentation_object(src, init['dst'])
             mock.assert_called_with(msg)
+
+def test_presentation_object_time_series(tmpdir, monkeypatch):
+    init = {
+        "src": [str(tmpdir) + "/test.nc"],
+        "dst": "",
+        "template": "/.template.txt.j2",
+    }
+    def mockreturn(src, dst_folder, loaded_cube):
+        return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
+    markdown_output = MarkdownOutput(init)
+
+    cube = iris.cube.Cube([0], attributes={'type': 'time series'})
+    iris.save(cube, init['src'][0])
+    monkeypatch.setattr("helpers.presentation_objects.make_time_series.__code__", mockreturn.__code__)
+    result = markdown_output.presentation_object(init['src'][0], init['dst'])
+    assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['dst'], cube)}
+
+def test_presentation_object_static_map(tmpdir, monkeypatch):
+    init = {
+        "src": [str(tmpdir) + "/test.nc"],
+        "dst": "",
+        "template": "/.template.txt.j2",
+    }
+    def mockreturn(src, dst_folder, loaded_cube):
+        return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
+    markdown_output = MarkdownOutput(init)
+
+    cube = iris.cube.Cube([0], attributes={'type': 'static map', 'map_type': 'invalid'})
+    iris.save(cube, init['src'][0])
+    result = markdown_output.presentation_object(init['src'][0], init['dst'])
+    assert result is None
+
+    cube = iris.cube.Cube([0], attributes={'type': 'static map', 'map_type': 'global ocean'})
+    iris.save(cube, init['src'][0])
+    monkeypatch.setattr("helpers.presentation_objects.make_static_map.__code__", mockreturn.__code__)
+    result = markdown_output.presentation_object(init['src'][0], init['dst'])
+    assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['dst'], cube)}
+
+def test_presentation_object_dynamic_map(tmpdir, monkeypatch):
+    init = {
+        "src": [str(tmpdir) + "/test.nc"],
+        "dst": "",
+        "template": "/.template.txt.j2",
+    }
+    def mockreturn(src, dst_folder, loaded_cube):
+        return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
+    markdown_output = MarkdownOutput(init)
+
+    cube = iris.cube.Cube([0], attributes={'type': 'dynamic map', 'map_type': 'invalid'})
+    iris.save(cube, init['src'][0])
+    result = markdown_output.presentation_object(init['src'][0], init['dst'])
+    assert result is None
+
+    cube = iris.cube.Cube([0], attributes={'type': 'dynamic map', 'map_type': 'global ocean'})
+    iris.save(cube, init['src'][0])
+    monkeypatch.setattr("helpers.presentation_objects.make_dynamic_map.__code__", mockreturn.__code__)
+    result = markdown_output.presentation_object(init['src'][0], init['dst'])
+    assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['dst'], cube)}
+
+def test_presentation_object_invalid_diagnostic_type(tmpdir, monkeypatch):
+    init = {
+        "src": [str(tmpdir) + "/test.nc"],
+        "dst": "",
+        "template": "/.template.txt.j2",
+    }
+    markdown_output = MarkdownOutput(init)
+
+    cube = iris.cube.Cube([0], attributes={'type': 'invalid'})
+    iris.save(cube, init['src'][0])
+    with patch.object(markdown_output, 'log_warning') as mock:
+        assert markdown_output.presentation_object(init['src'][0], init['dst']) is None
+    mock.assert_called_with(f"Invalid diagnostic type {cube.attributes['type']}")
 
 def test_presentation_list(tmpdir):
     init = {
