@@ -76,7 +76,7 @@ class TimeSeries(Task):
             data_cube,
             title=title,
             comment=comment,
-            type=self.diagnostic_type,
+            diagnostic_type=self.diagnostic_type,
         )
         self.save(data_cube, dst)
 

@@ -1,4 +1,4 @@
-"""Processing Task that creates a 2D dynamic map of sea ice concentration."""
+"""Processing Task that creates a 2D time map of sea ice concentration."""
 
 import datetime
 
@@ -8,7 +8,7 @@ import cftime
 
 from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
-from .dynamic_map import DynamicMap
+from .time_map import TimeMap
 
 meta_dict = {
     'sivolu':
@@ -27,8 +27,8 @@ meta_dict = {
         },
 }
 
-class SeaIceDynamicMap(DynamicMap):
-    """SeaIceDynamicMap Processing Task"""
+class SeaIceTimeMap(TimeMap):
+    """SeaIceTimeMap Processing Task"""
 
     map_type = "polar ice sheet"
 
@@ -39,7 +39,7 @@ class SeaIceDynamicMap(DynamicMap):
             "hemisphere",
             "varname",
         ]
-        super(DynamicMap, self).__init__(__name__, parameters, required_parameters=required)
+        super(TimeMap, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):
@@ -48,7 +48,7 @@ class SeaIceDynamicMap(DynamicMap):
         hemisphere = self.getarg('hemisphere', context)
         varname = self.getarg('varname', context)
 
-        self.log_info(f"Dynamic {varname} map for {hemisphere}ern hemisphere at {dst}.")
+        self.log_info(f"Time map for {varname} on {hemisphere}ern hemisphere at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
         if varname not in meta_dict:

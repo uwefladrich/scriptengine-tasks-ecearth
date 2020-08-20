@@ -104,7 +104,7 @@ class SeaIceTimeSeries(TimeSeries):
         hemispheric_sum.var_name = meta_dict[varname]['var_name'] + hemisphere[0]
 
         metadata = {
-            'type': self.diagnostic_type,
+            'diagnostic_type': self.diagnostic_type,
             'comment': (f"Sum of {long_name}/**{varname}** in March and "
                         f"September on {hemisphere.title()}ern Hemisphere."),
             'title': f"{long_name} (Seasonal Cycle)",

@@ -1,4 +1,4 @@
-"""Processing Task that creates a 2D dynamic map of a given extensive atmosphere quantity."""
+"""Processing Task that creates a 2D time map of a given extensive atmosphere quantity."""
 
 import iris
 import iris_grib
@@ -8,10 +8,10 @@ from scriptengine.tasks.base.timing import timed_runner
 
 from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
-from .dynamic_map import DynamicMap
+from .time_map import TimeMap
 
-class AtmosphereDynamicMap(DynamicMap):
-    """AtmosphereDynamicMap Processing Task"""
+class AtmosphereTimeMap(TimeMap):
+    """AtmosphereTimeMap Processing Task"""
 
     map_type = "global atmosphere"
 
@@ -21,7 +21,7 @@ class AtmosphereDynamicMap(DynamicMap):
             "dst",
             "grib_code",
         ]
-        super(DynamicMap, self).__init__(__name__, parameters, required_parameters=required)
+        super(TimeMap, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):
@@ -29,7 +29,7 @@ class AtmosphereDynamicMap(DynamicMap):
         dst = self.getarg('dst', context)
         grib_code = self.getarg('grib_code', context)
         src = [path for path in src if not path.endswith('000000')]
-        self.log_info(f"Create dynamic map for atmosphere variable {grib_code} at {dst}.")
+        self.log_info(f"Create time map for atmosphere variable {grib_code} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
         if not self.correct_file_extension(dst):

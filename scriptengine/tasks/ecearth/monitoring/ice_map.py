@@ -35,7 +35,7 @@ class SeaIceMap(Map):
         dst = self.getarg('dst', context)
         hemisphere = self.getarg('hemisphere', context)
         varname = self.getarg('varname', context)
-        self.log_info(f"Create static sivolu map for {hemisphere}ern hemisphere at {dst}.")
+        self.log_info(f"Create sivolu map for {hemisphere}ern hemisphere at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
         if varname not in meta_dict:

@@ -30,11 +30,11 @@ Diagnostic Type: Map
 
 Map Type: global atmosphere
 
-Mapped to: ``ece.mon.atmosphere_static_map``
+Mapped to: ``ece.mon.atmosphere_map``
 
 ::
 
-    - ece.mon.atmosphere_static_map:
+    - ece.mon.atmosphere_map:
         src: "{{gg_files}}"
         dst: "{{mondir}}/167-climatology.nc"
         grib_code: 167
@@ -46,11 +46,11 @@ Diagnostic Type: Time Map
 
 Map Type: global atmosphere
 
-Mapped to: ``ece.mon.atmosphere_dynamic map``
+Mapped to: ``ece.mon.atmosphere_time map``
 
 ::
 
-    - ece.mon.atosphere_dynamic_map:
+    - ece.mon.atmosphere_time_map:
         src: "{{gg_files}}"
         dst: "{{mondir}}/167-annual-map.nc"
         grib_code: 167

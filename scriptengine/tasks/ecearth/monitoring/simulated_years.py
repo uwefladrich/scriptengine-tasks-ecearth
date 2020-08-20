@@ -29,5 +29,5 @@ class SimulatedYears(Scalar):
             title="Simulated Years",
             comment="Current number of simulated years.",
             data=value,
-            type=self.diagnostic_type
+            diagnostic_type=self.diagnostic_type,
         )

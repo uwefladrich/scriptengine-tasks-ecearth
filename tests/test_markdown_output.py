@@ -69,13 +69,13 @@ def test_presentation_object_time_series(tmpdir, monkeypatch):
         return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
     markdown_output = MarkdownOutput(init)
 
-    cube = iris.cube.Cube([0], attributes={'type': 'time series'})
+    cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'time series'})
     iris.save(cube, init['src'][0])
     monkeypatch.setattr("helpers.presentation_objects.make_time_series.__code__", mockreturn.__code__)
     result = markdown_output.presentation_object(init['src'][0], init['dst'])
     assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['dst'], cube)}
 
-def test_presentation_object_static_map(tmpdir, monkeypatch):
+def test_presentation_object_map(tmpdir, monkeypatch):
     init = {
         "src": [str(tmpdir) + "/test.nc"],
         "dst": "",
@@ -85,18 +85,18 @@ def test_presentation_object_static_map(tmpdir, monkeypatch):
         return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
     markdown_output = MarkdownOutput(init)
 
-    cube = iris.cube.Cube([0], attributes={'type': 'static map', 'map_type': 'invalid'})
+    cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'map', 'map_type': 'invalid'})
     iris.save(cube, init['src'][0])
     result = markdown_output.presentation_object(init['src'][0], init['dst'])
     assert result is None
 
-    cube = iris.cube.Cube([0], attributes={'type': 'static map', 'map_type': 'global ocean'})
+    cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'map', 'map_type': 'global ocean'})
     iris.save(cube, init['src'][0])
-    monkeypatch.setattr("helpers.presentation_objects.make_static_map.__code__", mockreturn.__code__)
+    monkeypatch.setattr("helpers.presentation_objects.make_map.__code__", mockreturn.__code__)
     result = markdown_output.presentation_object(init['src'][0], init['dst'])
     assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['dst'], cube)}
 
-def test_presentation_object_dynamic_map(tmpdir, monkeypatch):
+def test_presentation_object_time_map(tmpdir, monkeypatch):
     init = {
         "src": [str(tmpdir) + "/test.nc"],
         "dst": "",
@@ -106,14 +106,14 @@ def test_presentation_object_dynamic_map(tmpdir, monkeypatch):
         return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
     markdown_output = MarkdownOutput(init)
 
-    cube = iris.cube.Cube([0], attributes={'type': 'dynamic map', 'map_type': 'invalid'})
+    cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'time map', 'map_type': 'invalid'})
     iris.save(cube, init['src'][0])
     result = markdown_output.presentation_object(init['src'][0], init['dst'])
     assert result is None
 
-    cube = iris.cube.Cube([0], attributes={'type': 'dynamic map', 'map_type': 'global ocean'})
+    cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'time map', 'map_type': 'global ocean'})
     iris.save(cube, init['src'][0])
-    monkeypatch.setattr("helpers.presentation_objects.make_dynamic_map.__code__", mockreturn.__code__)
+    monkeypatch.setattr("helpers.presentation_objects.make_time_map.__code__", mockreturn.__code__)
     result = markdown_output.presentation_object(init['src'][0], init['dst'])
     assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['dst'], cube)}
 
@@ -125,11 +125,11 @@ def test_presentation_object_invalid_diagnostic_type(tmpdir, monkeypatch):
     }
     markdown_output = MarkdownOutput(init)
 
-    cube = iris.cube.Cube([0], attributes={'type': 'invalid'})
+    cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'invalid'})
     iris.save(cube, init['src'][0])
     with patch.object(markdown_output, 'log_warning') as mock:
         assert markdown_output.presentation_object(init['src'][0], init['dst']) is None
-    mock.assert_called_with(f"Invalid diagnostic type {cube.attributes['type']}")
+    mock.assert_called_with(f"Invalid diagnostic type {cube.attributes['diagnostic_type']}")
 
 def test_presentation_list(tmpdir):
     init = {

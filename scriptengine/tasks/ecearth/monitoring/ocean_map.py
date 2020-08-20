@@ -1,4 +1,4 @@
-"""Processing Task that creates a 2D static map of a given extensive ocean quantity."""
+"""Processing Task that creates a 2D map of a given extensive ocean quantity."""
 
 import iris
 
@@ -6,8 +6,8 @@ from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
 from .map import Map
 
-class OceanStaticMap(Map):
-    """OceanStaticMap Processing Task"""
+class OceanMap(Map):
+    """OceanMap Processing Task"""
 
     map_type = "global ocean"
 
@@ -24,7 +24,7 @@ class OceanStaticMap(Map):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         varname = self.getarg('varname', context)
-        self.log_info(f"Create static map for ocean variable {varname} at {dst}.")
+        self.log_info(f"Create map for ocean variable {varname} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
         if not self.correct_file_extension(dst):

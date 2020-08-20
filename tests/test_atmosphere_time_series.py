@@ -17,7 +17,7 @@ def test_atmosphere_time_series_working(tmpdir):
     assert cube.name() == 'sea_surface_temperature'
     assert cube.attributes['title'] is not None
     assert cube.attributes['comment'] is not None
-    assert cube.attributes['type'] == atmo_ts.diagnostic_type
+    assert cube.attributes['diagnostic_type'] == atmo_ts.diagnostic_type
     assert cube.cell_methods == (
         iris.coords.CellMethod('mean', coords='time', intervals='6.0 hours'),
         iris.coords.CellMethod('mean', coords='area'),

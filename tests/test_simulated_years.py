@@ -19,5 +19,5 @@ def test_simulated_years_working(tmpdir):
         title="Simulated Years",
         comment="Current number of simulated years.",
         data=5,
-        type=simulated_years.diagnostic_type,
+        diagnostic_type=simulated_years.diagnostic_type,
         )

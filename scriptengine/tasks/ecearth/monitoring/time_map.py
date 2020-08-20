@@ -1,4 +1,4 @@
-"""Base class for dynamic map processing tasks."""
+"""Base class for time map processing tasks."""
 
 import os
 
@@ -7,10 +7,10 @@ import numpy as np
 
 from scriptengine.tasks.base import Task
 
-class DynamicMap(Task):
-    """DynamicMap Processing Task"""
+class TimeMap(Task):
+    """TimeMap Processing Task"""
 
-    diagnostic_type = "dynamic map"
+    diagnostic_type = "time map"
 
     def __init__(self, parameters):
         super().__init__(__name__, parameters)
@@ -19,7 +19,7 @@ class DynamicMap(Task):
         pass
 
     def save(self, new_cube, dst):
-        """save dynamic map cube in netCDF file"""
+        """save time map cube in netCDF file"""
         try:
             current_cube = iris.load_cube(dst)
         except OSError: # file does not exist yet.

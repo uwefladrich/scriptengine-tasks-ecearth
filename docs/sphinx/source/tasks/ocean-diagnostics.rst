@@ -64,7 +64,7 @@ Ocean Map
 Diagnostic Type: Map
 Map Type: global ocean
 
-Mapped to: ``ece.mon.ocean_static_map``
+Mapped to: ``ece.mon.ocean_map``
 
 This task computes the simulation average of the spatial distribution of an oceanic variable. This results in a map of the global ocean. First, it calculates the time mean of the current leg. If no old version of the simulation average exists, the new annual mean gets saved as the simulation average. Otherwise, the old simulation average and new annual mean get merged into a new simulation average, the old diagnostic on disk is then replaced.
 
@@ -100,7 +100,7 @@ Usage Example
 
 ::
 
-    - ece.mon.ocean_static_map:
+    - ece.mon.ocean_map:
         src: "{{t_files}}"
         dst: "{{mondir}}/tos-climatology.nc"
         varname: "tos"
@@ -112,11 +112,11 @@ Ocean Time Map
 Diagnostic Type: Time Map
 Map Type: global ocean
 
-Mapped to: ``ece.mon.ocean_dynamic_map``
+Mapped to: ``ece.mon.ocean_time_map``
 
 ::
 
-    - ece.mon.ocean_dynamic_map:
+    - ece.mon.ocean_time_map:
         src: "{{t_files}}"
         dst: "{{mondir}}/tos-annual-map.nc"
         varname: "tos"
