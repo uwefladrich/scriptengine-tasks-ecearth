@@ -10,7 +10,7 @@ from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import ChangeDirectory
-from helpers.presentation_objects import make_time_series, make_static_map, make_dynamic_map
+from helpers.presentation_objects import make_time_series, make_map, make_time_map
 from helpers.exceptions import InvalidMapTypeException
 
 class MarkdownOutput(Task):
@@ -63,7 +63,7 @@ class MarkdownOutput(Task):
         - for text objects: data
         - for image objects: path
         """
-        if src.endswith('.yml'):
+        if src.endswith('.yml') or src.endswith('.yaml'):
             try:
                 with open(src) as yml_file:
                     loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
@@ -78,26 +78,26 @@ class MarkdownOutput(Task):
             except OSError:
                 self.log_warning(f"File not found! Ignoring {src}")
                 return None
-            if loaded_cube.attributes["type"] == "time series":
+            if loaded_cube.attributes["diagnostic_type"] == "time series":
                 self.log_debug(f"Loading time series diagnostic {src}")
                 return {'presentation_type': 'image', **make_time_series(src, dst_folder, loaded_cube)}
-            if loaded_cube.attributes["type"] == "static map":
-                self.log_debug(f"Loading static map diagnostic {src}")
+            if loaded_cube.attributes["diagnostic_type"] == "map":
+                self.log_debug(f"Loading map diagnostic {src}")
                 try:
-                    map_plot_dict = make_static_map(src, dst_folder, loaded_cube)
+                    map_plot_dict = make_map(src, dst_folder, loaded_cube)
                 except InvalidMapTypeException as msg:
                     self.log_warning(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}
-            if loaded_cube.attributes["type"] == "dynamic map":
-                self.log_debug(f"Loading dynamic map diagnostic {src}")
+            if loaded_cube.attributes["diagnostic_type"] == "time map":
+                self.log_debug(f"Loading time map diagnostic {src}")
                 try:
-                    map_plot_dict = make_dynamic_map(src, dst_folder, loaded_cube)
+                    map_plot_dict = make_time_map(src, dst_folder, loaded_cube)
                 except InvalidMapTypeException as msg:
                     self.log_warning(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}
-            self.log_warning(f"Invalid diagnostic type {loaded_cube.attributes['type']}")
+            self.log_warning(f"Invalid diagnostic type {loaded_cube.attributes['diagnostic_type']}")
             return None
     
         self.log_warning(f"Invalid file extension of {src}")

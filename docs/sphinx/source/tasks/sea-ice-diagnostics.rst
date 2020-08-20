@@ -46,7 +46,7 @@ Sea-Ice Time Map
 
 Diagnostic Type: Time Map
 
-Mapped to: ``ece.mon.ice_dynamic_map``
+Mapped to: ``ece.mon.ice_time_map``
 
 varname can be ``sivolu`` or ``siconc``.
 
@@ -54,7 +54,7 @@ Map Type: polar ice sheet
 
 ::
 
-    - ece.mon.ice_dynamic_map:
+    - ece.mon.ice_time_map:
             src: "{{ice_file_mar}}"
             dst: "{{mondir}}/siconc-north-mar.nc"
             hemisphere: north

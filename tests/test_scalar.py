@@ -45,17 +45,17 @@ expected_result = [
         'title': 'Title',
         'data': 'Value',
         'comment': 'Comment',
-        'type': 'scalar',
+        'diagnostic_type': 'scalar',
     },
     {
         'title': 'Title',
         'data': [1, 2, 3],
-        'type': 'scalar',
+        'diagnostic_type': 'scalar',
     },
     {
         'title': 'Title',
         'data': 'message',
-        'type': 'scalar',
+        'diagnostic_type': 'scalar',
     },
 ]
 

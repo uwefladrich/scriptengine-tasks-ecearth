@@ -21,7 +21,7 @@ def test_ice_time_series_working(tmpdir):
     assert cube.name() == 'sea_ice_volume'
     assert cube.attributes['title'] is not None
     assert cube.attributes['comment'] is not None
-    assert cube.attributes['type'] == 'time series'
+    assert cube.attributes['diagnostic_type'] == 'time series'
     assert cube.cell_methods == (
         iris.coords.CellMethod('point', coords='time'),
         iris.coords.CellMethod('sum', coords='area', intervals='northern hemisphere'),

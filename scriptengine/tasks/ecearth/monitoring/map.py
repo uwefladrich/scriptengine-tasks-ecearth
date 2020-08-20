@@ -10,7 +10,7 @@ import helpers.file_handling as helpers
 class Map(Task):
     """Map Processing Task"""
 
-    diagnostic_type = "static map"
+    diagnostic_type = "map"
 
     def __init__(self, parameters):
         super().__init__(__name__, parameters)

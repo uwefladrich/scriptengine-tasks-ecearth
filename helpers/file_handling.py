@@ -62,7 +62,7 @@ def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs)
     metadata = {
         'title': title,
         'comment': comment,
-        'type': diagnostic_type,
+        'diagnostic_type': diagnostic_type,
         'source': 'EC-Earth 4',
         'Conventions': 'CF-1.8',
         }

@@ -50,7 +50,7 @@ def test_time_series_first_save(tmpdir):
     assert cube.data == [init['data_value']]
     assert cube.coord().points == [init['coord_value']]
     assert cube.attributes['title'] == init['title']
-    assert cube.attributes['type'] == 'time series'
+    assert cube.attributes['diagnostic_type'] == 'time series'
     assert cube.name() == init['title']
     assert cube.units.name == '1'
     assert cube.coord().name() == 'time'
@@ -80,7 +80,7 @@ def test_time_series_append(tmpdir):
     assert (cube.data == [init_a['data_value'], init_b['data_value']]).all()
     assert (cube.coord().points == [init_a['coord_value'], init_b['coord_value']]).all()
     assert cube.attributes['title'] == init_a['title']
-    assert cube.attributes['type'] == 'time series'
+    assert cube.attributes['diagnostic_type'] == 'time series'
     assert cube.name() == init_a['title']
     assert cube.coord().name() == 'time'
     assert cube.units.name == '1'
@@ -125,7 +125,7 @@ def test_time_series_date_time(tmpdir):
     assert cube.data == [init_date['data_value']]
     assert cube.coord().points == [seconds_value]
     assert cube.attributes['title'] == init_date['title']
-    assert cube.attributes['type'] == 'time series'
+    assert cube.attributes['diagnostic_type'] == 'time series'
     assert cube.name() == init_date['title']
     assert cube.units.name == '1'
     assert cube.coord().name() == 'time'
@@ -144,7 +144,7 @@ def test_time_series_date_time(tmpdir):
     assert cube.data == [init_date_time['data_value']]
     assert cube.coord().points == [seconds_value]
     assert cube.attributes['title'] == init_date_time['title']
-    assert cube.attributes['type'] == 'time series'
+    assert cube.attributes['diagnostic_type'] == 'time series'
     assert cube.name() == init_date_time['title']
     assert cube.units.name == '1'
     assert cube.coord().name() == 'time'

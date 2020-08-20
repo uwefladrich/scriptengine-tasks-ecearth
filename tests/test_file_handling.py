@@ -47,7 +47,7 @@ def test_set_metadata():
     new_metadata = {
         'title': 'Title',
         'comment': 'Comment',
-        'type': 'Type',
+        'diagnostic_type': 'Type',
         'source': 'EC-Earth 4',
         'Conventions': 'CF-1.8',
         'custom': 'Custom',

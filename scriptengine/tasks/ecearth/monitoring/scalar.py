@@ -26,7 +26,7 @@ class Scalar(Task):
         comment = self.getarg('comment', context, default=None)
         self.log_info(f"Write scalar diagnostic to {dst}")
 
-        self.save(dst, title=title, data=value, type=self.diagnostic_type, comment=comment)
+        self.save(dst, title=title, data=value, diagnostic_type=self.diagnostic_type, comment=comment)
 
     def save(self, dst, **kwargs):
         """Saves a scalar diagnostic in a YAML file."""

@@ -9,12 +9,12 @@ from .monitoring.markdown_output import MarkdownOutput
 from .monitoring.global_average import GlobalAverage
 from .monitoring.disk_usage import DiskUsage
 from .monitoring.ice_time_series import SeaIceTimeSeries
-from .monitoring.ocean_static_map import OceanStaticMap
-from .monitoring.ocean_dynamic_map import OceanDynamicMap
-from .monitoring.atmosphere_static_map import AtmosphereStaticMap
-from .monitoring.atmosphere_dynamic_map import AtmosphereDynamicMap
+from .monitoring.ocean_map import OceanMap
+from .monitoring.ocean_time_map import OceanTimeMap
+from .monitoring.atmosphere_map import AtmosphereMap
+from .monitoring.atmosphere_time_map import AtmosphereTimeMap
 from .monitoring.ice_map import SeaIceMap
-from .monitoring.ice_dynamic_map import SeaIceDynamicMap
+from .monitoring.ice_time_map import SeaIceTimeMap
 from .monitoring.atmosphere_time_series import AtmosphereTimeSeries
 from .monitoring.time_series import TimeSeries
 from .monitoring.redmine_output import RedmineOutput
@@ -29,12 +29,12 @@ def task_loader_map():
         'ece.mon.global_avg': GlobalAverage,
         'ece.mon.disk_usage': DiskUsage,
         'ece.mon.ice_time_series': SeaIceTimeSeries,
-        'ece.mon.ocean_static_map': OceanStaticMap,
-        'ece.mon.ocean_dynamic_map': OceanDynamicMap,
-        'ece.mon.atmosphere_static_map': AtmosphereStaticMap,
-        'ece.mon.atmosphere_dynamic_map': AtmosphereDynamicMap,
+        'ece.mon.ocean_map': OceanMap,
+        'ece.mon.ocean_time_map': OceanTimeMap,
+        'ece.mon.atmosphere_map': AtmosphereMap,
+        'ece.mon.atmosphere_time_map': AtmosphereTimeMap,
         'ece.mon.ice_map': SeaIceMap,
-        'ece.mon.ice_dynamic_map': SeaIceDynamicMap,
+        'ece.mon.ice_time_map': SeaIceTimeMap,
         'ece.mon.atmosphere_ts': AtmosphereTimeSeries,
         'ece.mon.time_series': TimeSeries,
         'ece.mon.redmine_output': RedmineOutput

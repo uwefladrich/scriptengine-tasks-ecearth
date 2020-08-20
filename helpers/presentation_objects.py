@@ -60,25 +60,25 @@ def make_time_series(src_path, dst_folder, time_series_cube):
     }
     return image_dict
 
-def make_static_map(src_path, dst_folder, static_map_cube):
+def make_map(src_path, dst_folder, map_cube):
     """
     Load map diagnostic and determine map type.
     """
     # get file name without extension
     base_name = os.path.splitext(os.path.basename(src_path))[0]
-    map_type = static_map_cube.attributes['map_type']
+    map_type = map_cube.attributes['map_type']
     map_handler = type_handling.function_mapper(map_type)
     if map_handler is None:
         raise exceptions.InvalidMapTypeException(map_type)
     
-    unit_text = f"{format_units(static_map_cube.units)}"
-    time_coord = static_map_cube.coord('time')
+    unit_text = f"{format_units(map_cube.units)}"
+    time_coord = map_cube.coord('time')
     time_bounds = time_coord.bounds[0]
     dates = cftime.num2pydate(time_bounds, time_coord.units.name)
-    plot_title = format_title(static_map_cube.long_name)
+    plot_title = format_title(map_cube.long_name)
     date_title = f"{dates[0].strftime('%Y')} - {dates[-1].strftime('%Y')}"
     fig = map_handler(
-        static_map_cube,
+        map_cube,
         title=plot_title,
         dates=date_title,
         units=unit_text,
@@ -89,45 +89,45 @@ def make_static_map(src_path, dst_folder, static_map_cube):
         plt.close(fig)
 
     image_dict = {
-        'title': static_map_cube.attributes['title'],
+        'title': map_cube.attributes['title'],
         'path': dst_file,
-        'comment': static_map_cube.attributes['comment'],
+        'comment': map_cube.attributes['comment'],
     }
     return image_dict
     
-def make_dynamic_map(src_path, dst_folder, dyn_map_cube):
+def make_time_map(src_path, dst_folder, time_map_cube):
     """
     Load map diagnostic and determine map type.
     """
     # get file name without extension
     base_name = os.path.splitext(os.path.basename(src_path))[0]
-    map_type = dyn_map_cube.attributes['map_type']
+    map_type = time_map_cube.attributes['map_type']
     map_handler = type_handling.function_mapper(map_type)
     if map_handler is None:
         raise exceptions.InvalidMapTypeException(map_type)
     
     png_dir = f"{base_name}_frames"
-    number_of_time_steps = len(dyn_map_cube.coord('time').points)
+    number_of_time_steps = len(time_map_cube.coord('time').points)
     with ChangeDirectory(dst_folder):
         if not os.path.isdir(png_dir):
             os.mkdir(png_dir)
         number_of_pngs = len(os.listdir(png_dir))
     
     value_range = [
-        dyn_map_cube.attributes["presentation_min"],
-        dyn_map_cube.attributes["presentation_max"]
+        time_map_cube.attributes["presentation_min"],
+        time_map_cube.attributes["presentation_max"]
     ]
-    unit_text = f"{format_units(dyn_map_cube.units)}"
+    unit_text = f"{format_units(time_map_cube.units)}"
     dst_file = f"./{base_name}.gif"
     with ChangeDirectory(f"{dst_folder}/{png_dir}"):
         for time_step in range(number_of_pngs, number_of_time_steps):
-            time_coord = dyn_map_cube.coord('time')
+            time_coord = time_map_cube.coord('time')
             time_bounds = time_coord.bounds[time_step]
             dates = cftime.num2pydate(time_bounds, time_coord.units.name)
             date_title = f"{dates[0].strftime('%Y')}"
-            plot_title = format_title(dyn_map_cube.long_name)
+            plot_title = format_title(time_map_cube.long_name)
             fig = map_handler(
-                dyn_map_cube[time_step],
+                time_map_cube[time_step],
                 title=plot_title,
                 dates=date_title,
                 min_value=value_range[0],
@@ -142,9 +142,9 @@ def make_dynamic_map(src_path, dst_folder, dyn_map_cube):
         imageio.mimsave(f'.{dst_file}', images, fps=2)
 
     image_dict = {
-        'title': dyn_map_cube.attributes['title'],
+        'title': time_map_cube.attributes['title'],
         'path': dst_file,
-        'comment': dyn_map_cube.attributes['comment'],
+        'comment': time_map_cube.attributes['comment'],
     }
     return image_dict
 

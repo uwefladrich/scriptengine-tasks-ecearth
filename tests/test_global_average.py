@@ -20,7 +20,7 @@ def test_global_average_working(tmpdir):
     assert cube.name() == 'sea_ice_thickness'
     assert cube.attributes['title'] is not None
     assert cube.attributes['comment'] is not None
-    assert cube.attributes['type'] == 'time series'
+    assert cube.attributes['diagnostic_type'] == 'time series'
     assert cube.cell_methods == (
         iris.coords.CellMethod('mean', coords='time', intervals='1 month'),
         iris.coords.CellMethod('mean', coords='area'),

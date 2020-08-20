@@ -44,7 +44,7 @@ def test_format_dates():
     assert [current_date.year, changed_year.year] == po.format_dates([current_date, changed_year])
     assert [current_date.strftime("%Y-%m"), changed_month.strftime("%Y-%m")] == po.format_dates([current_date, changed_month])
 
-def test_make_static_map(tmpdir, monkeypatch):
+def test_make_map(tmpdir, monkeypatch):
     path = './tests/testdata/tos-climatology.nc'
     dst_folder = str(tmpdir)
     cube = iris.load_cube(path)
@@ -52,7 +52,7 @@ def test_make_static_map(tmpdir, monkeypatch):
         return plt.figure()
     
     monkeypatch.setattr("helpers.map_type_handling.global_ocean_plot", mockreturn)
-    result = po.make_static_map(path, dst_folder, cube)
+    result = po.make_map(path, dst_folder, cube)
     expected_result = {
         'title': cube.attributes['title'],
         'path': './tos-climatology.png',
@@ -60,7 +60,7 @@ def test_make_static_map(tmpdir, monkeypatch):
     }
     assert result == expected_result
 
-def test_make_dynamic_map(tmpdir, monkeypatch):
+def test_make_time_map(tmpdir, monkeypatch):
     path = './tests/testdata/tos-annual-map.nc'
     dst_folder = str(tmpdir)
     cube = iris.load_cube(path)
@@ -68,7 +68,7 @@ def test_make_dynamic_map(tmpdir, monkeypatch):
         return plt.figure()
     
     monkeypatch.setattr("helpers.map_type_handling.global_ocean_plot", mockreturn)
-    result = po.make_dynamic_map(path, dst_folder, cube)
+    result = po.make_time_map(path, dst_folder, cube)
     expected_result = {
         'title': cube.attributes['title'],
         'path': './tos-annual-map.gif',
@@ -76,21 +76,21 @@ def test_make_dynamic_map(tmpdir, monkeypatch):
     }
     assert result == expected_result
 
-def test_make_dynamic_map_map_handling_exception(tmpdir):
+def test_make_time_map_map_handling_exception(tmpdir):
     path = './tests/testdata/tos-annual-map.nc'
     dst_folder = str(tmpdir)
     cube = iris.load_cube(path)
     cube.attributes['map_type'] = 'invalid type'
     with pytest.raises(exceptions.InvalidMapTypeException):
-        po.make_dynamic_map(path, dst_folder, cube)
+        po.make_time_map(path, dst_folder, cube)
 
-def test_make_static_map_map_handling_exception(tmpdir):
+def test_make_map_map_handling_exception(tmpdir):
     path = './tests/testdata/tos-climatology.nc'
     dst_folder = str(tmpdir)
     cube = iris.load_cube(path)
     cube.attributes['map_type'] = 'invalid type'
     with pytest.raises(exceptions.InvalidMapTypeException):
-        po.make_static_map(path, dst_folder, cube)
+        po.make_map(path, dst_folder, cube)
 
 def test_make_time_series(tmpdir):
     path = './tests/testdata/tos-global-avg.nc'
