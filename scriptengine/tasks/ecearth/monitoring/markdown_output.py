@@ -63,7 +63,7 @@ class MarkdownOutput(Task):
         - for text objects: data
         - for image objects: path
         """
-        if src.endswith('.yml'):
+        if src.endswith('.yml') or src.endswith('.yaml'):
             try:
                 with open(src) as yml_file:
                     loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)

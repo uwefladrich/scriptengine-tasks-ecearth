@@ -29,14 +29,15 @@ def test_markdown_output_full(tmpdir):
 
 def test_presentation_object_file_extension():
     init = {
-        "src": ["test.yml", "test.nc", "test.txt"],
+        "src": ["test.yml", "test.yaml", "test.nc", "test.txt"],
         "dst": "",
         "template": "/.template.txt.j2",
     }
     error_messages = [
         f"File not found! Ignoring {init['src'][0]}",
         f"File not found! Ignoring {init['src'][1]}",
-        f"Invalid file extension of {init['src'][2]}",
+        f"File not found! Ignoring {init['src'][2]}",
+        f"Invalid file extension of {init['src'][3]}",
     ]
     markdown_output = MarkdownOutput(init)
 
