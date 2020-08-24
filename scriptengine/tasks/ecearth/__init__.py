@@ -10,7 +10,7 @@ from .monitoring.nemo_global_mean_year_mean_timeseries import NemoGlobalMeanYear
 from .monitoring.diskusage_rte_scalar import DiskusageRteScalar
 from .monitoring.si3_hemis_sum_month_mean_timeseries import Si3HemisSumMonthMeanTimeseries
 from .monitoring.nemo_all_mean_map import NemoAllMeanMap
-from .monitoring.ocean_time_map import OceanTimeMap
+from .monitoring.nemo_time_mean_temporalmap import NemoYearMeanTemporalmap, NemoMonthMeanTemporalmap
 from .monitoring.oifs_all_mean_map import OifsAllMeanMap
 from .monitoring.oifs_year_mean_temporalmap import OifsYearMeanTemporalmap
 from .monitoring.si3_hemis_point_month_mean_all_mean_map import Si3HemisPointMonthMeanAllMeanMap
@@ -30,7 +30,8 @@ def task_loader_map():
         'ece.mon.diskusage_rte_scalar': DiskusageRteScalar,
         'ece.mon.si3_hemis_sum_month_mean_timeseries': Si3HemisSumMonthMeanTimeseries,
         'ece.mon.nemo_all_mean_map': NemoAllMeanMap,
-        'ece.mon.ocean_time_map': OceanTimeMap,
+        'ece.mon.nemo_month_mean_temporalmap': NemoMonthMeanTemporalmap,
+        'ece.mon.nemo_year_mean_temporalmap': NemoYearMeanTemporalmap,
         'ece.mon.oifs_all_mean_map': OifsAllMeanMap,
         'ece.mon.oifs_year_mean_temporalmap': OifsYearMeanTemporalmap,
         'ece.mon.si3_hemis_point_month_mean_all_mean_map': Si3HemisPointMonthMeanAllMeanMap,

@@ -46,38 +46,6 @@ Map Type: global ocean
 
 Mapped to: ``ece.mon.nemo_all_mean_map``
 
-This task computes the simulation average of the spatial distribution of an oceanic variable. This results in a map of the global ocean. First, it calculates the time mean of the current leg. If no old version of the simulation average exists, the new annual mean gets saved as the simulation average. Otherwise, the old simulation average and new annual mean get merged into a new simulation average, the old diagnostic on disk is then replaced.
-
-An application is the simulation average map of the sea surface temperature or sea surface salinity. Simulation average means "from the beginning of the experiment until now". This processing task assumes monthly output files but the leg length is completely irrelevant.
-
-The required arguments are:
-
-- ``src``: A list of strings containing paths to the desired NEMO output files. This list can be manually entered or (often better) created by the ``find`` task.
-- ``dst``: A string ending in ``.nc``. This is where the diagnostic will be saved.
-- ``varname``: The name of the oceanic variable as it is saved in the NEMO output file.
-
-run(self, context)
-------------------
-
-First, the required arguments get loaded from the context. The processing task returns with a logged error message if ``dst`` does not end in ``.nc``.
-
-The input files get loaded and concatenated into one single Iris cube with a call to ``helpers.load_input_cube()``. Since the variable metadata (standard name, long name, units) is already available in the NEMO output, this will not have to be set separately.
-
-NEMO output files contain an auxiliary time coordinate, this makes collapsing along the time axis more difficult. Thus, this coordinate gets removed before averaging over time. The time mean is weighted based on the month lengths. These weights get computed by ``helpers.compute_time_weights()``.
-
-The ``run()``-method calls ``helpers.set_metadata()`` to add relevant metadata to the diagnostic. Finally, it calls the ``save_cube()`` method to save the cube.
-
-save_cube(self, new_average, dst)
-------------------------------------------
-
-This method saves the newly computed leg average cube in a NetCDF file. If this file exists already, the new simulation average gets computed first and saved afterwards.
-
-If the file exists already, it gets loaded as an Iris cube. The new cube should get appended to the existing diagnostic on disk. This should not happen if appending would lead to a non-monotonic time axis. This can happen when monitoring leg n+1 finishes before monitoring leg n is completed. When inserting would lead to a non-monotonic time axis for the diagnostic on disk, the cube will not get saved and a warning message will get logged.
-When a monotonic insert is possible, the two cubes (existing diagnostic at ``dst`` and ``new_cube``) get concatenated. Then, ``compute_simulation_avg()`` computes the new simulation average. Since overwriting Iris cubes currently in memory leads to file corruption, the new version of the diagnostic gets saved as a copy, the old version gets deleted, and the new version is renamed.
-
-Usage Example
--------------
-
 ::
 
     - ece.mon.nemo_all_mean_map:
@@ -86,17 +54,33 @@ Usage Example
         varname: "tos"
 
 
-Ocean Time Map
-==============
+NemoYearMeanTemporalMap
+=======================
 
-Diagnostic Type: Time Map
+Diagnostic Type: Temporal Map
 Map Type: global ocean
 
-Mapped to: ``ece.mon.ocean_time_map``
+Mapped to: ``ece.mon.nemo_year_mean_temporalmap``
 
 ::
 
-    - ece.mon.ocean_time_map:
+    - ece.mon.nemo_year_mean_temporalmap:
         src: "{{t_files}}"
-        dst: "{{mondir}}/tos-annual-map.nc"
+        dst: "{{mondir}}/tos_nemo_year_mean_temporalmap.nc"
+        varname: "tos"
+
+
+NemoMonthMeanTemporalMap
+========================
+
+Diagnostic Type: Temporal Map
+Map Type: global ocean
+
+Mapped to: ``ece.mon.nemo_month_mean_temporalmap``
+
+::
+
+    - ece.mon.nemo_month_mean_temporalmap:
+        src: "{{t_files}}"
+        dst: "{{mondir}}/tos_nemo_month_mean_temporalmap.nc"
         varname: "tos"
