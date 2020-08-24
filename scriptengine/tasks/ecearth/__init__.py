@@ -3,7 +3,7 @@
 This module provides SE tasks for the EC-Earth ESM
 """
 
-from .monitoring.simulated_years import SimulatedYears
+from .monitoring.simulatedyears_rte_scalar import SimulatedyearsRteScalar
 from .monitoring.scalar import Scalar
 from .monitoring.markdown_output import MarkdownOutput
 from .monitoring.global_average import GlobalAverage
@@ -23,7 +23,7 @@ from .slurm import Sbatch
 def task_loader_map():
     return {
         'sbatch': Sbatch,
-        'ece.mon.sim_years': SimulatedYears,
+        'ece.mon.simulatedyears_rte_scalar': SimulatedyearsRteScalar,
         'ece.mon.scalar': Scalar,
         'ece.mon.markdown_report': MarkdownOutput,
         'ece.mon.global_avg': GlobalAverage,

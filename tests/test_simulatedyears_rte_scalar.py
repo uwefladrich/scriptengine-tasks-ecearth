@@ -2,16 +2,16 @@
 
 from unittest.mock import patch
 
-from scriptengine.tasks.ecearth.monitoring.simulated_years import SimulatedYears
+from scriptengine.tasks.ecearth.monitoring.simulatedyears_rte_scalar import SimulatedyearsRteScalar
 
-def test_simulated_years_working(tmpdir):
+def test_simulatedyears_working(tmpdir):
     test_path = str(tmpdir) + '/test.yml'
     init = {
         'dst': test_path,
         'start': "1990-01-01",
         'end': "1995-01-01"
     }
-    simulated_years = SimulatedYears(init)
+    simulated_years = SimulatedyearsRteScalar(init)
     with patch.object(simulated_years, 'save') as mock:
         simulated_years.run(init)
     mock.assert_called_with(

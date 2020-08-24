@@ -25,15 +25,15 @@ Diagnostic Type: Scalar
         src: "{{rundir}}/output"
         dst: "{{mondir}}/diskusage_rte_scalar.yml"
 
-Simulated Years
-===============
+SimulatedyearsRteScalar
+=======================
 
 Diagnostic Type: Scalar
 
 ::
 
-    - ece.mon.sim_years:
-        dst: "{{mondir}}/sim-years.yml"
+    - ece.mon.simulatedyears_rte_scalar:
+        dst: "{{mondir}}/simulatedyears_rte_scalar.yml"
         start: "{{start}}"
         end: "{{leg.end}}"
 

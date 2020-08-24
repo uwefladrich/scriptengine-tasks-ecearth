@@ -5,8 +5,8 @@ from dateutil.relativedelta import relativedelta
 from scriptengine.tasks.base.timing import timed_runner
 from .scalar import Scalar
 
-class SimulatedYears(Scalar):
-    """SimulatedYears Processing Task"""
+class SimulatedyearsRteScalar(Scalar):
+    """SimulatedyearsRteScalar Processing Task"""
     def __init__(self, parameters):
         required = [
             "dst",
