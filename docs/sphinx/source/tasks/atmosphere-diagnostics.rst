@@ -39,18 +39,18 @@ Mapped to: ``ece.mon.oifs_all_mean_map``
         dst: "{{mondir}}/2t_oifs_all_mean_map.nc"
         grib_code: 167
 
-Atmosphere Time Map
-===================
+OifsYearMeanTemporalmap
+=======================
 
-Diagnostic Type: Time Map
+Diagnostic Type: Temporal Map
 
 Map Type: global atmosphere
 
-Mapped to: ``ece.mon.atmosphere_time map``
+Mapped to: ``ece.mon.oifs_year_mean_temporalmap``
 
 ::
 
-    - ece.mon.atmosphere_time_map:
+    - ece.mon.oifs_year_mean_temporalmap:
         src: "{{gg_files}}"
-        dst: "{{mondir}}/167-annual-map.nc"
+        dst: "{{mondir}}/2t_oifs_year_mean_temporalmap.nc"
         grib_code: 167

@@ -10,8 +10,8 @@ from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
 from .temporalmap import Temporalmap
 
-class AtmosphereTimeMap(Temporalmap):
-    """AtmosphereTimeMap Processing Task"""
+class OifsYearMeanTemporalmap(Temporalmap):
+    """OifsYearMeanTemporalmap Processing Task"""
 
     map_type = "global atmosphere"
 

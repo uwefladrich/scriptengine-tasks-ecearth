@@ -12,7 +12,7 @@ from .monitoring.ice_time_series import SeaIceTimeSeries
 from .monitoring.ocean_map import OceanMap
 from .monitoring.ocean_time_map import OceanTimeMap
 from .monitoring.oifs_all_mean_map import OifsAllMeanMap
-from .monitoring.atmosphere_time_map import AtmosphereTimeMap
+from .monitoring.oifs_year_mean_temporalmap import OifsYearMeanTemporalmap
 from .monitoring.ice_map import SeaIceMap
 from .monitoring.ice_time_map import SeaIceTimeMap
 from .monitoring.atmosphere_time_series import AtmosphereTimeSeries
@@ -32,7 +32,7 @@ def task_loader_map():
         'ece.mon.ocean_map': OceanMap,
         'ece.mon.ocean_time_map': OceanTimeMap,
         'ece.mon.oifs_all_mean_map': OifsAllMeanMap,
-        'ece.mon.atmosphere_time_map': AtmosphereTimeMap,
+        'ece.mon.oifs_year_mean_temporalmap': OifsYearMeanTemporalmap,
         'ece.mon.ice_map': SeaIceMap,
         'ece.mon.ice_time_map': SeaIceTimeMap,
         'ece.mon.atmosphere_ts': AtmosphereTimeSeries,
