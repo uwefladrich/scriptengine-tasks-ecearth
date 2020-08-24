@@ -4,29 +4,29 @@ from unittest.mock import patch
 
 import iris
 
-from scriptengine.tasks.ecearth.monitoring.ice_time_map import SeaIceTimeMap, meta_dict
+from scriptengine.tasks.ecearth.monitoring.si3_hemis_point_month_mean_temporalmap import Si3HemisPointMonthMeanTemporalmap, meta_dict
 
-def test_ice_time_map_once(tmpdir):
+def test_si3_hemis_point_month_mean_temporalmap_once(tmpdir):
     init = {
         "src": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "dst": str(tmpdir) + '/test.nc',
         "hemisphere": "north",
         "varname": "sivolu",
     }
-    ice_time_map = SeaIceTimeMap(init)
+    ice_time_map = Si3HemisPointMonthMeanTemporalmap(init)
     ice_time_map.run(init)
     cube = iris.load_cube(init['dst'])
     assert cube.attributes['map_type'] == ice_time_map.map_type
     assert cube.attributes['diagnostic_type'] == ice_time_map.diagnostic_type
 
-def test_ice_time_map_twice(tmpdir):
+def test_si3_hemis_point_month_mean_temporalmap_twice(tmpdir):
     init_a = {
         "src": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "dst": str(tmpdir) + '/test.nc',
         "hemisphere": "north",
         "varname": "sivolu",
     }
-    ice_time_map = SeaIceTimeMap(init_a)
+    ice_time_map = Si3HemisPointMonthMeanTemporalmap(init_a)
     ice_time_map.run(init_a)
     init_b = {
         "src": './tests/testdata/NEMO_output_sivolu-199103.nc',
@@ -34,20 +34,20 @@ def test_ice_time_map_twice(tmpdir):
         "hemisphere": "north",
         "varname": "sivolu",
     }
-    ice_time_map = SeaIceTimeMap(init_b)
+    ice_time_map = Si3HemisPointMonthMeanTemporalmap(init_b)
     ice_time_map.run(init_b)
     cube = iris.load_cube(init_b['dst'])
     assert cube.attributes['map_type'] == ice_time_map.map_type
     assert cube.attributes['diagnostic_type'] == ice_time_map.diagnostic_type
 
-def test_ice_time_map_wrong_varname(tmpdir):
+def test_si3_hemis_point_month_mean_temporalmap_wrong_varname(tmpdir):
     init = {
         "src": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "dst": str(tmpdir) + '/test.nc',
         "hemisphere": "north",
         "varname": "tos",
     }
-    ice_time_map = SeaIceTimeMap(init)
+    ice_time_map = Si3HemisPointMonthMeanTemporalmap(init)
     ice_time_map.run(init)
     with patch.object(ice_time_map, 'log_warning') as mock:
         ice_time_map.run(init)
@@ -55,14 +55,14 @@ def test_ice_time_map_wrong_varname(tmpdir):
                 f"'varname' must be one of the following: {meta_dict.keys()} "
                 f"Diagnostic will not be treated, returning now."))
 
-def test_ice_time_map_wrong_hemisphere(tmpdir):
+def test_si3_hemis_point_month_mean_temporalmap_wrong_hemisphere(tmpdir):
     init = {
         "src": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "dst": str(tmpdir) + '/test.nc',
         "varname": "sivolu",
         "hemisphere": "east",
     }
-    ice_time_map = SeaIceTimeMap(init)
+    ice_time_map = Si3HemisPointMonthMeanTemporalmap(init)
     ice_time_map.run(init)
     with patch.object(ice_time_map, 'log_warning') as mock:
         ice_time_map.run(init)

@@ -41,12 +41,12 @@ Map Type: polar ice sheet
         hemisphere: south
         varname: sivolu
 
-Sea-Ice Time Map
-================
+Si3HemisPointMonthMeanTemporalmap
+=================================
 
-Diagnostic Type: Time Map
+Diagnostic Type: Temporal Map
 
-Mapped to: ``ece.mon.ice_time_map``
+Mapped to: ``ece.mon.si3_hemis_point_month_mean_temporalmap``
 
 varname can be ``sivolu`` or ``siconc``.
 
@@ -54,8 +54,8 @@ Map Type: polar ice sheet
 
 ::
 
-    - ece.mon.ice_time_map:
+    - ece.mon.si3_hemis_point_month_mean_temporalmap:
             src: "{{ice_file_mar}}"
-            dst: "{{mondir}}/siconc-north-mar.nc"
+            dst: "{{mondir}}/siconc_si3_north_point_mar_mean_temporalmap.nc"
             hemisphere: north
             varname: siconc 

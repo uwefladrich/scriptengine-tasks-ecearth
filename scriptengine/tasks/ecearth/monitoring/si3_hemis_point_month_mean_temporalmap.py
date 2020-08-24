@@ -27,8 +27,8 @@ meta_dict = {
         },
 }
 
-class SeaIceTimeMap(Temporalmap):
-    """SeaIceTimeMap Processing Task"""
+class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
+    """Si3HemisPointMonthMeanTemporalmap Processing Task"""
 
     map_type = "polar ice sheet"
 
