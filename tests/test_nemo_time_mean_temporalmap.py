@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/ocean_time_map.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/nemo_time_mean_temporalmap.py"""
 
 import pytest
 import iris

@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/disk_usage.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/diskusage_rte_scalar.py"""
 
 from unittest.mock import patch
 

@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/disk_usage.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/timeseries.py"""
 
 import datetime
 from unittest.mock import patch

@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/time_map.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/temporalmap.py"""
 
 from unittest.mock import patch
 

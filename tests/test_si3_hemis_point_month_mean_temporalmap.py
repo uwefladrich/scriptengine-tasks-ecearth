@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/ice_time_map.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/si3_hemis_point_month_mean_temporalmap.py"""
 
 from unittest.mock import patch
 

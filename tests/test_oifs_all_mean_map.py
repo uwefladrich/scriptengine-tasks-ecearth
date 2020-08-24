@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/atmosphere_map.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/oifs_all_mean_map.py"""
 
 from unittest.mock import patch
 

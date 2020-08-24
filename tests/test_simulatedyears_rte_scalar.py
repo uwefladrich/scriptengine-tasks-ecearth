@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/simulated_years.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/simulatedyears_rte_scalar.py"""
 
 from unittest.mock import patch
 
