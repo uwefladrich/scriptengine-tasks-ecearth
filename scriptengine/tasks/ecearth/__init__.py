@@ -8,7 +8,7 @@ from .monitoring.scalar import Scalar
 from .monitoring.markdown_output import MarkdownOutput
 from .monitoring.global_average import GlobalAverage
 from .monitoring.diskusage_rte_scalar import DiskusageRteScalar
-from .monitoring.ice_time_series import SeaIceTimeSeries
+from .monitoring.si3_hemis_sum_month_mean_timeseries import Si3HemisSumMonthMeanTimeseries
 from .monitoring.ocean_map import OceanMap
 from .monitoring.ocean_time_map import OceanTimeMap
 from .monitoring.oifs_all_mean_map import OifsAllMeanMap
@@ -28,7 +28,7 @@ def task_loader_map():
         'ece.mon.markdown_report': MarkdownOutput,
         'ece.mon.global_avg': GlobalAverage,
         'ece.mon.diskusage_rte_scalar': DiskusageRteScalar,
-        'ece.mon.ice_time_series': SeaIceTimeSeries,
+        'ece.mon.si3_hemis_sum_month_mean_timeseries': Si3HemisSumMonthMeanTimeseries,
         'ece.mon.ocean_map': OceanMap,
         'ece.mon.ocean_time_map': OceanTimeMap,
         'ece.mon.oifs_all_mean_map': OifsAllMeanMap,

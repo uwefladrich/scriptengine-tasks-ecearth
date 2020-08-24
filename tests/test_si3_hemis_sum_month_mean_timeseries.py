@@ -1,12 +1,12 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/ice_time_series.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/si3_hemis_sum_month_mean_timeseries.py"""
 
 from unittest.mock import patch
 
 import iris
 
-from scriptengine.tasks.ecearth.monitoring.ice_time_series import SeaIceTimeSeries, meta_dict
+from scriptengine.tasks.ecearth.monitoring.si3_hemis_sum_month_mean_timeseries import Si3HemisSumMonthMeanTimeseries, meta_dict
 
-def test_ice_time_series_working(tmpdir):
+def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
     init = {
         "winter": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "summer": './tests/testdata/NEMO_output_sivolu-199009.nc',
@@ -15,7 +15,7 @@ def test_ice_time_series_working(tmpdir):
         "varname": "sivolu",
         "hemisphere": "north",
     }
-    ice_time_series = SeaIceTimeSeries(init)
+    ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
     ice_time_series.run(init)
     cube = iris.load_cube(str(tmpdir) + '/test.nc')
     assert cube.name() == 'sea_ice_volume'
@@ -27,7 +27,7 @@ def test_ice_time_series_working(tmpdir):
         iris.coords.CellMethod('sum', coords='area', intervals='northern hemisphere'),
         )
 
-def test_ice_time_series_wrong_varname(tmpdir):
+def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmpdir):
     init = {
         "winter": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "summer": './tests/testdata/NEMO_output_sivolu-199009.nc',
@@ -36,7 +36,7 @@ def test_ice_time_series_wrong_varname(tmpdir):
         "varname": "tos",
         "hemisphere": "south",
     }
-    ice_time_series = SeaIceTimeSeries(init)
+    ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
     ice_time_series.run(init)
     with patch.object(ice_time_series, 'log_warning') as mock:
         ice_time_series.run(init)
@@ -44,7 +44,7 @@ def test_ice_time_series_wrong_varname(tmpdir):
                 f"'varname' must be one of the following: {meta_dict.keys()} "
                 f"Diagnostic will not be treated, returning now."))
 
-def test_ice_time_series_wrong_hemisphere(tmpdir):
+def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmpdir):
     init = {
         "winter": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "summer": './tests/testdata/NEMO_output_sivolu-199009.nc',
@@ -53,7 +53,7 @@ def test_ice_time_series_wrong_hemisphere(tmpdir):
         "varname": "sivolu",
         "hemisphere": "east",
     }
-    ice_time_series = SeaIceTimeSeries(init)
+    ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
     ice_time_series.run(init)
     with patch.object(ice_time_series, 'log_warning') as mock:
         ice_time_series.run(init)

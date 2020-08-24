@@ -2,22 +2,22 @@
 Sea-Ice Diagnostics
 *******************
 
-Sea-Ice Time Series
-========================
+Si3HemisSumMonthMeanTimeseries
+==============================
 
 Diagnostic Type: Time Series
 
-Mapped to: ``ece.mon.ice_time_series``
+Mapped to: ``ece.mon.si3_hemis_sum_month_mean_timeseries``
 
 varname can be ``sivolu`` or ``siconc``.
 
 ::
 
-    - ece.mon.ice_time_series:
+    - ece.mon.si3_hemis_sum_month_mean_timeseries:
         summer: "{{feb_file}}"
         summer: "{{sep_file}}"
         domain: "{{rundir}}/domain_cfg.nc"
-        dst: "{{mondir}}/siarea-south.nc"
+        dst: "{{mondir}}/siarea_si3_south_sum_febsep_mean_timeseries.nc"
         hemisphere: south
         varname: sivolu
 

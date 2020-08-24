@@ -31,8 +31,8 @@ meta_dict = {
         },
 }
 
-class SeaIceTimeSeries(Timeseries):
-    """SeaIceTimeSeries Processing Task"""
+class Si3HemisSumMonthMeanTimeseries(Timeseries):
+    """Si3HemisSumMonthMeanTimeseries Processing Task"""
     def __init__(self, parameters):
         required = [
             "summer",
