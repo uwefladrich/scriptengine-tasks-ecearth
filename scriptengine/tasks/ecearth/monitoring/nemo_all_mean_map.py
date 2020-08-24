@@ -6,8 +6,8 @@ from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
 from .map import Map
 
-class OceanMap(Map):
-    """OceanMap Processing Task"""
+class NemoAllMeanMap(Map):
+    """NemoAllMeanMap Processing Task"""
 
     map_type = "global ocean"
 
