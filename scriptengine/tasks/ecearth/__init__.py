@@ -6,7 +6,7 @@ This module provides SE tasks for the EC-Earth ESM
 from .monitoring.simulatedyears_rte_scalar import SimulatedyearsRteScalar
 from .monitoring.scalar import Scalar
 from .monitoring.markdown_output import MarkdownOutput
-from .monitoring.global_average import GlobalAverage
+from .monitoring.nemo_global_mean_year_mean_timeseries import NemoGlobalMeanYearMeanTimeseries
 from .monitoring.diskusage_rte_scalar import DiskusageRteScalar
 from .monitoring.si3_hemis_sum_month_mean_timeseries import Si3HemisSumMonthMeanTimeseries
 from .monitoring.ocean_map import OceanMap
@@ -26,7 +26,7 @@ def task_loader_map():
         'ece.mon.simulatedyears_rte_scalar': SimulatedyearsRteScalar,
         'ece.mon.scalar': Scalar,
         'ece.mon.markdown_report': MarkdownOutput,
-        'ece.mon.global_avg': GlobalAverage,
+        'ece.mon.nemo_global_mean_year_mean_timeseries': NemoGlobalMeanYearMeanTimeseries,
         'ece.mon.diskusage_rte_scalar': DiskusageRteScalar,
         'ece.mon.si3_hemis_sum_month_mean_timeseries': Si3HemisSumMonthMeanTimeseries,
         'ece.mon.ocean_map': OceanMap,

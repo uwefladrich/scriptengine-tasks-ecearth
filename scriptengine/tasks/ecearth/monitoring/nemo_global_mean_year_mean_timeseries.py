@@ -8,8 +8,8 @@ from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as hlp
 from .timeseries import Timeseries
 
-class GlobalAverage(Timeseries):
-    """GlobalAverage Processing Task"""
+class NemoGlobalMeanYearMeanTimeseries(Timeseries):
+    """NemoGlobalMeanYearMeanTimeseries Processing Task"""
     def __init__(self, parameters):
         required = [
             "src",
