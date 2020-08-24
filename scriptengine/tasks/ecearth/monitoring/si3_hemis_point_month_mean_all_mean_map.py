@@ -12,11 +12,11 @@ from .map import Map
 
 meta_dict = {
     'sivolu': 'Sea-Ice Volume per Area',
-    'siconc':'Sea-Ice Area Fraction',
+    'siconc': 'Sea-Ice Area Fraction',
 }
 
-class SeaIceMap(Map):
-    """SeaIceMap Processing Task"""
+class Si3HemisPointMonthMeanAllMeanMap(Map):
+    """Si3HemisPointMonthMeanAllMeanMap Processing Task"""
 
     map_type = "polar ice sheet"
 

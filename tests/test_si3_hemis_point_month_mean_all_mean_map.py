@@ -1,10 +1,10 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/ice_map.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/si3_hemis_point_month_mean_all_mean_map.py"""
 
 from unittest.mock import patch
 
 import iris
 
-from scriptengine.tasks.ecearth.monitoring.ice_map import SeaIceMap, meta_dict
+from scriptengine.tasks.ecearth.monitoring.si3_hemis_point_month_mean_all_mean_map import Si3HemisPointMonthMeanAllMeanMap, meta_dict
 
 def test_ice_map_once(tmpdir):
     init = {
@@ -13,7 +13,7 @@ def test_ice_map_once(tmpdir):
         "varname": "sivolu",
         "hemisphere": "north",
     }
-    ice_map = SeaIceMap(init)
+    ice_map = Si3HemisPointMonthMeanAllMeanMap(init)
     ice_map.run(init)
     cube = iris.load_cube(init['dst'])
     assert cube.attributes['map_type'] == ice_map.map_type
@@ -28,7 +28,7 @@ def test_ice_map_twice(tmpdir):
         "varname": "sivolu",
         "hemisphere": "north",
     }
-    ice_map = SeaIceMap(init_a)
+    ice_map = Si3HemisPointMonthMeanAllMeanMap(init_a)
     ice_map.run(init_a)
     init_b = {
         "src": './tests/testdata/NEMO_output_sivolu-199103.nc',
@@ -36,7 +36,7 @@ def test_ice_map_twice(tmpdir):
         "varname": "sivolu",
         "hemisphere": "north",
     }
-    ice_map = SeaIceMap(init_b)
+    ice_map = Si3HemisPointMonthMeanAllMeanMap(init_b)
     ice_map.run(init_b)
     cube = iris.load_cube(init_b['dst'])
     assert cube.attributes['map_type'] == ice_map.map_type
@@ -51,7 +51,7 @@ def test_ice_map_wrong_varname(tmpdir):
         "hemisphere": "north",
         "varname": "tos",
     }
-    ice_map = SeaIceMap(init)
+    ice_map = Si3HemisPointMonthMeanAllMeanMap(init)
     ice_map.run(init)
     with patch.object(ice_map, 'log_warning') as mock:
         ice_map.run(init)
@@ -66,7 +66,7 @@ def test_ice_map_wrong_hemisphere(tmpdir):
         "varname": "sivolu",
         "hemisphere": "east",
     }
-    ice_map = SeaIceMap(init)
+    ice_map = Si3HemisPointMonthMeanAllMeanMap(init)
     ice_map.run(init)
     with patch.object(ice_map, 'log_warning') as mock:
         ice_map.run(init)

@@ -22,12 +22,12 @@ varname can be ``sivolu`` or ``siconc``.
         varname: sivolu
 
 
-Sea-Ice Map
-============
+Si3HemisPointMonthMeanAllMeanMap
+================================
 
 Diagnostic Type: Map
 
-Mapped to: ``ece.mon.ice_map``
+Mapped to: ``ece.mon.si3_hemis_point_month_mean_all_mean_map``
 
 varname can be ``sivolu`` or ``siconc``.
 
@@ -35,9 +35,9 @@ Map Type: polar ice sheet
 
 ::
 
-    - ece.mon.ice_map:
+    - ece.mon.si3_hemis_point_month_mean_all_mean_map:
         src: "{{ice_file_sep}}"
-        dst: "{{mondir}}/sivolu-south-sep.nc"
+        dst: "{{mondir}}/sivolu_si3_north_point_sep_mean_all_mean_map.nc"
         hemisphere: south
         varname: sivolu
 
