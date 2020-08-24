@@ -10,7 +10,7 @@ import cftime
 
 from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
-from .time_series import TimeSeries
+from .timeseries import Timeseries
 
 meta_dict = {
     'sivolu':
@@ -31,7 +31,7 @@ meta_dict = {
         },
 }
 
-class SeaIceTimeSeries(TimeSeries):
+class SeaIceTimeSeries(Timeseries):
     """SeaIceTimeSeries Processing Task"""
     def __init__(self, parameters):
         required = [
@@ -42,7 +42,7 @@ class SeaIceTimeSeries(TimeSeries):
             "hemisphere",
             "varname",
         ]
-        super(TimeSeries, self).__init__(__name__, parameters, required_parameters=required)
+        super(Timeseries, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):

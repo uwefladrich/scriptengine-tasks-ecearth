@@ -10,9 +10,9 @@ import numpy as np
 from scriptengine.tasks.base.timing import timed_runner
 from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
-from .time_series import TimeSeries
+from .timeseries import Timeseries
 
-class AtmosphereTimeSeries(TimeSeries):
+class AtmosphereTimeSeries(Timeseries):
     """AtmosphereMap Processing Task"""
     def __init__(self, parameters):
         required = [
@@ -20,7 +20,7 @@ class AtmosphereTimeSeries(TimeSeries):
             "dst",
             "grib_code",
         ]
-        super(TimeSeries, self).__init__(__name__, parameters, required_parameters=required)
+        super(Timeseries, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):

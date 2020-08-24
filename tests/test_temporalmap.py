@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import iris
 
-from scriptengine.tasks.ecearth.monitoring.time_map import TimeMap
+from scriptengine.tasks.ecearth.monitoring.temporalmap import Temporalmap
 
 def test_time_map_dst_error():
-    time_map = TimeMap({})
+    time_map = Temporalmap({})
     assert time_map.correct_file_extension("test.yml") == False
 
 
 def test_presentation_value_range():
     
-    time_map = TimeMap({})
+    time_map = Temporalmap({})
     cube = iris.cube.Cube([0, 10])
 
     cube.attributes['presentation_min'] = None

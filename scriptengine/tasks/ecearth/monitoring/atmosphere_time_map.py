@@ -8,9 +8,9 @@ from scriptengine.tasks.base.timing import timed_runner
 
 from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
-from .time_map import TimeMap
+from .temporalmap import Temporalmap
 
-class AtmosphereTimeMap(TimeMap):
+class AtmosphereTimeMap(Temporalmap):
     """AtmosphereTimeMap Processing Task"""
 
     map_type = "global atmosphere"
@@ -21,7 +21,7 @@ class AtmosphereTimeMap(TimeMap):
             "dst",
             "grib_code",
         ]
-        super(TimeMap, self).__init__(__name__, parameters, required_parameters=required)
+        super(Temporalmap, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):

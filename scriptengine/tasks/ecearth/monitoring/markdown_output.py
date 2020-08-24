@@ -10,7 +10,7 @@ from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import ChangeDirectory
-from helpers.presentation_objects import make_time_series, make_map, make_time_map
+from helpers.presentation_objects import make_timeseries, make_map, make_temporalmap
 from helpers.exceptions import InvalidMapTypeException
 
 class MarkdownOutput(Task):
@@ -80,7 +80,7 @@ class MarkdownOutput(Task):
                 return None
             if loaded_cube.attributes["diagnostic_type"] == "time series":
                 self.log_debug(f"Loading time series diagnostic {src}")
-                return {'presentation_type': 'image', **make_time_series(src, dst_folder, loaded_cube)}
+                return {'presentation_type': 'image', **make_timeseries(src, dst_folder, loaded_cube)}
             if loaded_cube.attributes["diagnostic_type"] == "map":
                 self.log_debug(f"Loading map diagnostic {src}")
                 try:
@@ -89,10 +89,10 @@ class MarkdownOutput(Task):
                     self.log_warning(f"Invalid Map Type {msg}")
                     return None
                 return {'presentation_type': 'image', **map_plot_dict}
-            if loaded_cube.attributes["diagnostic_type"] == "time map":
-                self.log_debug(f"Loading time map diagnostic {src}")
+            if loaded_cube.attributes["diagnostic_type"] == "temporal map":
+                self.log_debug(f"Loading temporal map diagnostic {src}")
                 try:
-                    map_plot_dict = make_time_map(src, dst_folder, loaded_cube)
+                    map_plot_dict = make_temporalmap(src, dst_folder, loaded_cube)
                 except InvalidMapTypeException as msg:
                     self.log_warning(f"Invalid Map Type {msg}")
                     return None

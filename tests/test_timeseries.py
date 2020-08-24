@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import iris
 
-from scriptengine.tasks.ecearth.monitoring.time_series import TimeSeries
+from scriptengine.tasks.ecearth.monitoring.timeseries import Timeseries
 
 def test_time_series_dst_error():
     init = {
@@ -14,7 +14,7 @@ def test_time_series_dst_error():
         "data_value": 0,
         "coord_value": 0,
     }
-    time_series = TimeSeries(init)
+    time_series = Timeseries(init)
     assert not time_series.correct_file_extension(init['dst'])
 
 def test_monotonic_increase():
@@ -24,7 +24,7 @@ def test_monotonic_increase():
         "data_value": 0,
         "coord_value": 0,
     }
-    time_series = TimeSeries(init)
+    time_series = Timeseries(init)
 
     old_coord = iris.coords.Coord([1])
     new_coord = iris.coords.Coord([2])
@@ -43,7 +43,7 @@ def test_time_series_first_save(tmpdir):
         "data_value": 0,
         "coord_value": 0,
     }
-    time_series = TimeSeries(init)
+    time_series = Timeseries(init)
     time_series.run(init)
 
     cube = iris.load_cube(init['dst'])
@@ -63,7 +63,7 @@ def test_time_series_append(tmpdir):
         "data_value": 0,
         "coord_value": 0,
     }
-    time_series = TimeSeries(init_a)
+    time_series = Timeseries(init_a)
     time_series.run(init_a)
 
     init_b = {
@@ -73,7 +73,7 @@ def test_time_series_append(tmpdir):
         "coord_value": 1,
     }
 
-    time_series = TimeSeries(init_b)
+    time_series = Timeseries(init_b)
     time_series.run(init_b)
 
     cube = iris.load_cube(init_a['dst'])
@@ -93,7 +93,7 @@ def test_time_series_append_nonmonotonic(tmpdir):
         "data_value": 0,
         "coord_value": 1,
     }
-    time_series = TimeSeries(init_a)
+    time_series = Timeseries(init_a)
     time_series.run(init_a)
 
     init_b = {
@@ -103,7 +103,7 @@ def test_time_series_append_nonmonotonic(tmpdir):
         "coord_value": 0,
     }
 
-    time_series = TimeSeries(init_b)
+    time_series = Timeseries(init_b)
     with patch.object(time_series, 'log_warning') as mock:
         time_series.run(init_b)
     mock.assert_called_with("Non-monotonic coordinate. Cube will not be saved.")
@@ -118,7 +118,7 @@ def test_time_series_date_time(tmpdir):
         "data_value": 0,
         "coord_value": "1990-01-01",
     }
-    time_series = TimeSeries(init_date)
+    time_series = Timeseries(init_date)
     time_series.run(init_date)
     
     cube = iris.load_cube(init_date['dst'])
@@ -137,7 +137,7 @@ def test_time_series_date_time(tmpdir):
         "data_value": 0,
         "coord_value": "1990-01-01 00:00:00",
     }
-    time_series = TimeSeries(init_date_time)
+    time_series = Timeseries(init_date_time)
     time_series.run(init_date_time)
     
     cube = iris.load_cube(init_date_time['dst'])

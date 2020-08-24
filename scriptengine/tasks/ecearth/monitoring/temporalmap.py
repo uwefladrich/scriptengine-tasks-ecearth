@@ -1,4 +1,4 @@
-"""Base class for time map processing tasks."""
+"""Base class for temporal map processing tasks."""
 
 import os
 
@@ -7,10 +7,10 @@ import numpy as np
 
 from scriptengine.tasks.base import Task
 
-class TimeMap(Task):
-    """TimeMap Processing Task"""
+class Temporalmap(Task):
+    """Temporalmap Processing Task"""
 
-    diagnostic_type = "time map"
+    diagnostic_type = "temporal map"
 
     def __init__(self, parameters):
         super().__init__(__name__, parameters)

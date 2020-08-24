@@ -71,7 +71,7 @@ def test_presentation_object_time_series(tmpdir, monkeypatch):
 
     cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'time series'})
     iris.save(cube, init['src'][0])
-    monkeypatch.setattr("helpers.presentation_objects.make_time_series.__code__", mockreturn.__code__)
+    monkeypatch.setattr("helpers.presentation_objects.make_timeseries.__code__", mockreturn.__code__)
     result = markdown_output.presentation_object(init['src'][0], init['dst'])
     assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['dst'], cube)}
 
@@ -96,7 +96,7 @@ def test_presentation_object_map(tmpdir, monkeypatch):
     result = markdown_output.presentation_object(init['src'][0], init['dst'])
     assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['dst'], cube)}
 
-def test_presentation_object_time_map(tmpdir, monkeypatch):
+def test_presentation_object_temporal_map(tmpdir, monkeypatch):
     init = {
         "src": [str(tmpdir) + "/test.nc"],
         "dst": "",
@@ -106,14 +106,14 @@ def test_presentation_object_time_map(tmpdir, monkeypatch):
         return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
     markdown_output = MarkdownOutput(init)
 
-    cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'time map', 'map_type': 'invalid'})
+    cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'temporal map', 'map_type': 'invalid'})
     iris.save(cube, init['src'][0])
     result = markdown_output.presentation_object(init['src'][0], init['dst'])
     assert result is None
 
-    cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'time map', 'map_type': 'global ocean'})
+    cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'temporal map', 'map_type': 'global ocean'})
     iris.save(cube, init['src'][0])
-    monkeypatch.setattr("helpers.presentation_objects.make_time_map.__code__", mockreturn.__code__)
+    monkeypatch.setattr("helpers.presentation_objects.make_temporalmap.__code__", mockreturn.__code__)
     result = markdown_output.presentation_object(init['src'][0], init['dst'])
     assert result == {'presentation_type': 'image', **mockreturn(init['src'][0], init['dst'], cube)}
 

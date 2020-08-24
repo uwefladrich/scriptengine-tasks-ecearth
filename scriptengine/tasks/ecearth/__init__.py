@@ -16,7 +16,7 @@ from .monitoring.atmosphere_time_map import AtmosphereTimeMap
 from .monitoring.ice_map import SeaIceMap
 from .monitoring.ice_time_map import SeaIceTimeMap
 from .monitoring.atmosphere_time_series import AtmosphereTimeSeries
-from .monitoring.time_series import TimeSeries
+from .monitoring.timeseries import Timeseries
 from .monitoring.redmine_output import RedmineOutput
 from .slurm import Sbatch
 

@@ -14,7 +14,7 @@ from helpers.file_handling import ChangeDirectory
 import helpers.exceptions as exceptions
 import helpers.map_type_handling as type_handling
 
-def make_time_series(src_path, dst_folder, time_series_cube):
+def make_timeseries(src_path, dst_folder, time_series_cube):
     """
     Load time series diagnostic and call plot creator.
     """
@@ -95,7 +95,7 @@ def make_map(src_path, dst_folder, map_cube):
     }
     return image_dict
     
-def make_time_map(src_path, dst_folder, time_map_cube):
+def make_temporalmap(src_path, dst_folder, time_map_cube):
     """
     Load map diagnostic and determine map type.
     """

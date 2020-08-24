@@ -10,7 +10,7 @@ from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
 
-class TimeSeries(Task):
+class Timeseries(Task):
     """Processing Task that writes out a generalized time series diagnostic."""
 
     diagnostic_type = 'time series'

@@ -60,7 +60,7 @@ def test_make_map(tmpdir, monkeypatch):
     }
     assert result == expected_result
 
-def test_make_time_map(tmpdir, monkeypatch):
+def test_make_temporalmap(tmpdir, monkeypatch):
     path = './tests/testdata/tos-annual-map.nc'
     dst_folder = str(tmpdir)
     cube = iris.load_cube(path)
@@ -68,7 +68,7 @@ def test_make_time_map(tmpdir, monkeypatch):
         return plt.figure()
     
     monkeypatch.setattr("helpers.map_type_handling.global_ocean_plot", mockreturn)
-    result = po.make_time_map(path, dst_folder, cube)
+    result = po.make_temporalmap(path, dst_folder, cube)
     expected_result = {
         'title': cube.attributes['title'],
         'path': './tos-annual-map.gif',
@@ -76,13 +76,13 @@ def test_make_time_map(tmpdir, monkeypatch):
     }
     assert result == expected_result
 
-def test_make_time_map_map_handling_exception(tmpdir):
+def test_make_temporalmap_map_handling_exception(tmpdir):
     path = './tests/testdata/tos-annual-map.nc'
     dst_folder = str(tmpdir)
     cube = iris.load_cube(path)
     cube.attributes['map_type'] = 'invalid type'
     with pytest.raises(exceptions.InvalidMapTypeException):
-        po.make_time_map(path, dst_folder, cube)
+        po.make_temporalmap(path, dst_folder, cube)
 
 def test_make_map_map_handling_exception(tmpdir):
     path = './tests/testdata/tos-climatology.nc'
@@ -92,12 +92,12 @@ def test_make_map_map_handling_exception(tmpdir):
     with pytest.raises(exceptions.InvalidMapTypeException):
         po.make_map(path, dst_folder, cube)
 
-def test_make_time_series(tmpdir):
+def test_make_timeseries(tmpdir):
     path = './tests/testdata/tos-global-avg.nc'
     dst_folder = str(tmpdir)
     cube = iris.load_cube(path)
 
-    result = po.make_time_series(path, dst_folder, cube)
+    result = po.make_timeseries(path, dst_folder, cube)
     expected_result = {
         'title': cube.attributes['title'],
         'path': './tos-global-avg.png',

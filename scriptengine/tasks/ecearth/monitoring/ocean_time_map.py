@@ -4,9 +4,9 @@ import iris
 
 from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
-from .time_map import TimeMap
+from .temporalmap import Temporalmap
 
-class OceanTimeMap(TimeMap):
+class OceanTimeMap(Temporalmap):
     """OceanTimeMap Processing Task"""
 
     map_type = "global ocean"
@@ -17,7 +17,7 @@ class OceanTimeMap(TimeMap):
             "dst",
             "varname",
         ]
-        super(TimeMap, self).__init__(__name__, parameters, required_parameters=required)
+        super(Temporalmap, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):

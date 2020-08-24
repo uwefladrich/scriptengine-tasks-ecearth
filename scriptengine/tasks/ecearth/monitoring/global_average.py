@@ -6,9 +6,9 @@ import iris
 
 from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as hlp
-from .time_series import TimeSeries
+from .timeseries import Timeseries
 
-class GlobalAverage(TimeSeries):
+class GlobalAverage(Timeseries):
     """GlobalAverage Processing Task"""
     def __init__(self, parameters):
         required = [
@@ -17,7 +17,7 @@ class GlobalAverage(TimeSeries):
             "domain",
             "varname",
         ]
-        super(TimeSeries, self).__init__(__name__, parameters, required_parameters=required)
+        super(Timeseries, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):

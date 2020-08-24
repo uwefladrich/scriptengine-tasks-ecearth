@@ -8,7 +8,7 @@ import cftime
 
 from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
-from .time_map import TimeMap
+from .temporalmap import Temporalmap
 
 meta_dict = {
     'sivolu':
@@ -27,7 +27,7 @@ meta_dict = {
         },
 }
 
-class SeaIceTimeMap(TimeMap):
+class SeaIceTimeMap(Temporalmap):
     """SeaIceTimeMap Processing Task"""
 
     map_type = "polar ice sheet"
@@ -39,7 +39,7 @@ class SeaIceTimeMap(TimeMap):
             "hemisphere",
             "varname",
         ]
-        super(TimeMap, self).__init__(__name__, parameters, required_parameters=required)
+        super(Temporalmap, self).__init__(__name__, parameters, required_parameters=required)
 
     @timed_runner
     def run(self, context):
