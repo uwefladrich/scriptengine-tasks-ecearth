@@ -9,8 +9,8 @@ from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
 from .map import Map
 
-class AtmosphereMap(Map):
-    """AtmosphereMap Processing Task"""
+class OifsAllMeanMap(Map):
+    """OifsAllMeanMap Processing Task"""
 
     map_type = "global atmosphere"
 

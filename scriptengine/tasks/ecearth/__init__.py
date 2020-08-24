@@ -11,7 +11,7 @@ from .monitoring.diskusage_rte_scalar import DiskusageRteScalar
 from .monitoring.ice_time_series import SeaIceTimeSeries
 from .monitoring.ocean_map import OceanMap
 from .monitoring.ocean_time_map import OceanTimeMap
-from .monitoring.atmosphere_map import AtmosphereMap
+from .monitoring.oifs_all_mean_map import OifsAllMeanMap
 from .monitoring.atmosphere_time_map import AtmosphereTimeMap
 from .monitoring.ice_map import SeaIceMap
 from .monitoring.ice_time_map import SeaIceTimeMap
@@ -31,7 +31,7 @@ def task_loader_map():
         'ece.mon.ice_time_series': SeaIceTimeSeries,
         'ece.mon.ocean_map': OceanMap,
         'ece.mon.ocean_time_map': OceanTimeMap,
-        'ece.mon.atmosphere_map': AtmosphereMap,
+        'ece.mon.oifs_all_mean_map': OifsAllMeanMap,
         'ece.mon.atmosphere_time_map': AtmosphereTimeMap,
         'ece.mon.ice_map': SeaIceMap,
         'ece.mon.ice_time_map': SeaIceTimeMap,

@@ -23,20 +23,20 @@ Mapped to: ``ece.mon.atmosphere_ts``
         grib_code: 167
 
 
-Atmosphere Map
+OifsAllMeanMap
 ==============
 
 Diagnostic Type: Map
 
 Map Type: global atmosphere
 
-Mapped to: ``ece.mon.atmosphere_map``
+Mapped to: ``ece.mon.oifs_all_mean_map``
 
 ::
 
-    - ece.mon.atmosphere_map:
+    - ece.mon.oifs_all_mean_map:
         src: "{{gg_files}}"
-        dst: "{{mondir}}/167-climatology.nc"
+        dst: "{{mondir}}/2t_oifs_all_mean_map.nc"
         grib_code: 167
 
 Atmosphere Time Map
