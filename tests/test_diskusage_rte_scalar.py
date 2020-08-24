@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import yaml
 
-from scriptengine.tasks.ecearth.monitoring.disk_usage import DiskUsage
+from scriptengine.tasks.ecearth.monitoring.diskusage_rte_scalar import DiskusageRteScalar
 
-def test_disk_usage_working(tmpdir):
+def test_diskusage_working(tmpdir):
     test_path = str(tmpdir)
     subfile = tmpdir.mkdir("sub").join("file.txt")
     subfile.write("content")
@@ -16,7 +16,7 @@ def test_disk_usage_working(tmpdir):
         'dst': path,
     }
     context = init
-    disk_usage = DiskUsage(init)
+    disk_usage = DiskusageRteScalar(init)
     disk_usage.run(context)
     with open(path) as file:
         result = yaml.load(file, Loader=yaml.FullLoader)
@@ -32,7 +32,7 @@ def test_not_a_directory(tmpdir):
         'dst': str(path),
     }
     context = init
-    disk_usage = DiskUsage(init)
+    disk_usage = DiskusageRteScalar(init)
     disk_usage.run(context)
     expected_result = {
         'title': "Disk Usage in GB",
@@ -56,7 +56,7 @@ def test_permission_error(tmpdir):
         'dst': str(path),
     }
     context = init
-    disk_usage = DiskUsage(init)
+    disk_usage = DiskusageRteScalar(init)
     disk_usage.run(context)
     expected_result = {
         'title': "Disk Usage in GB",

@@ -14,16 +14,16 @@ Diagnostic Type: Scalar
         value: "{{exp_id}}"
         dst: "{{mondir}}/exp-id.yml"
 
-Disk Usage
-==========
+DiskusageRteScalar
+==================
 
 Diagnostic Type: Scalar
 
 ::
 
-    - ece.mon.disk_usage:
+    - ece.mon.diskusage_rte_scalar:
         src: "{{rundir}}/output"
-        dst: "{{mondir}}/output-disk-usage.yml"
+        dst: "{{mondir}}/diskusage_rte_scalar.yml"
 
 Simulated Years
 ===============

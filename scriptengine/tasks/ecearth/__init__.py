@@ -7,7 +7,7 @@ from .monitoring.simulated_years import SimulatedYears
 from .monitoring.scalar import Scalar
 from .monitoring.markdown_output import MarkdownOutput
 from .monitoring.global_average import GlobalAverage
-from .monitoring.disk_usage import DiskUsage
+from .monitoring.diskusage_rte_scalar import DiskusageRteScalar
 from .monitoring.ice_time_series import SeaIceTimeSeries
 from .monitoring.ocean_map import OceanMap
 from .monitoring.ocean_time_map import OceanTimeMap
@@ -27,7 +27,7 @@ def task_loader_map():
         'ece.mon.scalar': Scalar,
         'ece.mon.markdown_report': MarkdownOutput,
         'ece.mon.global_avg': GlobalAverage,
-        'ece.mon.disk_usage': DiskUsage,
+        'ece.mon.diskusage_rte_scalar': DiskusageRteScalar,
         'ece.mon.ice_time_series': SeaIceTimeSeries,
         'ece.mon.ocean_map': OceanMap,
         'ece.mon.ocean_time_map': OceanTimeMap,
@@ -36,6 +36,6 @@ def task_loader_map():
         'ece.mon.ice_map': SeaIceMap,
         'ece.mon.ice_time_map': SeaIceTimeMap,
         'ece.mon.atmosphere_ts': AtmosphereTimeSeries,
-        'ece.mon.time_series': TimeSeries,
+        'ece.mon.time_series': Timeseries,
         'ece.mon.redmine_output': RedmineOutput
         }

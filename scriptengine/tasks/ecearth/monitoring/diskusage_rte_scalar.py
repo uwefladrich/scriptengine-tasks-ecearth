@@ -4,8 +4,8 @@ import os
 from scriptengine.tasks.base.timing import timed_runner
 from .scalar import Scalar
 
-class DiskUsage(Scalar):
-    """DiskUsage Processing Task"""
+class DiskusageRteScalar(Scalar):
+    """DiskusageRteScalar Processing Task"""
     def __init__(self, parameters):
         required = [
             "src",
