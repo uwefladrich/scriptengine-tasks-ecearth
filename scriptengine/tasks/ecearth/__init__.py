@@ -37,6 +37,6 @@ def task_loader_map():
         'ece.mon.si3_hemis_point_month_mean_all_mean_map': Si3HemisPointMonthMeanAllMeanMap,
         'ece.mon.si3_hemis_point_month_mean_temporalmap': Si3HemisPointMonthMeanTemporalmap,
         'ece.mon.oifs_global_mean_year_mean_timeseries': OifsGlobalMeanYearMeanTimeseries,
-        'ece.mon.time_series': Timeseries,
+        'ece.mon.timeseries': Timeseries,
         'ece.mon.redmine_output': RedmineOutput
         }

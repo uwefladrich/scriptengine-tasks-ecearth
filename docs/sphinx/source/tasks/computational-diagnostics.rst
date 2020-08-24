@@ -3,16 +3,16 @@ Computational Diagnostics
 *************************
 
 Scalar
-============
+=======
 
 Diagnostic Type: Scalar
 
 ::
 
-    - ece.mon.write_scalar:
+    - ece.mon.scalar:
         long_name: "Experiment ID"
         value: "{{exp_id}}"
-        dst: "{{mondir}}/exp-id.yml"
+        dst: "{{mondir}}/expid_scalar.yml"
 
 DiskusageRteScalar
 ==================
@@ -38,18 +38,7 @@ Diagnostic Type: Scalar
         end: "{{leg.end}}"
 
 
-Simulated Legs
-==============
-
-Diagnostic Type: Scalar
-
-::
-
-    - ece.mon.sim_legs:
-        src: "{{rundir}}"
-        dst: "{{mondir}}/sim-legs.yml"
-
-Generic Time Series
+Timeseries
 =======================
 
 Diagnostic Type: Time Series
@@ -74,22 +63,22 @@ Minimal Example
 
 ::
 
-    - ece.mon.time_series:
+    - ece.mon.timeseries:
         title: "Some Diagnostic"
         data_value: "{{some_value}}"
         coord_value: "{{leg_num}}"
-        dst: "{{mondir}}/some-diagnostic.nc"
+        dst: "{{mondir}}/diagnostic_timeseries.nc"
         
 Elaborate Example
 #################
 
 ::
 
-    - ece.mon.time_series:
+    - ece.mon.timeseries:
         title: "An Interesting Title"
         data_value: "{{some_value}}"
         coord_value: "{{some_other_value}}"
-        dst: "{{mondir}}/some-diagnostic.nc"
+        dst: "{{mondir}}/diagnostic_timeseries.nc"
         comment: "Diagnostic Description."
         coord_name: "x-axis label"
         coord_units: "s"
@@ -102,11 +91,11 @@ SYPD Example
 
 ::
 
-    - ece.mon.time_series:
+    - ece.mon.timeseries:
         title: "Simulated Years per Day"
         coord_value: "{{leg_num}}"
         coord_name: "Leg Number"
         comment: "SYPD development during this simulation."
         data_value: "{{((schedule.leg.end - schedule.leg.start)/script_elapsed_time/365)}}"
-        dst: "{{mondir}}/generic-sypd.nc"
+        dst: "{{mondir}}/sypd_timeseries.nc"
 
