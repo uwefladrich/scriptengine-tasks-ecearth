@@ -5,11 +5,11 @@ Presentation Tasks
 Markdown Report
 ===============
 
-Mapped to ``ece.mon.markdown_report``.
+Mapped to ``ece.mon.presentation.markdown``.
 
 ::
 
-    - ece.mon.markdown_report
+    - ece.mon.presentation.markdown
         src:
             - "{{mondir}}/description.yml"
             - "{{mondir}}/exp-id.yml"
@@ -22,11 +22,11 @@ Mapped to ``ece.mon.markdown_report``.
 Redmine Output
 ==============
 
-Mapped to ``ece.mon.redmine_output``.
+Mapped to ``ece.mon.presentation.redmine``.
 
 ::
 
-    - ece.mon.redmine_output
+    - ece.mon.presentation.redmine
         src:
             - "{{mondir}}/description.yml"
             - "{{mondir}}/exp-id.yml"

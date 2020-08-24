@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/monitoring test_markdown_output.py"""
+"""Tests for scriptengine/tasks/monitoring/markdown.py"""
 
 from unittest.mock import patch, Mock
 import os
@@ -7,7 +7,7 @@ import pytest
 import iris
 import yaml
 
-from scriptengine.tasks.ecearth.monitoring.markdown_output import MarkdownOutput
+from scriptengine.tasks.ecearth.monitoring.markdown import Markdown
 
 def mock_pres_object(value_1, value_2):
     if value_1 == 1:
@@ -22,7 +22,7 @@ def test_markdown_output_full(tmpdir):
     }
     with open(init['src'][0], 'w') as file:
         yaml.dump(init, file)
-    markdown_output = MarkdownOutput(init)
+    markdown_output = Markdown(init)
 
     markdown_output.run(init)
     assert os.path.isfile(init['dst'] + "/summary.md")
@@ -39,7 +39,7 @@ def test_presentation_object_file_extension():
         f"File not found! Ignoring {init['src'][2]}",
         f"Invalid file extension of {init['src'][3]}",
     ]
-    markdown_output = MarkdownOutput(init)
+    markdown_output = Markdown(init)
 
     with patch.object(markdown_output, 'log_warning') as mock:
         for src, msg in zip(init['src'], error_messages):
@@ -54,7 +54,7 @@ def test_presentation_object_yaml(tmpdir):
     }
     with open(init['src'][0], 'w') as file:
         yaml.dump(init, file)
-    markdown_output = MarkdownOutput(init)
+    markdown_output = Markdown(init)
 
     result = markdown_output.presentation_object(init['src'][0], init['dst'])
     assert result == {'presentation_type': 'text', **init}
@@ -67,7 +67,7 @@ def test_presentation_object_time_series(tmpdir, monkeypatch):
     }
     def mockreturn(src, dst_folder, loaded_cube):
         return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
-    markdown_output = MarkdownOutput(init)
+    markdown_output = Markdown(init)
 
     cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'time series'})
     iris.save(cube, init['src'][0])
@@ -83,7 +83,7 @@ def test_presentation_object_map(tmpdir, monkeypatch):
     }
     def mockreturn(src, dst_folder, loaded_cube):
         return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
-    markdown_output = MarkdownOutput(init)
+    markdown_output = Markdown(init)
 
     cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'map', 'map_type': 'invalid'})
     iris.save(cube, init['src'][0])
@@ -104,7 +104,7 @@ def test_presentation_object_temporal_map(tmpdir, monkeypatch):
     }
     def mockreturn(src, dst_folder, loaded_cube):
         return {'src': src, 'dst_folder': dst_folder, 'name': loaded_cube.name()}
-    markdown_output = MarkdownOutput(init)
+    markdown_output = Markdown(init)
 
     cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'temporal map', 'map_type': 'invalid'})
     iris.save(cube, init['src'][0])
@@ -123,7 +123,7 @@ def test_presentation_object_invalid_diagnostic_type(tmpdir, monkeypatch):
         "dst": "",
         "template": "/.template.txt.j2",
     }
-    markdown_output = MarkdownOutput(init)
+    markdown_output = Markdown(init)
 
     cube = iris.cube.Cube([0], attributes={'diagnostic_type': 'invalid'})
     iris.save(cube, init['src'][0])
@@ -137,7 +137,7 @@ def test_presentation_list(tmpdir):
         "dst": str(tmpdir),
         "template": str(tmpdir) + "/template.txt.j2",
     }
-    markdown_output = MarkdownOutput(init)
+    markdown_output = Markdown(init)
     markdown_output.presentation_object = Mock(side_effect=mock_pres_object)
     result = markdown_output.get_presentation_list(init['src'], init['dst'])
     assert result == [init['dst']]
