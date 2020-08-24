@@ -8,18 +8,18 @@ These processing tasks assume that the provided input files are GRIB output file
 - reduced Gaussian grid
 - currently only GG output files
 
-Atmosphere Time Series
-======================
+OifsGlobalMeanYearMeanTimeseries
+================================
 
 Diagnostic Type: Time Series
 
-Mapped to: ``ece.mon.atmosphere_ts``
+Mapped to: ``ece.mon.oifs_global_mean_year_mean_timeseries``
 
 ::
 
     - ece.mon.atmosphere_ts:
         src: "{{gg_files}}"
-        dst: "{{mondir}}/167-time-series.nc"
+        dst: "{{mondir}}/2t_oifs_global_mean_year_mean_timeseries.nc"
         grib_code: 167
 
 

@@ -15,7 +15,7 @@ from .monitoring.oifs_all_mean_map import OifsAllMeanMap
 from .monitoring.oifs_year_mean_temporalmap import OifsYearMeanTemporalmap
 from .monitoring.ice_map import SeaIceMap
 from .monitoring.ice_time_map import SeaIceTimeMap
-from .monitoring.atmosphere_time_series import AtmosphereTimeSeries
+from .monitoring.oifs_global_mean_year_mean_timeseries import OifsGlobalMeanYearMeanTimeseries
 from .monitoring.timeseries import Timeseries
 from .monitoring.redmine_output import RedmineOutput
 from .slurm import Sbatch
@@ -35,7 +35,7 @@ def task_loader_map():
         'ece.mon.oifs_year_mean_temporalmap': OifsYearMeanTemporalmap,
         'ece.mon.ice_map': SeaIceMap,
         'ece.mon.ice_time_map': SeaIceTimeMap,
-        'ece.mon.atmosphere_ts': AtmosphereTimeSeries,
+        'ece.mon.oifs_global_mean_year_mean_timeseries': OifsGlobalMeanYearMeanTimeseries,
         'ece.mon.time_series': Timeseries,
         'ece.mon.redmine_output': RedmineOutput
         }

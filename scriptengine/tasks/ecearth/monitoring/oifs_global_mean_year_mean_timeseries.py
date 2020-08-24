@@ -12,8 +12,8 @@ from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
 from .timeseries import Timeseries
 
-class AtmosphereTimeSeries(Timeseries):
-    """AtmosphereMap Processing Task"""
+class OifsGlobalMeanYearMeanTimeseries(Timeseries):
+    """OifsGlobalMeanYearMeanTimeseries Processing Task"""
     def __init__(self, parameters):
         required = [
             "src",

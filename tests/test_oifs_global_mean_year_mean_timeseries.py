@@ -1,17 +1,17 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/atmosphere_time_series.py"""
+"""Tests for scriptengine/tasks/ecearth/monitoring/oifs_global_mean_year_mean_timeseries.py"""
 
 from unittest.mock import patch
 import iris
 
-from scriptengine.tasks.ecearth.monitoring.atmosphere_time_series import AtmosphereTimeSeries
+from scriptengine.tasks.ecearth.monitoring.oifs_global_mean_year_mean_timeseries import OifsGlobalMeanYearMeanTimeseries
 
-def test_atmosphere_time_series_working(tmpdir):
+def test_oifs_global_mean_year_mean_timeseries_working(tmpdir):
     init = {
         "src": ['./tests/testdata/OIFSGG34199001'],
         "dst": str(tmpdir) + '/test.nc',
         "grib_code": 34,
     }
-    atmo_ts = AtmosphereTimeSeries(init)
+    atmo_ts = OifsGlobalMeanYearMeanTimeseries(init)
     atmo_ts.run(init)
     cube = iris.load_cube(str(tmpdir) + '/test.nc')
     assert cube.name() == 'sea_surface_temperature'
@@ -23,13 +23,13 @@ def test_atmosphere_time_series_working(tmpdir):
         iris.coords.CellMethod('mean', coords='area'),
         )
 
-def test_atmosphere_time_wrong_code(tmpdir):
+def test_oifs_global_mean_year_mean_timeseries_wrong_code(tmpdir):
     init = {
         "src": ['./tests/testdata/NEMO_output_sivolu-199003.nc'],
         "dst": str(tmpdir) + '/test.nc',
         "grib_code": 0,
     }
-    atmo_ts = AtmosphereTimeSeries(init)
+    atmo_ts = OifsGlobalMeanYearMeanTimeseries(init)
     with patch.object(atmo_ts, 'log_warning') as mock:
         atmo_ts.run(init)
     mock.assert_called_with(f"CF Phenomenon for {init['grib_code']} not found. Update local table?")
