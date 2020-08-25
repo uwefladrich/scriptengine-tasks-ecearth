@@ -42,6 +42,7 @@ class Markdown(Task):
 
     def get_presentation_list(self, sources, dst_folder):
         """create a list of presentation objects"""
+        self.log_debug("Getting list of presentation objects.")
         presentation_list = []
         for src in sources:
             presentation_list.append(self.presentation_object(src, dst_folder))
@@ -65,6 +66,7 @@ class Markdown(Task):
         """
         if src.endswith('.yml') or src.endswith('.yaml'):
             try:
+                self.log_debug(f"Loading scalar diagnostic {src}")
                 with open(src) as yml_file:
                     loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
                 return {'presentation_type': 'text', **loaded_dict}

@@ -16,10 +16,11 @@ class Map(Task):
         super().__init__(__name__, parameters)
 
     def run(self, context):
-        pass
+        raise NotImplementedError('Base class function Map.run() must not be called')
 
     def save(self, new_cube, dst):
         """save map cube in netCDF file"""
+        self.log_debug(f"Saving map cube to {dst}")
         try:
             current_cube = iris.load_cube(dst)
         except OSError: # file does not exist yet.
@@ -60,6 +61,7 @@ class Map(Task):
         """
         Compute Time Average for the whole simulation.
         """
+        self.log_debug("Computing simulation average.")
         time_weights = helpers.compute_time_weights(merged_cube, merged_cube.shape)
         simulation_avg = merged_cube.collapsed(
             'time',

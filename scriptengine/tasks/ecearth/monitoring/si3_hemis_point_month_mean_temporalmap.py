@@ -48,7 +48,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
         hemisphere = self.getarg('hemisphere', context)
         varname = self.getarg('varname', context)
 
-        self.log_info(f"Time map for {varname} on {hemisphere}ern hemisphere at {dst}.")
+        self.log_info(f"Temporal map for {varname} on {hemisphere}ern hemisphere at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
         if varname not in meta_dict:
@@ -129,6 +129,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
 
     def set_cell_methods(self, cube, hemisphere):
         """Set the correct cell methods."""
+        self.log_debug("Setting cell methods.")
         cube.cell_methods = ()
         cube.add_cell_method(iris.coords.CellMethod('point', coords='time'))
         cube.add_cell_method(iris.coords.CellMethod(

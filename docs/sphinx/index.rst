@@ -9,13 +9,13 @@ Currently, it contains the EC-Earth 4 monitoring tool, as well as the Sbatch tas
    :caption: Contents:
    
    source/usage/installation
-   source/tasks/monitoring/scalar-diagnostics
+   source/tasks/monitoring/processing-tasks
+   source/tasks/monitoring/computational-diagnostics
    source/tasks/monitoring/ocean-diagnostics
    source/tasks/monitoring/sea-ice-diagnostics
    source/tasks/monitoring/atmosphere-diagnostics
-   source/tasks/monitoring/computational-diagnostics
-   source/tasks/monitoring/processing-tasks
    source/tasks/sbatch
+   source/developer-guide
 
 
 

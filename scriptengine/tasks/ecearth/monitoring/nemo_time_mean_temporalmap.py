@@ -1,4 +1,4 @@
-"""Processing Task that creates a 2D time map of a given extensive ocean quantity."""
+"""Processing Task that creates a temporal map of a given 2D extensive ocean quantity."""
 
 import iris
 
@@ -24,7 +24,7 @@ class NemoTimeMeanTemporalmap(Temporalmap):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
         varname = self.getarg('varname', context)
-        self.log_info(f"Create time map for ocean variable {varname} at {dst}.")
+        self.log_info(f"Create temporal map for ocean variable {varname} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
         if not self.correct_file_extension(dst):
@@ -39,7 +39,7 @@ class NemoTimeMeanTemporalmap(Temporalmap):
         self.save(processed_cube, dst)
     
     def time_operation(self, varname, leg_cube):
-        raise NotImplementedError('Base class function NemoTimeMeanTemporalmap.time_op() must not be called')
+        raise NotImplementedError('Base class function NemoTimeMeanTemporalmap.time_operation() must not be called')
 
 class NemoYearMeanTemporalmap(NemoTimeMeanTemporalmap):
     """NemoYearMeanTemporalmap Processing Task"""
@@ -53,6 +53,7 @@ class NemoYearMeanTemporalmap(NemoTimeMeanTemporalmap):
         super(Temporalmap, self).__init__(__name__, parameters, required_parameters=required)
 
     def time_operation(self, varname, leg_cube):
+        self.log_debug("Creating an annual mean.")
         month_weights = helpers.compute_time_weights(leg_cube, leg_cube.shape)
         leg_average = leg_cube.collapsed(
             'time',
@@ -85,6 +86,7 @@ class NemoMonthMeanTemporalmap(NemoTimeMeanTemporalmap):
         super(Temporalmap, self).__init__(__name__, parameters, required_parameters=required)
 
     def time_operation(self, varname, leg_cube):
+        self.log_debug("Creating monthly means.")
         leg_cube = helpers.set_metadata(
             leg_cube,
             title=f'{leg_cube.long_name.title()} (Monthly Mean Map)',

@@ -35,7 +35,7 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
         dst = self.getarg('dst', context)
         hemisphere = self.getarg('hemisphere', context)
         varname = self.getarg('varname', context)
-        self.log_info(f"Create sivolu map for {hemisphere}ern hemisphere at {dst}.")
+        self.log_info(f"Create {varname} map for {hemisphere}ern hemisphere at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
         if varname not in meta_dict:
@@ -107,6 +107,7 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
     
     def set_cell_methods(self, cube, hemisphere):
         """Set the correct cell methods."""
+        self.log_debug("Setting cell methods.")
         cube.cell_methods = ()
         cube.add_cell_method(iris.coords.CellMethod('mean over years', coords='time'))
         cube.add_cell_method(iris.coords.CellMethod(

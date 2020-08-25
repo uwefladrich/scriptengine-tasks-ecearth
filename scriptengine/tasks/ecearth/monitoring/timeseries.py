@@ -82,6 +82,7 @@ class Timeseries(Task):
 
     def save(self, new_cube, dst):
         """save time series cube in netCDF file"""
+        self.log_debug(f"Saving time series cube to {dst}")
         try:
             current_cube = iris.load_cube(dst)
         except OSError: # file does not exist yet.

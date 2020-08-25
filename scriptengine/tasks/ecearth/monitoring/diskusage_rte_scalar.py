@@ -17,9 +17,10 @@ class DiskusageRteScalar(Scalar):
     def run(self, context):
         src = self.getarg('src', context)
         dst = self.getarg('dst', context)
-        self.log_info(f"Write disk usage to {dst}")
+        self.log_info(f"Write disk usage of {src} to {dst}")
 
         value = round(self.get_directory_size(src) * 1e-9, 1)
+        self.log_debug(f"Size of Directory: {value}")
 
         self.save(
             dst,
@@ -31,6 +32,7 @@ class DiskusageRteScalar(Scalar):
 
     def get_directory_size(self, path):
         """Returns the size of `path` in Bytes."""
+        self.log_debug("Getting directory size.")
         total = 0
         try:
             for entry in os.scandir(path):
