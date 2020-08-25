@@ -21,15 +21,18 @@ class Scalar(Task):
     @timed_runner
     def run(self, context):
         title = self.getarg('title', context)
-        value = self.getarg('value', context)
         dst = self.getarg('dst', context)
+
+        self.log_info(f"Write scalar {title} to {dst}")
+
+        value = self.getarg('value', context)
         comment = self.getarg('comment', context, default=None)
-        self.log_info(f"Write scalar diagnostic to {dst}")
 
         self.save(dst, title=title, data=value, diagnostic_type=self.diagnostic_type, comment=comment)
 
     def save(self, dst, **kwargs):
         """Saves a scalar diagnostic in a YAML file."""
+        self.log_debug(f"Saving scalar diagnostic to {dst}")
         filtered_dict = {k: v for k, v in kwargs.items() if v is not None}
         if dst.endswith(".yml") or dst.endswith(".yaml"):
             with open(dst, 'w') as outfile:

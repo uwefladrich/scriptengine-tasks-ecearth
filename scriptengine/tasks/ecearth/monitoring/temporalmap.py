@@ -16,10 +16,11 @@ class Temporalmap(Task):
         super().__init__(__name__, parameters)
 
     def run(self, context):
-        pass
+        raise NotImplementedError('Base class function Temporalmap.run() must not be called')
 
     def save(self, new_cube, dst):
-        """save time map cube in netCDF file"""
+        """save temporal map cube in netCDF file"""
+        self.log_debug(f"Saving temporal map cube to {dst}")
         try:
             current_cube = iris.load_cube(dst)
         except OSError: # file does not exist yet.

@@ -34,7 +34,7 @@ class Redmine(Task):
         issue_subject = self.getarg('subject', context)
         template_path = self.getarg('template', context)
         key = self.getarg('api_key', context)
-        self.log_info(f"Create new issue '{issue_subject}'.")
+        self.log_info(f"Create Redmine issue '{issue_subject}'.")
         self.log_debug(f"Template: {template_path}, Source File(s): {sources}")
 
         presentation_list = self.get_presentation_list(sources, dst_folder)
@@ -44,16 +44,17 @@ class Redmine(Task):
         url = 'https://dev.ec-earth.org'
         redmine = redminelib.Redmine(url, key=key)
 
+        self.log_debug("Connecting to Redmine.")
         issue = self.get_issue(redmine, issue_subject)
         if issue is None:
             return
 
-        self.log_info("Updating the issue.")
-
+        self.log_debug("Updating the issue description.")
         issue.description = ""
         for line in issue_description:
             issue.description += line
 
+        self.log_debug("Uploading attachments.")
         issue.uploads = []
         for item in presentation_list:
             if item['presentation_type'] == 'image':
@@ -65,10 +66,12 @@ class Redmine(Task):
                 except redminelib.exceptions.ResourceNotFoundError:
                     pass
                 issue.uploads.append({'filename': file_name, 'path': f"{dst_folder}/{file_name}"})
+        self.log_debug("Saving issue.")
         issue.save()
 
     def get_presentation_list(self, sources, dst_folder):
         """create a list of presentation objects"""
+        self.log_debug("Getting list of presentation objects.")
         presentation_list = []
         for src in sources:
             presentation_list.append(self.presentation_object(src, dst_folder))
@@ -93,6 +96,7 @@ class Redmine(Task):
         """
         if src.endswith('.yml') or src.endswith('.yaml'):
             try:
+                self.log_debug(f"Loading scalar diagnostic {src}")
                 with open(src) as yml_file:
                     loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
                 return {'presentation_type': 'text', **loaded_dict}
