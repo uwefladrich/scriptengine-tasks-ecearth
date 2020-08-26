@@ -14,10 +14,11 @@ varname can be ``sivolu`` or ``siconc``.
 ::
 
     - ece.mon.si3_hemis_sum_month_mean_timeseries:
-        summer: "{{feb_file}}"
-        summer: "{{sep_file}}"
+        src:
+            - "{{feb_file}}"
+            - "{{sep_file}}"
         domain: "{{rundir}}/domain_cfg.nc"
-        dst: "{{mondir}}/siarea_si3_south_sum_febsep_mean_timeseries.nc"
+        dst: "{{mondir}}/siarea_si3_south_sum_feb+sep_mean_timeseries.nc"
         hemisphere: south
         varname: sivolu
 
