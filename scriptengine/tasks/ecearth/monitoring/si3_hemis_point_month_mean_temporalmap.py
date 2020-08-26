@@ -14,15 +14,11 @@ meta_dict = {
     'sivolu':
         {
             'long_name': 'Sea-Ice Volume per Area',
-            'presentation_min': 0,
-            'presentation_max': None,
             'convert_to': None,
         },
     'siconc':
         {
             'long_name': 'Sea-Ice Area Fraction',
-            'presentation_min': 0,
-            'presentation_max': 100,
             'convert_to': '%',
         },
 }
@@ -81,8 +77,6 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
             title=f"{month_cube.long_name} {self.get_month(time_coord)}",
             comment=comment,
             map_type="polar ice sheet",
-            presentation_min=meta_dict[varname]['presentation_min'],
-            presentation_max=meta_dict[varname]['presentation_max'],
         )
 
         month_cube = self.set_cell_methods(month_cube, hemisphere)

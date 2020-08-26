@@ -26,7 +26,7 @@ def test_compute_spatial_weights(tmpdir):
     assert file_handling.compute_spatial_weights(domain_path, shape, 'T').all() == result.all()
 
 def test_load_input_cube():
-    src = "./tests/testdata/tos-climatology.nc"
+    src = "./tests/testdata/tos_nemo_all_mean_map.nc"
     varname = "tos"
     assert isinstance(file_handling.load_input_cube(src, varname), iris.cube.Cube)
 
