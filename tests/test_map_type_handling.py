@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import helpers.map_type_handling as mth
 
 def test_global_ocean_plot():
-    ocean_cube = iris.load_cube("./tests/testdata/tos-climatology.nc")
+    ocean_cube = iris.load_cube("./tests/testdata/tos_nemo_all_mean_map.nc")
     assert isinstance(mth.global_ocean_plot(ocean_cube), plt.Figure)
 
 def test_ice_sheet_plot():

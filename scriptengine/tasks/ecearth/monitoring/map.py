@@ -10,8 +10,6 @@ import helpers.file_handling as helpers
 class Map(Task):
     """Map Processing Task"""
 
-    diagnostic_type = "map"
-
     def __init__(self, parameters):
         super().__init__(__name__, parameters)
 
@@ -21,6 +19,7 @@ class Map(Task):
     def save(self, new_cube, dst):
         """save map cube in netCDF file"""
         self.log_debug(f"Saving map cube to {dst}")
+        new_cube.attributes['diagnostic_type'] = 'map'
         try:
             current_cube = iris.load_cube(dst)
         except OSError: # file does not exist yet.

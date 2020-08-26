@@ -29,5 +29,4 @@ class SimulatedyearsRteScalar(Scalar):
             title="Simulated Years",
             comment="Current number of simulated years.",
             data=value,
-            diagnostic_type=self.diagnostic_type,
         )

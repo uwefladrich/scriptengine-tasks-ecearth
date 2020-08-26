@@ -13,8 +13,6 @@ import helpers.file_handling as helpers
 class Timeseries(Task):
     """Processing Task that writes out a generalized time series diagnostic."""
 
-    diagnostic_type = 'time series'
-
     def __init__(self, parameters):
         required = [
             "title",
@@ -76,13 +74,14 @@ class Timeseries(Task):
             data_cube,
             title=title,
             comment=comment,
-            diagnostic_type=self.diagnostic_type,
         )
         self.save(data_cube, dst)
 
     def save(self, new_cube, dst):
         """save time series cube in netCDF file"""
         self.log_debug(f"Saving time series cube to {dst}")
+
+        new_cube.attributes['diagnostic_type'] = 'time series'
         try:
             current_cube = iris.load_cube(dst)
         except OSError: # file does not exist yet.

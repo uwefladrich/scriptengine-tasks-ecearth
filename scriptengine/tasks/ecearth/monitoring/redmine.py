@@ -12,8 +12,8 @@ import iris
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import filters as j2filters
-from helpers.presentation_objects import make_timeseries, make_map, make_temporalmap
-from helpers.exceptions import InvalidMapTypeException
+from helpers.presentation_objects import PresentationObject
+from helpers.exceptions import PresentationException
 
 class Redmine(Task):
     """Redmine Presentation Task"""
@@ -74,66 +74,16 @@ class Redmine(Task):
         self.log_debug("Getting list of presentation objects.")
         presentation_list = []
         for src in sources:
-            presentation_list.append(self.presentation_object(src, dst_folder))
-        # remove None objects from list
-        presentation_list = [item for item in presentation_list if item]
+            try:
+                try:
+                    pres_object = PresentationObject(dst_folder, **src)
+                except TypeError:
+                    pres_object = PresentationObject(dst_folder, src)
+                self.log_debug(f"Loading {pres_object.loader.diag_type} diagnostic from {pres_object.loader.path}.")
+                presentation_list.append(pres_object.create_dict())
+            except PresentationException as msg:
+                self.log_warning(f"Can not present diagnostic: {msg}")
         return presentation_list
-
-    def presentation_object(self, src, dst_folder):
-        """
-        create a presentation object from an input path
-
-        returns None
-        - if the provided path is invalid
-        - if the diagnostic_type or map_type is invalid
-
-        otherwise returns a dictionary containing the keys:
-        - title
-        - comment
-        - presentation_type (text or image)
-        - for text objects: data
-        - for image objects: path
-        """
-        if src.endswith('.yml') or src.endswith('.yaml'):
-            try:
-                self.log_debug(f"Loading scalar diagnostic {src}")
-                with open(src) as yml_file:
-                    loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
-                return {'presentation_type': 'text', **loaded_dict}
-            except FileNotFoundError:
-                self.log_warning(f"File not found! Ignoring {src}")
-                return None
-
-        if src.endswith('.nc'):
-            try:
-                loaded_cube = iris.load_cube(src)
-            except OSError:
-                self.log_warning(f"File not found! Ignoring {src}")
-                return None
-            if loaded_cube.attributes["diagnostic_type"] == "time series":
-                self.log_debug(f"Loading time series diagnostic {src}")
-                return {'presentation_type': 'image', **make_timeseries(src, dst_folder, loaded_cube)}
-            if loaded_cube.attributes["diagnostic_type"] == "map":
-                self.log_debug(f"Loading map diagnostic {src}")
-                try:
-                    map_plot_dict = make_map(src, dst_folder, loaded_cube)
-                except InvalidMapTypeException as msg:
-                    self.log_warning(f"Invalid Map Type {msg}")
-                    return None
-                return {'presentation_type': 'image', **map_plot_dict}
-            if loaded_cube.attributes["diagnostic_type"] == "temporal map":
-                self.log_debug(f"Loading temporal map diagnostic {src}")
-                try:
-                    map_plot_dict = make_temporalmap(src, dst_folder, loaded_cube)
-                except InvalidMapTypeException as msg:
-                    self.log_warning(f"Invalid Map Type {msg}")
-                    return None
-                return {'presentation_type': 'image', **map_plot_dict}
-            self.log_warning(f"Invalid diagnostic type {loaded_cube.attributes['diagnostic_type']}")
-            return None
-
-        self.log_warning(f"Invalid file extension of {src}")
-        return None
 
     def get_template(self, context, template):
         """get Jinja2 template file"""

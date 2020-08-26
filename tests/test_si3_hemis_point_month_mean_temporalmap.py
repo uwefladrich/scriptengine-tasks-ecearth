@@ -16,8 +16,8 @@ def test_si3_hemis_point_month_mean_temporalmap_once(tmpdir):
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(init)
     ice_time_map.run(init)
     cube = iris.load_cube(init['dst'])
-    assert cube.attributes['map_type'] == ice_time_map.map_type
-    assert cube.attributes['diagnostic_type'] == ice_time_map.diagnostic_type
+    assert cube.attributes['map_type'] == 'polar ice sheet'
+    assert cube.attributes['diagnostic_type'] == 'temporal map'
 
 def test_si3_hemis_point_month_mean_temporalmap_twice(tmpdir):
     init_a = {
@@ -37,8 +37,8 @@ def test_si3_hemis_point_month_mean_temporalmap_twice(tmpdir):
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(init_b)
     ice_time_map.run(init_b)
     cube = iris.load_cube(init_b['dst'])
-    assert cube.attributes['map_type'] == ice_time_map.map_type
-    assert cube.attributes['diagnostic_type'] == ice_time_map.diagnostic_type
+    assert cube.attributes['map_type'] == 'polar ice sheet'
+    assert cube.attributes['diagnostic_type'] == 'temporal map'
 
 def test_si3_hemis_point_month_mean_temporalmap_wrong_varname(tmpdir):
     init = {

@@ -17,7 +17,7 @@ def test_oifs_global_mean_year_mean_timeseries_working(tmpdir):
     assert cube.name() == 'sea_surface_temperature'
     assert cube.attributes['title'] is not None
     assert cube.attributes['comment'] is not None
-    assert cube.attributes['diagnostic_type'] == atmo_ts.diagnostic_type
+    assert cube.attributes['diagnostic_type'] == 'time series'
     assert cube.cell_methods == (
         iris.coords.CellMethod('mean', coords='time', intervals='6.0 hours'),
         iris.coords.CellMethod('mean', coords='area'),

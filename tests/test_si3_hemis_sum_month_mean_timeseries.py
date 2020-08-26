@@ -8,8 +8,10 @@ from scriptengine.tasks.ecearth.monitoring.si3_hemis_sum_month_mean_timeseries i
 
 def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
     init = {
-        "winter": './tests/testdata/NEMO_output_sivolu-199003.nc',
-        "summer": './tests/testdata/NEMO_output_sivolu-199009.nc',
+        "src": [
+            './tests/testdata/NEMO_output_sivolu-199003.nc',
+            './tests/testdata/NEMO_output_sivolu-199009.nc',
+            ],
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",
@@ -29,8 +31,7 @@ def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
 
 def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmpdir):
     init = {
-        "winter": './tests/testdata/NEMO_output_sivolu-199003.nc',
-        "summer": './tests/testdata/NEMO_output_sivolu-199009.nc',
+        "src": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "tos",
@@ -46,8 +47,7 @@ def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmpdir):
 
 def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmpdir):
     init = {
-        "winter": './tests/testdata/NEMO_output_sivolu-199003.nc',
-        "summer": './tests/testdata/NEMO_output_sivolu-199009.nc',
+        "src": './tests/testdata/NEMO_output_sivolu-199003.nc',
         "dst": str(tmpdir) + '/test.nc',
         "domain": './tests/testdata/domain_cfg_example.nc',
         "varname": "sivolu",

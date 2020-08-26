@@ -14,23 +14,17 @@ meta_dict = {
     'sivolu':
         {
             'long_name': 'Sea-Ice Volume per Area',
-            'presentation_min': 0,
-            'presentation_max': None,
             'convert_to': None,
         },
     'siconc':
         {
             'long_name': 'Sea-Ice Area Fraction',
-            'presentation_min': 0,
-            'presentation_max': 100,
             'convert_to': '%',
         },
 }
 
 class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
     """Si3HemisPointMonthMeanTemporalmap Processing Task"""
-
-    map_type = "polar ice sheet"
 
     def __init__(self, parameters):
         required = [
@@ -82,10 +76,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
             month_cube,
             title=f"{month_cube.long_name} {self.get_month(time_coord)}",
             comment=comment,
-            diagnostic_type=self.diagnostic_type,
-            map_type=self.map_type,
-            presentation_min=meta_dict[varname]['presentation_min'],
-            presentation_max=meta_dict[varname]['presentation_max'],
+            map_type="polar ice sheet",
         )
 
         month_cube = self.set_cell_methods(month_cube, hemisphere)

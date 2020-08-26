@@ -63,7 +63,6 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
             ann_spatial_avg,
             title=f'{ann_spatial_avg.long_name} (Annual Mean)',
             comment=comment,
-            diagnostic_type=self.diagnostic_type,
             )
 
         ann_spatial_avg.cell_methods = ()
