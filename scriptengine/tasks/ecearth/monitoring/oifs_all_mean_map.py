@@ -12,8 +12,6 @@ from .map import Map
 class OifsAllMeanMap(Map):
     """OifsAllMeanMap Processing Task"""
 
-    map_type = "global atmosphere"
-
     def __init__(self, parameters):
         required = [
             "src",
@@ -66,8 +64,7 @@ class OifsAllMeanMap(Map):
             leg_mean,
             title=f'{leg_mean.long_name.title()} (Annual Mean Climatology)',
             comment=f"Simulation Average of **{grib_code}**.",
-            diagnostic_type=self.diagnostic_type,
-            map_type=self.map_type,
+            map_type='global atmosphere',
         )
         if leg_mean.units.name == 'kelvin':
             leg_mean.convert_units('degC')

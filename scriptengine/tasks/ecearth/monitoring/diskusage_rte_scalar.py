@@ -27,7 +27,6 @@ class DiskusageRteScalar(Scalar):
             title="Disk Usage in GB",
             comment=f"Current size of {src}.",
             data=value,
-            diagnostic_type=self.diagnostic_type,
         )
 
     def get_directory_size(self, path):

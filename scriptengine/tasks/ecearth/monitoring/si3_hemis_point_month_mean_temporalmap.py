@@ -30,8 +30,6 @@ meta_dict = {
 class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
     """Si3HemisPointMonthMeanTemporalmap Processing Task"""
 
-    map_type = "polar ice sheet"
-
     def __init__(self, parameters):
         required = [
             "src",
@@ -82,8 +80,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
             month_cube,
             title=f"{month_cube.long_name} {self.get_month(time_coord)}",
             comment=comment,
-            diagnostic_type=self.diagnostic_type,
-            map_type=self.map_type,
+            map_type="polar ice sheet",
             presentation_min=meta_dict[varname]['presentation_min'],
             presentation_max=meta_dict[varname]['presentation_max'],
         )

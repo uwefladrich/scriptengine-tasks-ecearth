@@ -13,8 +13,6 @@ from .temporalmap import Temporalmap
 class OifsYearMeanTemporalmap(Temporalmap):
     """OifsYearMeanTemporalmap Processing Task"""
 
-    map_type = "global atmosphere"
-
     def __init__(self, parameters):
         required = [
             "src",
@@ -69,8 +67,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
             leg_mean,
             title=f'{leg_mean.long_name.title()} (Annual Mean Map)',
             comment=f"Leg Mean of **{grib_code}**.",
-            diagnostic_type=self.diagnostic_type,
-            map_type=self.map_type,
+            map_type="global atmosphere",
         )
 
         self.save(leg_mean, dst)

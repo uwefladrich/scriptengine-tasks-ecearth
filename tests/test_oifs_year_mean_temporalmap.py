@@ -18,7 +18,9 @@ def test_oifs_year_mean_temporalmap_working(tmpdir):
     assert cube.name() == 'sea_surface_temperature'
     assert cube.attributes['title'] is not None
     assert cube.attributes['comment'] is not None
-    assert cube.attributes['diagnostic_type'] == atmos_time_map.diagnostic_type
+    assert cube.attributes['diagnostic_type'] == 'temporal map'
+    assert cube.attributes['map_type'] == 'global atmosphere'
+
 
 def test_oifs_year_mean_temporalmap_wrong_code(tmpdir):
     init = {

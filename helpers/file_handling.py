@@ -57,12 +57,11 @@ def load_input_cube(src, varname):
     leg_cube = month_cubes.concatenate_cube()
     return leg_cube
 
-def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs):
+def set_metadata(cube, title=None, comment=None, **kwargs):
     """Set metadata for diagnostic."""
     metadata = {
         'title': title,
         'comment': comment,
-        'diagnostic_type': diagnostic_type,
         'source': 'EC-Earth 4',
         'Conventions': 'CF-1.8',
         }

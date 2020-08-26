@@ -16,8 +16,8 @@ def test_nemo_all_mean_map_once(tmpdir):
     ocean_map = NemoAllMeanMap(init)
     ocean_map.run(init)
     cube = iris.load_cube(init['dst'])
-    assert cube.attributes['map_type'] == ocean_map.map_type
-    assert cube.attributes['diagnostic_type'] == ocean_map.diagnostic_type
+    assert cube.attributes['map_type'] == 'global ocean'
+    assert cube.attributes['diagnostic_type'] == 'map'
     assert cube.coord('time').climatological
     assert len(cube.coord('time').points) == 1
 
@@ -37,7 +37,7 @@ def test_nemo_all_mean_map_twice(tmpdir):
     ocean_map = NemoAllMeanMap(init_b)
     ocean_map.run(init_b)
     cube = iris.load_cube(init_b['dst'])
-    assert cube.attributes['map_type'] == ocean_map.map_type
-    assert cube.attributes['diagnostic_type'] == ocean_map.diagnostic_type
+    assert cube.attributes['map_type'] == 'global ocean'
+    assert cube.attributes['diagnostic_type'] == 'map'
     assert cube.coord('time').climatological
     assert len(cube.coord('time').points) == 1

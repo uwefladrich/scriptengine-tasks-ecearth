@@ -10,8 +10,6 @@ from scriptengine.tasks.base import Task
 class Temporalmap(Task):
     """Temporalmap Processing Task"""
 
-    diagnostic_type = "temporal map"
-
     def __init__(self, parameters):
         super().__init__(__name__, parameters)
 
@@ -21,6 +19,7 @@ class Temporalmap(Task):
     def save(self, new_cube, dst):
         """save temporal map cube in netCDF file"""
         self.log_debug(f"Saving temporal map cube to {dst}")
+        new_cube.attributes['diagnostic_type'] = 'temporal map'
         try:
             current_cube = iris.load_cube(dst)
         except OSError: # file does not exist yet.

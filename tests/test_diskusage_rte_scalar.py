@@ -20,7 +20,7 @@ def test_diskusage_working(tmpdir):
     disk_usage.run(context)
     with open(path) as file:
         result = yaml.load(file, Loader=yaml.FullLoader)
-    assert result['diagnostic_type'] == disk_usage.diagnostic_type
+    assert result['diagnostic_type'] == 'scalar'
     assert result['data'] == 0.0 # DiskUsage rounds to GB
 
 
@@ -36,7 +36,7 @@ def test_not_a_directory(tmpdir):
     disk_usage.run(context)
     expected_result = {
         'title': "Disk Usage in GB",
-        'diagnostic_type': disk_usage.diagnostic_type,
+        'diagnostic_type': 'scalar',
         'data': -1,
     }
     with patch.object(disk_usage, 'log_warning') as mock:
@@ -60,7 +60,7 @@ def test_permission_error(tmpdir):
     disk_usage.run(context)
     expected_result = {
         'title': "Disk Usage in GB",
-        'diagnostic_type': disk_usage.diagnostic_type,
+        'diagnostic_type': 'scalar',
         'data': -1,
     }
     with patch.object(disk_usage, 'log_warning') as mock:

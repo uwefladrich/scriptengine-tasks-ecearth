@@ -18,8 +18,6 @@ meta_dict = {
 class Si3HemisPointMonthMeanAllMeanMap(Map):
     """Si3HemisPointMonthMeanAllMeanMap Processing Task"""
 
-    map_type = "polar ice sheet"
-
     def __init__(self, parameters):
         required = [
             "src",
@@ -74,8 +72,7 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
             month_cube,
             title=f'{month_cube.long_name} (Climatology)',
             comment=comment,
-            diagnostic_type=self.diagnostic_type,
-            map_type=self.map_type,
+            map_type='polar ice sheet',
         )
         time_coord.climatological = True
         month_cube = self.set_cell_methods(month_cube, hemisphere)

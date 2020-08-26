@@ -18,7 +18,8 @@ def test_oifs_all_mean_map_working(tmpdir):
     assert cube.name() == 'sea_surface_temperature'
     assert cube.attributes['title'] is not None
     assert cube.attributes['comment'] is not None
-    assert cube.attributes['diagnostic_type'] == atmo_map.diagnostic_type
+    assert cube.attributes['diagnostic_type'] == 'map'
+    assert cube.attributes['map_type'] == 'global atmosphere'
     assert cube.coord('time').climatological
     assert len(cube.coord('time').points) == 1
 

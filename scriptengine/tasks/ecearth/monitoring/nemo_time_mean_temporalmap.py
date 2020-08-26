@@ -9,8 +9,6 @@ from .temporalmap import Temporalmap
 class NemoTimeMeanTemporalmap(Temporalmap):
     """NemoTimeMeanTemporalmap Processing Task"""
 
-    map_type = "global ocean"
-
     def __init__(self, parameters):
         required = [
             "src",
@@ -66,8 +64,7 @@ class NemoYearMeanTemporalmap(NemoTimeMeanTemporalmap):
             leg_average,
             title=f'{leg_average.long_name.title()} (Annual Mean Map)',
             comment=f"Leg Mean of **{varname}**.",
-            diagnostic_type=self.diagnostic_type,
-            map_type=self.map_type,
+            map_type="global ocean",
         )
         leg_average.cell_methods = ()
         leg_average.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals='1 month'))
@@ -91,8 +88,7 @@ class NemoMonthMeanTemporalmap(NemoTimeMeanTemporalmap):
             leg_cube,
             title=f'{leg_cube.long_name.title()} (Monthly Mean Map)',
             comment=f"Monthly Mean of **{varname}**.",
-            diagnostic_type=self.diagnostic_type,
-            map_type=self.map_type,
+            map_type='global ocean',
         )
         leg_cube.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
         return leg_cube

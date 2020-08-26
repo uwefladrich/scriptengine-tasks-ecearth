@@ -87,7 +87,6 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
             spatial_mean,
             title=f'{spatial_mean.long_name} (Annual Mean)',
             comment=comment,
-            diagnostic_type=self.diagnostic_type,
         )
 
         if spatial_mean.units.name == 'kelvin':
