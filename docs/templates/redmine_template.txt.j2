@@ -3,7 +3,7 @@ h1. EC-Earth 4: Monitoring
 {% for item in presentation_list %}
 
 {%- if item["presentation_type"] == "text" %}
-**{{ item["title"] }}**: {{ item["data"] }}
+**{{ item["title"] }}**: {{ item["value"] }}
 {%- if "comment" in item %}
 {{item["comment"]}} 
 {% endif %}

@@ -89,7 +89,7 @@ def global_atmosphere_plot(cube, title=None, dates=None, units=None, value_range
 def polar_ice_sheet_plot(cube, title=None, dates=None, units=None, value_range=[None, None], colormap='RdBu_r', **kwargs):
     fig = plt.figure(figsize=(6,4), dpi=150)
     fig.suptitle(title)
-    if "North" in cube.long_name:
+    if "north" in cube.long_name or "North" in cube.long_name:
         center = 90.0
     else:
         center = -90.0

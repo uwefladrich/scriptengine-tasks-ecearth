@@ -8,12 +8,10 @@ from .scalar import Scalar
 class SimulatedyearsRteScalar(Scalar):
     """SimulatedyearsRteScalar Processing Task"""
     def __init__(self, parameters):
-        required = [
-            "dst",
-            "start",
-            "end",
-        ]
-        super(Scalar, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            parameters={**parameters, 'value': None, 'title': None},
+            required_parameters=['start', 'end']
+            )
 
     @timed_runner
     def run(self, context):
@@ -22,11 +20,12 @@ class SimulatedyearsRteScalar(Scalar):
         end = self.getarg('end', context)
         self.log_info(f"Write simulated years to {dst}")
 
-        value = relativedelta(end, start).years
+        self.value = relativedelta(end, start).years
+        self.title = "Simulated Years"
 
         self.save(
             dst,
-            title="Simulated Years",
+            title=self.title,
             comment="Current number of simulated years.",
-            data=value,
+            value=self.value,
         )

@@ -14,12 +14,10 @@ class OifsYearMeanTemporalmap(Temporalmap):
     """OifsYearMeanTemporalmap Processing Task"""
 
     def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "grib_code",
-        ]
-        super(Temporalmap, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            parameters,
+            required_parameters=['src', 'dst', 'grib_code']
+            )
 
     @timed_runner
     def run(self, context):
@@ -78,7 +76,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
         cube.add_cell_method(iris.coords.CellMethod(
             'mean',
             coords='time',
-            intervals=f'{step} seconds',
+            intervals=f'{step * 3600} seconds',
             ))
         cube.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
         return cube

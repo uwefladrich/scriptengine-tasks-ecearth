@@ -7,11 +7,10 @@ from .scalar import Scalar
 class DiskusageRteScalar(Scalar):
     """DiskusageRteScalar Processing Task"""
     def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-        ]
-        super(Scalar, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            parameters={**parameters, 'value': None, 'title': None},
+            required_parameters=['src']
+            )
 
     @timed_runner
     def run(self, context):
@@ -19,14 +18,15 @@ class DiskusageRteScalar(Scalar):
         dst = self.getarg('dst', context)
         self.log_info(f"Write disk usage of {src} to {dst}")
 
-        value = round(self.get_directory_size(src) * 1e-9, 1)
-        self.log_debug(f"Size of Directory: {value}")
+        self.value = round(self.get_directory_size(src) * 1e-9, 1)
+        self.title = "Disk Usage in GB"
+        self.log_debug(f"Size of Directory: {self.value}")
 
         self.save(
             dst,
-            title="Disk Usage in GB",
+            title=self.title,
             comment=f"Current size of {src}.",
-            data=value,
+            value=self.value,
         )
 
     def get_directory_size(self, path):

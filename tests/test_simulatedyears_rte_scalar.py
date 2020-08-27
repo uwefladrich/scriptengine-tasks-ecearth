@@ -18,5 +18,5 @@ def test_simulatedyears_working(tmpdir):
         init['dst'],
         title="Simulated Years",
         comment="Current number of simulated years.",
-        data=5,
+        value=5,
         )

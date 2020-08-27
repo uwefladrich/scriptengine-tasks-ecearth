@@ -13,14 +13,18 @@ import helpers.file_handling as helpers
 class Timeseries(Task):
     """Processing Task that writes out a generalized time series diagnostic."""
 
-    def __init__(self, parameters):
+    def __init__(self, parameters, required_parameters = None):
         required = [
             "title",
             "coord_value",
             "data_value",
             "dst",
         ]
-        super().__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            __name__,
+            parameters,
+            required_parameters=required + (required_parameters or [])
+            )
 
     @timed_runner
     def run(self, context):

@@ -13,12 +13,10 @@ class OifsAllMeanMap(Map):
     """OifsAllMeanMap Processing Task"""
 
     def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "grib_code",
-        ]
-        super(Map, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            parameters,
+            required_parameters=['src', 'dst', 'grib_code']
+            )
 
     @timed_runner
     def run(self, context):
@@ -54,7 +52,7 @@ class OifsAllMeanMap(Map):
         )
         leg_mean.coord('time').climatological = True
         leg_mean.cell_methods = ()
-        leg_mean.add_cell_method(iris.coords.CellMethod('mean within years', coords='time', intervals=f'{step} seconds'))
+        leg_mean.add_cell_method(iris.coords.CellMethod('mean within years', coords='time', intervals=f'{step * 3600} seconds'))
         leg_mean.add_cell_method(iris.coords.CellMethod('mean over years', coords='time'))
         leg_mean.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
 

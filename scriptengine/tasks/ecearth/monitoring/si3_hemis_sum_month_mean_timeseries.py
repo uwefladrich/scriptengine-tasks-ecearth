@@ -32,14 +32,10 @@ meta_dict = {
 class Si3HemisSumMonthMeanTimeseries(Timeseries):
     """Si3HemisSumMonthMeanTimeseries Processing Task"""
     def __init__(self, parameters):
-        required = [
-            "src",
-            "domain",
-            "dst",
-            "hemisphere",
-            "varname",
-        ]
-        super(Timeseries, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            {**parameters, 'title': None, 'coord_value': None, 'data_value': None},
+            required_parameters=['src', 'domain', 'hemisphere', 'varname']
+            )
 
     @timed_runner
     def run(self, context):

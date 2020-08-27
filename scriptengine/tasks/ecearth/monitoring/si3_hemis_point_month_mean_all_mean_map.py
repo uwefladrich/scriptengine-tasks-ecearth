@@ -19,13 +19,10 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
     """Si3HemisPointMonthMeanAllMeanMap Processing Task"""
 
     def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "hemisphere",
-            "varname",
-        ]
-        super(Map, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            parameters,
+            required_parameters=['src', 'dst', 'hemisphere', 'varname']
+            )
 
     @timed_runner
     def run(self, context):

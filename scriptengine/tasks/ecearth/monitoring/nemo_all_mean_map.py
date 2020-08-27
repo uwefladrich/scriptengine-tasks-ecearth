@@ -10,12 +10,10 @@ class NemoAllMeanMap(Map):
     """NemoAllMeanMap Processing Task"""
 
     def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "varname",
-        ]
-        super(Map, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            parameters,
+            required_parameters=['src', 'dst', 'varname']
+            )
 
     @timed_runner
     def run(self, context):

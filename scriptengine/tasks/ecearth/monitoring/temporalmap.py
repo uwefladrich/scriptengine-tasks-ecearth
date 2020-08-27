@@ -10,8 +10,8 @@ from scriptengine.tasks.base import Task
 class Temporalmap(Task):
     """Temporalmap Processing Task"""
 
-    def __init__(self, parameters):
-        super().__init__(__name__, parameters)
+    def __init__(self, parameters, required_parameters = None):
+        super().__init__(__name__, parameters, required_parameters)
 
     def run(self, context):
         raise NotImplementedError('Base class function Temporalmap.run() must not be called')

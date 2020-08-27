@@ -15,12 +15,10 @@ from .timeseries import Timeseries
 class OifsGlobalMeanYearMeanTimeseries(Timeseries):
     """OifsGlobalMeanYearMeanTimeseries Processing Task"""
     def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "grib_code",
-        ]
-        super(Timeseries, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            {**parameters, 'title': None, 'coord_value': None, 'data_value': None},
+            required_parameters=['src', 'grib_code']
+            )
 
     @timed_runner
     def run(self, context):
@@ -72,7 +70,7 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
             )
         
         spatial_mean.cell_methods = ()
-        spatial_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals=f'{step} hours'))
+        spatial_mean.add_cell_method(iris.coords.CellMethod('mean', coords='time', intervals=f'{step * 3600} seconds'))
         spatial_mean.add_cell_method(iris.coords.CellMethod('mean', coords='area'))
 
         # Promote time from scalar to dimension coordinate

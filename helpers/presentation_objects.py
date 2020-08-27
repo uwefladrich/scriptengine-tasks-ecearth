@@ -85,7 +85,7 @@ class TimeseriesLoader(PresentationObjectLoader):
         dst_file = f"./{base_name}.png"
 
         x_coord = self.cube.coords()[0]
-        if "second since" in x_coord.units.name:
+        if "second since" in x_coord.units.name or "hour since" in x_coord.units.name:
             dates = cftime.num2pydate(x_coord.points, x_coord.units.name)
             coord_points = format_dates(dates)
         else:
