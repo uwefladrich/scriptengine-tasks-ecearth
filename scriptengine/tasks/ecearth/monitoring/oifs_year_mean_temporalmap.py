@@ -76,7 +76,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
         cube.add_cell_method(iris.coords.CellMethod(
             'mean',
             coords='time',
-            intervals=f'{step} seconds',
+            intervals=f'{step * 3600} seconds',
             ))
         cube.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
         return cube
