@@ -28,5 +28,5 @@ class SimulatedyearsRteScalar(Scalar):
             dst,
             title="Simulated Years",
             comment="Current number of simulated years.",
-            data=value,
+            value=value,
         )

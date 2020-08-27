@@ -43,18 +43,18 @@ context = [
 expected_result = [
     {
         'title': 'Title',
-        'data': 'Value',
+        'value': 'Value',
         'comment': 'Comment',
         'diagnostic_type': 'scalar',
     },
     {
         'title': 'Title',
-        'data': [1, 2, 3],
+        'value': [1, 2, 3],
         'diagnostic_type': 'scalar',
     },
     {
         'title': 'Title',
-        'data': 'message',
+        'value': 'message',
         'diagnostic_type': 'scalar',
     },
 ]
