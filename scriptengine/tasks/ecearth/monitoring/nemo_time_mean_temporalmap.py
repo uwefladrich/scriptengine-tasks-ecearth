@@ -9,13 +9,11 @@ from .temporalmap import Temporalmap
 class NemoTimeMeanTemporalmap(Temporalmap):
     """NemoTimeMeanTemporalmap Processing Task"""
 
-    def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "varname",
-        ]
-        super(Temporalmap, self).__init__(__name__, parameters, required_parameters=required)
+    def __init__(self, parameters, required_parameters = None):
+        super().__init__(
+            parameters,
+            required_parameters=['src', 'dst', 'varname'] + (required_parameters or [])
+            )
 
     @timed_runner
     def run(self, context):
@@ -43,12 +41,7 @@ class NemoYearMeanTemporalmap(NemoTimeMeanTemporalmap):
     """NemoYearMeanTemporalmap Processing Task"""
 
     def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "varname",
-        ]
-        super(Temporalmap, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(parameters)
 
     def time_operation(self, varname, leg_cube):
         self.log_debug("Creating an annual mean.")
@@ -75,12 +68,7 @@ class NemoMonthMeanTemporalmap(NemoTimeMeanTemporalmap):
     """NemoMonthMeanTemporalmap Processing Task"""
 
     def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "varname",
-        ]
-        super(Temporalmap, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(parameters)
 
     def time_operation(self, varname, leg_cube):
         self.log_debug("Creating monthly means.")

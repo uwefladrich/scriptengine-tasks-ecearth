@@ -15,12 +15,10 @@ from .timeseries import Timeseries
 class OifsGlobalMeanYearMeanTimeseries(Timeseries):
     """OifsGlobalMeanYearMeanTimeseries Processing Task"""
     def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "grib_code",
-        ]
-        super(Timeseries, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            {**parameters, 'title': None, 'coord_value': None, 'data_value': None},
+            required_parameters=['src', 'grib_code']
+            )
 
     @timed_runner
     def run(self, context):

@@ -14,7 +14,11 @@ class Scalar(Task):
             "value",
             "dst",
         ]
-        super().__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            __name__,
+            parameters,
+            required_parameters=required + (required_parameters or [])
+            )
 
     @timed_runner
     def run(self, context):

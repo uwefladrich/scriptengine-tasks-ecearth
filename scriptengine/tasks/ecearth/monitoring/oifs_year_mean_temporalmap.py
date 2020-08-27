@@ -14,12 +14,10 @@ class OifsYearMeanTemporalmap(Temporalmap):
     """OifsYearMeanTemporalmap Processing Task"""
 
     def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "grib_code",
-        ]
-        super(Temporalmap, self).__init__(__name__, parameters, required_parameters=required)
+        super().__init__(
+            parameters,
+            required_parameters=['src', 'dst', 'grib_code']
+            )
 
     @timed_runner
     def run(self, context):

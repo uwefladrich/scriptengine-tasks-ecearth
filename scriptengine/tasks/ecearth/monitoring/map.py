@@ -10,8 +10,8 @@ import helpers.file_handling as helpers
 class Map(Task):
     """Map Processing Task"""
 
-    def __init__(self, parameters):
-        super().__init__(__name__, parameters)
+    def __init__(self, parameters, required_parameters = None):
+        super().__init__(__name__, parameters, required_parameters)
 
     def run(self, context):
         raise NotImplementedError('Base class function Map.run() must not be called')
