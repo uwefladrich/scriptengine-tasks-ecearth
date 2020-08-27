@@ -10,7 +10,7 @@ Diagnostic Type: Scalar
 ::
 
     - ece.mon.scalar:
-        long_name: "Experiment ID"
+        title: "Experiment ID"
         value: "{{exp_id}}"
         dst: "{{mondir}}/expid_scalar.yml"
 
@@ -33,9 +33,9 @@ Diagnostic Type: Scalar
 ::
 
     - ece.mon.simulatedyears_rte_scalar:
-        dst: "{{mondir}}/simulatedyears_rte_scalar.yml"
         start: "{{start}}"
         end: "{{leg.end}}"
+        dst: "{{mondir}}/simulatedyears_rte_scalar.yml"
 
 
 Timeseries

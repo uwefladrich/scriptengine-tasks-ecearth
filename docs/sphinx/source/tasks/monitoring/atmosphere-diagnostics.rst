@@ -17,7 +17,7 @@ Mapped to: ``ece.mon.oifs_global_mean_year_mean_timeseries``
 
 ::
 
-    - ece.mon.atmosphere_ts:
+    - ece.mon.oifs_global_mean_year_mean_timeseries:
         src: "{{gg_files}}"
         dst: "{{mondir}}/2t_oifs_global_mean_year_mean_timeseries.nc"
         grib_code: 167

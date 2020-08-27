@@ -9,7 +9,7 @@ Mapped to ``ece.mon.presentation.markdown``.
 
 ::
 
-    - ece.mon.presentation.markdown
+    - ece.mon.presentation.markdown:
         src:
             - "{{mondir}}/description.yml"
             - "{{mondir}}/exp-id.yml"
@@ -52,7 +52,7 @@ Mapped to ``ece.mon.presentation.redmine``.
 
 ::
 
-    - ece.mon.presentation.redmine
+    - ece.mon.presentation.redmine:
         src:
             - "{{mondir}}/description.yml"
             - "{{mondir}}/exp-id.yml"
