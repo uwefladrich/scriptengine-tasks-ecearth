@@ -9,20 +9,19 @@ The processing tasks in this chapter create diagnostics informing about computat
 Scalar
 =======
 
-Diagnostic Type: Scalar
-
-Mapped to: ``ece.mon.scalar``
+| Diagnostic Type: Scalar
+| Mapped to: ``ece.mon.scalar``
 
 This is the base class for all implemented scalar tasks.
 The Scalar processing task writes custom output to a YAML file.
 
-Required arguments:
+**Required arguments**
 
 * ``title``: Title of the diagnostic
 * ``value``: Value of the scalar
 * ``dst``: Destination, must end in *.yml* or *.yaml*
 
-Optional arguments:
+**Optional arguments**
 
 * ``comment``: Additional description of diagnostic. Default: ``None``.
 
@@ -36,13 +35,12 @@ Optional arguments:
 DiskusageRteScalar
 ==================
 
-Diagnostic Type: Scalar
-
-Mapped to: ``ece.mon.diskusage_rte_scalar``
+| Diagnostic Type: Scalar
+| Mapped to: ``ece.mon.diskusage_rte_scalar``
 
 Computes the size of a user-specified directory.
 
-Required arguments:
+**Required arguments**
 
 * ``src``: Path to the specified directory.
 * ``dst``: Destination, must end in *.yml* or *.yaml*
@@ -56,13 +54,12 @@ Required arguments:
 SimulatedyearsRteScalar
 =======================
 
-Diagnostic Type: Scalar
-
-Mapped to: ``ece.mon.simulatedyears_rte_scalar``
+| Diagnostic Type: Scalar
+| Mapped to: ``ece.mon.simulatedyears_rte_scalar``
 
 Computes the difference in years between ``end`` and ``start``.
 
-Required arguments:
+**Required arguments**
 
 * ``start``: Start date of the simulation.
 * ``end``: End date of the current leg.
@@ -79,21 +76,20 @@ Required arguments:
 Timeseries
 =======================
 
-Diagnostic Type: Time Series
-
-Mapped to: ``ece.mon.timeseries``
+| Diagnostic Type: Time Series
+| Mapped to: ``ece.mon.timeseries``
 
 This processing task creates a time series diagnostic, illustrating the progression of a scalar quantity over the duration of the current experiment.
 It can be used for custom output, an exemplary use case is the SYPD time series (shown below).
 
-Required arguments:
+**Required arguments**
 
 * ``title``: Title of the diagnostic
 * ``data_value``: Value of the new data point
 * ``coord_value``: New value of the time coordinate (can be int/float/double or date/datetime). Must be monotonically increasing.
 * ``dst``: Destination, must end in *.nc*
 
-Optional arguments:
+**Optional arguments**
 
 * ``comment``: Additional description of diagnostic. Default: "."
 * ``data_name``: Name of the data variable. Default: value of ``title``
