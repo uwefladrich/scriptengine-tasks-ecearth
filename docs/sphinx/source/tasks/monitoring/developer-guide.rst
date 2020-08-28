@@ -13,6 +13,7 @@ A task **should** write only one ``log_info`` message during execution.
 General "progression" statements **must** be ``log_debug`` messages. These **should not** be used sparsely.
 If a monitoring task has to abort: It **should** use ``log_warning`` (except if the problem is unexpected) and **must not** use `log_error`.
 
+.. _naming-scheme:
 Naming Processing Tasks
 =======================
 

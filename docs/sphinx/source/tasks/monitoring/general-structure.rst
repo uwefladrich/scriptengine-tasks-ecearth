@@ -8,11 +8,15 @@ Both the selection of diagnostics as well as the desired visualization might var
 The software consists of two different task types: 
 
 **Processing tasks** process input from the model output and the runtime environment.
-With this, they create diagnostics and save them in a file. 
+With this, they create diagnostics and save them in a file, the diagnostic on disk.
+The tool so far supports four types of diagnostics:
+
+* scalar: zero-dimensional in time & space.
+* time series: zero-dimensional in space, one-dimensional in time.
+* map: two-dimensional in space, zero-dimensional in time.
+* temporal map: two-dimensional in space, zero-dimensional in time.
+
+Processing tasks and the resulting diagnostics on disk should be named according to the naming scheme described here: :ref:`naming-scheme`.
 
 **Presentation tasks** read these saved diagnostics and visualize them.
 Then, they present all diagnostics at a presentation outlet.
-
-Diagnostic Types!
-Reference to Naming Scheme!
-
