@@ -11,6 +11,8 @@ The package supports two different installation methods:
 
 The next sections will detail the procedure to install the package for both methods.
 
+.. highlight:: bash
+
 Prerequisites
 =============
 
