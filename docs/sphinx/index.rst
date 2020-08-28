@@ -28,12 +28,3 @@ Currently, it contains the EC-Earth 4 monitoring tool, as well as the Sbatch tas
    :caption: Other Tasks in this Package
    
    source/tasks/sbatch
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
