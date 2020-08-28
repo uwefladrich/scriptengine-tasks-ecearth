@@ -4,6 +4,8 @@ Computational Performance Diagnostics
 
 The processing tasks in this chapter create diagnostics informing about computational performance and the general experiment progress.
 
+.. highlight:: yaml
+
 Scalar
 =======
 

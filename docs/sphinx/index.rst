@@ -17,9 +17,10 @@ Currently, it contains the EC-Earth 4 monitoring tool, as well as the Sbatch tas
 
    source/tasks/monitoring/general-structure
    source/tasks/monitoring/computational-diagnostics
-   source/tasks/monitoring/ocean-diagnostics
-   source/tasks/monitoring/sea-ice-diagnostics
-   source/tasks/monitoring/atmosphere-diagnostics
+   source/tasks/monitoring/nemo-diagnostics
+   source/tasks/monitoring/si3-diagnostics
+   source/tasks/monitoring/openifs-diagnostics
+   source/tasks/monitoring/presentation-tasks
    source/tasks/monitoring/developer-guide
 
 .. toctree::
