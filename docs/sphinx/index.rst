@@ -8,13 +8,14 @@ Currently, it contains the EC-Earth 4 monitoring tool, as well as the Sbatch tas
    :maxdepth: 2
    :caption: Getting Started
 
-   source/usage/installation
+   source/getting-started/installation
+   source/getting-started/usage
 
 .. toctree::
    :maxdepth: 2
    :caption: The Monitoring Tool
 
-   source/tasks/monitoring/processing-tasks
+   source/tasks/monitoring/general-structure
    source/tasks/monitoring/computational-diagnostics
    source/tasks/monitoring/ocean-diagnostics
    source/tasks/monitoring/sea-ice-diagnostics

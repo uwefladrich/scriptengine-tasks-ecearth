@@ -1,7 +1,7 @@
 **Component**,**Spatial Domain**,**Spatial Operation**,**Temporal Domain**,**Temporal Operation**,**Diagnostic Type**
 oifs,global,mean,"*season*: djf, mam,...",mean,scalar
 nemo,"*hemis*: north, south",sum,"*month*: jan, feb,...",min,timeseries
-si3, "*region*: http://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html",min,year,max,map
+si3, "*region*: `region names <http://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html>`_",min,year,max,map
 lpjg,,max,all,,temporalmap
 fesom,,point?,,,
 xios,,...,,,

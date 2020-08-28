@@ -16,9 +16,9 @@ Prerequisites
 
 This package requires a couple of preinstalled Python packages:
 
-    * For everything to work you need to install the ScriptEngine package (`PyPI <https://pypi.org/project/scriptengine/>`_ or `GitHub <https://github.com/uwefladrich/scriptengine>`_
-    * The monitoring tool requires `PyYAML <https://pyyaml.org/>`, `Iris <https://scitools.org.uk/iris/docs/latest/>`_ and `iris-grib <https://github.com/SciTools/iris-grib>`_ to open EC-Earth output files. 
-    * Additionally, `NumPy <https://numpy.org/>`_, `Python-Redmine <https://python-redmine.com/>`_ and `Imageio <http://imageio.github.io/>`_ are required.
+    * For everything to work you need to install the ScriptEngine package (`ScriptEngine on PyPI`_ or `on GitHub`_)
+    * The monitoring tool requires PyYAML_, Iris_ and iris-grib_ to open EC-Earth output files. 
+    * Additionally, NumPy_, Python-Redmine_ and Imageio_ are required.
 
 Most of these requirements will be automatically installed during the installation process. 
 Iris and iris-grib will have to be installed manually, ideally using a Conda environment.
@@ -46,12 +46,26 @@ The package can be installed from inside the *scriptengine-tasks-ecearth* direct
 
     pip install -e .
 
-If you want to run the tests, you will need to install `Pytest <https://docs.pytest.org/en/latest>`_.
+If you want to run the tests, you will need to install Pytest_.
 You can run them from inside the *scriptengine-tasks-ecearth* directory using
 
 :: 
 
     pytest .
 
-To build the documentation manually, you will need `Sphinx <https://www.sphinx-doc.org/>`_.
-The HTML theme is the `Read the Docs Sphinx Theme <https://sphinx-rtd-theme.readthedocs.io/en/stable/index.html>`_.
+To build the documentation manually, you will need Sphinx_.
+The HTML theme is the `Read the Docs Sphinx Theme`_.
+
+
+
+.. _ScriptEngine on PyPI: https://pypi.org/project/scriptengine/
+.. _on GitHub: https://github.com/uwefladrich/scriptengine
+.. _PyYAML: https://pyyaml.org/
+.. _Iris: https://scitools.org.uk/iris/docs/latest/
+.. _iris-grib: https://github.com/SciTools/iris-grib
+.. _NumPy: https://numpy.org/
+.. _Python-Redmine: https://python-redmine.com/
+.. _Imageio: http://imageio.github.io/
+.. _Pytest: https://docs.pytest.org/en/latest
+.. _Sphinx: https://www.sphinx-doc.org/
+.. _Read the Docs Sphinx Theme:  https://sphinx-rtd-theme.readthedocs.io/en/stable/index.html
