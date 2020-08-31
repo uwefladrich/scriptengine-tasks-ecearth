@@ -14,6 +14,7 @@ from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import filters as j2filters
 from helpers.presentation_objects import PresentationObject
 from helpers.exceptions import PresentationException
+from helpers.file_handling import ChangeDirectory
 
 class Redmine(Task):
     """Redmine Presentation Task"""
@@ -31,7 +32,7 @@ class Redmine(Task):
     def run(self, context):
         sources = self.getarg('src', context)
         dst_folder = self.getarg('local_dst', context)
-        issue_subject = self.getarg('subject', context)
+        issue_subject = self.getarg('subject', context, parse_yaml=False)
         template_path = self.getarg('template', context)
         key = self.getarg('api_key', context)
         self.log_info(f"Create Redmine issue '{issue_subject}'.")
@@ -40,6 +41,9 @@ class Redmine(Task):
         presentation_list = self.get_presentation_list(sources, dst_folder)
         redmine_template = self.get_template(context, template_path)
         issue_description = redmine_template.render(presentation_list=presentation_list)
+        with ChangeDirectory(dst_folder):
+            with open("./issue_description.txt", 'w') as outfile:
+                outfile.write(issue_description)
 
         url = 'https://dev.ec-earth.org'
         redmine = redminelib.Redmine(url, key=key)
@@ -104,6 +108,7 @@ class Redmine(Task):
 
         project_identifier = 'ec-earth-experiments'
         tracker_name = 'Experiment'
+        status_identifier = 14 # 'Ongoing'
 
         try:
             tracker = next(t for t in redmine.tracker.all() if t.name == tracker_name)
@@ -123,6 +128,7 @@ class Redmine(Task):
             issue.project_id = project_identifier
             issue.subject = issue_subject
             issue.tracker_id = tracker.id
+            issue.status_id = status_identifier
             issue.is_private = False
 
         return issue
