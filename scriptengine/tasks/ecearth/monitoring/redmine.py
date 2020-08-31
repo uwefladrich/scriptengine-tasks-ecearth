@@ -107,28 +107,27 @@ class Redmine(Task):
         """Connect to Redmine server, find and return issue corresponding to the experiment ID"""
 
         project_identifier = 'ec-earth-experiments'
-        tracker_name = 'Experiment'
+        tracker_identifier = 15 # 'Experiment'
         status_identifier = 14 # 'Ongoing'
+        priority_identifier = 2 # 'Medium'
 
+        # Find issue or create if none exists; define issue's last leg
         try:
-            tracker = next(t for t in redmine.tracker.all() if t.name == tracker_name)
+            filtered_issues = redmine.issue.filter(project_id=project_identifier, tracker_id=tracker_identifier)
         except redminelib.exceptions.AuthError:
             self.log_warning('Could not log in to Redmine server (AuthError)')
             return
-        except StopIteration:
-            self.log_warning('Redmine tracker for EC-Earth experiments not found')
-            return
 
-        # Find issue or create if none exists; define issue's last leg
-        for issue in redmine.issue.filter(project_id=project_identifier, tracker_id=tracker.id):
+        for issue in filtered_issues:
             if issue.subject == issue_subject:
                 break
         else:
             issue = redmine.issue.new()
-            issue.project_id = project_identifier
             issue.subject = issue_subject
-            issue.tracker_id = tracker.id
+            issue.project_id = project_identifier
+            issue.tracker_id = tracker_identifier
             issue.status_id = status_identifier
+            issue.priority_id = priority_identifier
+            issue.assigned_to_id = redmine.auth().id
             issue.is_private = False
-
         return issue
