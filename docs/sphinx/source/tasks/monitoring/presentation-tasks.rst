@@ -37,7 +37,7 @@ The path then must lie at the key ``path``.
 Currently, the following customization features are implemented:
 
 * ``value_range``: set the minimum and maximum value of a time series or (temporal) map. Particularly useful for temporal maps. Default: ``[None, None]``
-* ``colormap``: set a custom colormap for maps and temporal maps. Default: ``RdBu_r``. The list of possible colormaps is in the `Matplotlib documentation <https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html>`
+* ``colormap``: set a custom colormap for maps and temporal maps. Default: ``RdBu_r``. The list of possible colormaps is in the `Matplotlib documentation`_.
 
 Example::
 
@@ -88,3 +88,4 @@ This presentation task creates a Redmine issue on the EC-Earth development porta
 
 .. _repository: https://github.com/valentinaschueller/scriptengine-tasks-ecearth/tree/master/docs/templates
 .. _account settings: https://dev.ec-earth.org/my/account
+.. _Matplotlib documentation: https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html
