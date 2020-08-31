@@ -39,7 +39,7 @@ class DiskusageRteScalar(Scalar):
                     total += entry.stat().st_size
                 elif entry.is_dir():
                     total += self.get_directory_size(entry.path)
-        except NotADirectoryError:
+        except (NotADirectoryError, FileNotFoundError):
             self.log_warning(f"{path} is not a directory. Returning -1.")
             return -1e9 # gets multiplied with 1e-9 again
         except PermissionError:

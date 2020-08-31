@@ -13,7 +13,7 @@ def test_markdown_output_full(tmpdir):
     init = {
         "src": [str(tmpdir) + "/test.yml"],
         "dst": str(tmpdir),
-        "template": './docs/templates/monitoring.md.j2',
+        "template": './docs/templates/markdown_template.md.j2',
     }
     with open(init['src'][0], 'w') as file:
         yaml.dump(init, file)

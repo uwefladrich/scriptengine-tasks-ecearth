@@ -48,6 +48,28 @@ def test_not_a_directory(tmpdir):
     assert expected_result['diagnostic_type'] == result['diagnostic_type']
     assert expected_result['value'] == result['value']
 
+def test_non_existent_directory(tmpdir):
+    init = {
+        'src': str(tmpdir) + "/non-existent",
+        'dst': str(tmpdir) + ".yml",
+    }
+    context = init
+    disk_usage = DiskusageRteScalar(init)
+    disk_usage.run(context)
+    expected_result = {
+        'title': "Disk Usage in GB",
+        'diagnostic_type': 'scalar',
+        'value': -1,
+    }
+    with patch.object(disk_usage, 'log_warning') as mock:
+        disk_usage.run(context)
+    mock.assert_called_with(f"{init['src']} is not a directory. Returning -1.")
+    with open(init['dst']) as file:
+        result = yaml.load(file, Loader=yaml.FullLoader)
+    assert expected_result['title'] == result['title']
+    assert expected_result['diagnostic_type'] == result['diagnostic_type']
+    assert expected_result['value'] == result['value']
+
 def test_permission_error(tmpdir):
     path = str(tmpdir) + '/test.yml'
     forbidden = '/root'

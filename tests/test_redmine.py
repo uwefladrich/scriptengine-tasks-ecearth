@@ -10,13 +10,13 @@ from scriptengine.tasks.ecearth.monitoring.redmine import Redmine
 
 class MockTemplate:
     def render(self, **kwargs):
-        pass
+        return "string"
 
 def test_invalid_key(tmpdir):
     init = {
         "src": str(tmpdir),
         "local_dst": str(tmpdir),
-        "template": str(tmpdir) + "/template.txt.j2",
+        "template": str(tmpdir) + "/redmine_template.txt.j2",
         "subject": "Test Issue",
         "api_key": "Invalid Key"
     }
