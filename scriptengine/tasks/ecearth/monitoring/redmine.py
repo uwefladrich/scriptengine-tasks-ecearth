@@ -63,6 +63,12 @@ class Redmine(Task):
         for item in presentation_list:
             if item['presentation_type'] == 'image':
                 file_name = os.path.basename(item['path'])
+                try:
+                    for attachment in issue.attachments or []:
+                        if attachment.filename == file_name:
+                            redmine.attachment.delete(attachment.id)
+                except redminelib.exceptions.ResourceNotFoundError:
+                    pass
                 issue.uploads.append({'filename': file_name, 'path': f"{dst_folder}/{file_name}"})
         self.log_debug("Saving issue.")
         issue.save()
