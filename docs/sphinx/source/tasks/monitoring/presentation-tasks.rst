@@ -46,9 +46,9 @@ Example::
             - "{{mondir}}/description.yml"
             - "{{mondir}}/exp-id.yml"
             - "{{mondir}}/output-disk-usage.yml"
-            - path: "full/path/to/tos_nemo_global_mean_year_mean_timeseries.nc"
+            - path: "{{mondir}}/tos_nemo_global_mean_year_mean_timeseries.nc"
               value_range: [13, 17]
-            - path: "full/path/to/tos_nemo_year_mean_temporalmap.nc"
+            - path: "{{mondir}}/tos_nemo_year_mean_temporalmap.nc"
               value_range: [-2, 30]
               colormap: 'viridis'
         dst: "{{mondir}}/report"

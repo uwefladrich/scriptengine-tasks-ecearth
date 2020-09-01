@@ -1,5 +1,5 @@
 **********************
-Atmosphere Diagnostics
+OpenIFS Diagnostics
 **********************
 
 These processing tasks assume that the provided input files are GRIB output files from OpenIFS. Further assumptions:
