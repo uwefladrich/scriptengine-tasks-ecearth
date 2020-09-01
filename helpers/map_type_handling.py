@@ -5,7 +5,6 @@ import warnings
 import iris
 import iris.plot as iplt
 import matplotlib.pyplot as plt
-import matplotlib.cm as mpl_cm
 import cftime
 import cf_units as unit
 import cartopy.crs as ccrs
