@@ -1,6 +1,8 @@
 """Presentation Task that uploads Data and Plots to the EC-Earth dev portal."""
 
 import os
+import urllib.parse
+import requests
 
 import redminelib
 import redminelib.exceptions
@@ -40,6 +42,7 @@ class Redmine(Task):
 
         presentation_list = self.get_presentation_list(sources, dst_folder)
         redmine_template = self.get_template(context, template_path)
+        redmine_template.globals['urlencode'] = urllib.parse.quote
         issue_description = redmine_template.render(presentation_list=presentation_list)
         with ChangeDirectory(dst_folder):
             with open("./issue_description.txt", 'w') as outfile:
@@ -111,23 +114,25 @@ class Redmine(Task):
         status_identifier = 14 # 'Ongoing'
         priority_identifier = 2 # 'Medium'
 
-        # Find issue or create if none exists; define issue's last leg
+        # Find issue or create if none exists
+        filtered_issues = redmine.issue.filter(project_id=project_identifier, tracker_id=tracker_identifier)
         try:
-            filtered_issues = redmine.issue.filter(project_id=project_identifier, tracker_id=tracker_identifier)
+            for issue in filtered_issues:
+                if issue.subject == issue_subject:
+                    break
+            else:
+                issue = redmine.issue.new()
+                issue.subject = issue_subject
+                issue.project_id = project_identifier
+                issue.tracker_id = tracker_identifier
+                issue.status_id = status_identifier
+                issue.priority_id = priority_identifier
+                issue.assigned_to_id = redmine.auth().id
+                issue.is_private = False
+            return issue
         except redminelib.exceptions.AuthError:
             self.log_warning('Could not log in to Redmine server (AuthError)')
             return
-
-        for issue in filtered_issues:
-            if issue.subject == issue_subject:
-                break
-        else:
-            issue = redmine.issue.new()
-            issue.subject = issue_subject
-            issue.project_id = project_identifier
-            issue.tracker_id = tracker_identifier
-            issue.status_id = status_identifier
-            issue.priority_id = priority_identifier
-            issue.assigned_to_id = redmine.auth().id
-            issue.is_private = False
-        return issue
+        except requests.exceptions.ConnectionError:
+            self.log_warning('Could not log in to Redmine server (ConnectionError)')
+            return

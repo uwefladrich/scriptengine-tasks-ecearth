@@ -12,7 +12,9 @@ h1. EC-Earth 4: Monitoring
 
 h2. {{item["title"].title()}}
 
-!{{item["path"][2:]}}!  {# [2:] removes the characters "./" from the path string #}
+!{{ urlencode(item["path"][2:]) }}!  
+{# urlencode() encodes + symbols and spaces as %2B, %20 etc. The passed function is urllib.parse.quote #}
+{# [2:] removes the characters "./" from the path string #}
 
 {{item["comment"]}}
 
