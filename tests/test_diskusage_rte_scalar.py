@@ -7,6 +7,7 @@ import yaml
 from scriptengine.tasks.ecearth.monitoring.diskusage_rte_scalar import DiskusageRteScalar
 
 def test_diskusage_working(tmpdir):
+    """test full execution of DiskusageRteScalar"""
     test_path = str(tmpdir)
     subfile = tmpdir.mkdir("sub").join("file.txt")
     subfile.write("content")
@@ -25,6 +26,7 @@ def test_diskusage_working(tmpdir):
 
 
 def test_not_a_directory(tmpdir):
+    """test with erroneous input: file instead of directory"""
     path = tmpdir.mkdir("sub").join("hello.yml")
     path.write("content")
     init = {
@@ -49,6 +51,7 @@ def test_not_a_directory(tmpdir):
     assert expected_result['value'] == result['value']
 
 def test_non_existent_directory(tmpdir):
+    """test with erroneous input: directory does not exist"""
     init = {
         'src': str(tmpdir) + "/non-existent",
         'dst': str(tmpdir) + ".yml",
@@ -71,6 +74,7 @@ def test_non_existent_directory(tmpdir):
     assert expected_result['value'] == result['value']
 
 def test_permission_error(tmpdir):
+    """test with erroneous input: permission error"""
     path = str(tmpdir) + '/test.yml'
     forbidden = '/root'
     init = {
