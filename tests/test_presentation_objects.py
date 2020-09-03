@@ -40,8 +40,8 @@ def test_format_units(unit, expected_result):
 
 def test_format_dates():
     current_date = datetime.datetime.now()
-    changed_year = datetime.datetime(current_date.year - 1, current_date.month, current_date.day)
-    changed_month = datetime.datetime(current_date.year, (current_date.month + 1) % 12, current_date.day)
+    changed_year = datetime.datetime(current_date.year - 1, current_date.month, 25)
+    changed_month = datetime.datetime(current_date.year, (current_date.month + 1) % 12, 25)
     assert [current_date.year, changed_year.year] == po.format_dates([current_date, changed_year])
     assert [current_date.strftime("%Y-%m"), changed_month.strftime("%Y-%m")] == po.format_dates([current_date, changed_month])
 

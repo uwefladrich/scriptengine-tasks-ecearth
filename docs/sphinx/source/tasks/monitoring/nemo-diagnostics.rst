@@ -1,5 +1,5 @@
 *****************
-Ocean Diagnostics
+NEMO Diagnostics
 *****************
 
 The processing tasks in this chapter create diagnostics for the NEMO ocean model.

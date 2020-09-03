@@ -1,5 +1,5 @@
 *******************
-Sea-Ice Diagnostics
+SI3 Diagnostics
 *******************
 
 The processing tasks in this chapter create diagnostics for the SI3 sea ice model.
@@ -33,8 +33,8 @@ This can be used to create a seasonal cycle time series (March-September or simi
 
     - ece.mon.si3_hemis_sum_month_mean_timeseries:
         src:
-            - "{{feb_file}}"
-            - "{{sep_file}}"
+            - "{{feb_file[0]}}"
+            - "{{sep_file[0]}}"
         domain: "{{rundir}}/domain_cfg.nc"
         dst: "{{mondir}}/siarea_si3_south_sum_feb+sep_mean_timeseries.nc"
         hemisphere: south

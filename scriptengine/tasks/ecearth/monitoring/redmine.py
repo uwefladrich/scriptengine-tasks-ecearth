@@ -1,6 +1,8 @@
 """Presentation Task that uploads Data and Plots to the EC-Earth dev portal."""
 
 import os
+import urllib.parse
+import requests
 
 import redminelib
 import redminelib.exceptions
@@ -14,6 +16,7 @@ from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import filters as j2filters
 from helpers.presentation_objects import PresentationObject
 from helpers.exceptions import PresentationException
+from helpers.file_handling import ChangeDirectory
 
 class Redmine(Task):
     """Redmine Presentation Task"""
@@ -31,7 +34,7 @@ class Redmine(Task):
     def run(self, context):
         sources = self.getarg('src', context)
         dst_folder = self.getarg('local_dst', context)
-        issue_subject = self.getarg('subject', context)
+        issue_subject = self.getarg('subject', context, parse_yaml=False)
         template_path = self.getarg('template', context)
         key = self.getarg('api_key', context)
         self.log_info(f"Create Redmine issue '{issue_subject}'.")
@@ -39,7 +42,11 @@ class Redmine(Task):
 
         presentation_list = self.get_presentation_list(sources, dst_folder)
         redmine_template = self.get_template(context, template_path)
+        redmine_template.globals['urlencode'] = urllib.parse.quote
         issue_description = redmine_template.render(presentation_list=presentation_list)
+        with ChangeDirectory(dst_folder):
+            with open("./issue_description.txt", 'w') as outfile:
+                outfile.write(issue_description)
 
         url = 'https://dev.ec-earth.org'
         redmine = redminelib.Redmine(url, key=key)
@@ -103,26 +110,29 @@ class Redmine(Task):
         """Connect to Redmine server, find and return issue corresponding to the experiment ID"""
 
         project_identifier = 'ec-earth-experiments'
-        tracker_name = 'Experiment'
+        tracker_identifier = 15 # 'Experiment'
+        status_identifier = 14 # 'Ongoing'
+        priority_identifier = 2 # 'Medium'
 
+        # Find issue or create if none exists
+        filtered_issues = redmine.issue.filter(project_id=project_identifier, tracker_id=tracker_identifier)
         try:
-            tracker = next(t for t in redmine.tracker.all() if t.name == tracker_name)
+            for issue in filtered_issues:
+                if issue.subject == issue_subject:
+                    break
+            else:
+                issue = redmine.issue.new()
+                issue.subject = issue_subject
+                issue.project_id = project_identifier
+                issue.tracker_id = tracker_identifier
+                issue.status_id = status_identifier
+                issue.priority_id = priority_identifier
+                issue.assigned_to_id = redmine.auth().id
+                issue.is_private = False
+            return issue
         except redminelib.exceptions.AuthError:
             self.log_warning('Could not log in to Redmine server (AuthError)')
             return
-        except StopIteration:
-            self.log_warning('Redmine tracker for EC-Earth experiments not found')
+        except requests.exceptions.ConnectionError:
+            self.log_warning('Could not log in to Redmine server (ConnectionError)')
             return
-
-        # Find issue or create if none exists; define issue's last leg
-        for issue in redmine.issue.filter(project_id=project_identifier, tracker_id=tracker.id):
-            if issue.subject == issue_subject:
-                break
-        else:
-            issue = redmine.issue.new()
-            issue.project_id = project_identifier
-            issue.subject = issue_subject
-            issue.tracker_id = tracker.id
-            issue.is_private = False
-
-        return issue
