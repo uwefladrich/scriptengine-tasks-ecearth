@@ -75,5 +75,6 @@ The task/class/module name should be the presentation outlet, e.g. Markdown.
 Their YAML representation is preceded by *ece.mon.presentation* to make them distinguishable from processing tasks.
 
 .. _`scriptengine/tasks/ecearth/monitoring`: https://github.com/uwefladrich/scriptengine-tasks-ecearth/tree/master/scriptengine/tasks/ecearth/monitoring
+.. _`helpers`: https://github.com/uwefladrich/scriptengine-tasks-ecearth/tree/master/helpers
 .. _`ScriptEngine Task`: https://github.com/uwefladrich/scriptengine/blob/master/scriptengine/tasks/base/task.py
 .. _`scriptengine/tasks/ecearth/__init__.py`: https://github.com/uwefladrich/scriptengine-tasks-ecearth/tree/master/scriptengine/tasks/ecearth/__init__.py
