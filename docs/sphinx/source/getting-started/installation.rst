@@ -6,42 +6,58 @@ The ScriptEngine tasks for EC-Earth require a Unix(-like) operating system and P
 
 The package supports two different installation methods:
 
-    * Installation using PyPI (see https://pypi.org);
-    * Installation from source (source code available at https://github.com/uwefladrich/scriptengine-tasks-ecearth).
+    * Installation using conda and PyPI/pip;
+    * Installation from source.
 
 The next sections will detail the procedure to install the package for both methods.
 
 .. highlight:: bash
 
-Prerequisites
-=============
+Installation using conda and pip
+================================
 
-This package requires a couple of preinstalled Python packages:
+This is the recommended way to install this package.
 
-    * For everything to work you need to install the ScriptEngine package (`ScriptEngine on PyPI`_ or `on GitHub`_)
-    * The monitoring tool requires PyYAML_, Iris_ and iris-grib_ to open EC-Earth output files. 
-    * Additionally, NumPy_, Python-Redmine_ and Imageio_ are required.
+Get the conda package manager following the `instructions`_. 
+Create an environment and activate it with 
 
-Most of these requirements will be automatically installed during the installation process. 
-Iris and iris-grib will have to be installed manually, ideally using a Conda environment.
-See the respective documentation for more information on that.
+::
 
-Installation using PyPI
-=======================
+    conda create --name your_environment_name python=3.6 # or 3.7 or 3.8
+    conda activate your_environment_name
 
-Make sure that Iris and iris-grib are installed before installing from PyPI.
-The package can be installed using
+Alternatively, activate the existing conda environment you want to use for this package.
+
+Update your conda environment using the file ``conda_environment.yml`` in the GitHub repository::
+
+    conda env update -n your_environment_name --file conda_environment.yml
+
+This YAML file contains necessary dependencies for packages that *should* be installed via conda (like Iris or eccodes).
+You can also install these packages from source, but this will require a lot more attention during the setup process. 
+Refer to the documentation of the packages in ``conda_environment.yml`` for more information on installing them.
+
+The ScriptEngine tasks for EC-Earth can then be installed using
 
 ::
 
     pip install scriptengine-tasks-ecearth
+
+The remaining dependencies will be installed automatically.
 
 
 Installation from Source
 ========================
 
 You can download or clone the source code from https://github.com/uwefladrich/scriptengine-tasks-ecearth.
-Make sure that Iris and iris-grib are installed before installing the package.
+
+Update your conda environment using the file ``conda_environment.yml`` in the GitHub repository::
+
+    conda env update -n your_environment_name --file conda_environment.yml
+
+This YAML file contains necessary dependencies for packages that *should* be installed via conda (like Iris or eccodes).
+You can also install these packages from source, but this will require a lot more attention during the setup process. 
+Refer to the documentation of the packages in ``conda_environment.yml`` for more information on installing them.
+
 The package can be installed from inside the *scriptengine-tasks-ecearth* directory (assuming you did not choose a different name) using
 
 ::
@@ -58,16 +74,8 @@ You can run them from inside the *scriptengine-tasks-ecearth* directory using
 To build the documentation manually, you will need Sphinx_.
 The HTML theme is the `Read the Docs Sphinx Theme`_.
 
-
-
-.. _ScriptEngine on PyPI: https://pypi.org/project/scriptengine/
+.. _instructions: https://docs.conda.io/projects/conda/en/latest/user-guide/install/
 .. _on GitHub: https://github.com/uwefladrich/scriptengine
-.. _PyYAML: https://pyyaml.org/
-.. _Iris: https://scitools.org.uk/iris/docs/latest/
-.. _iris-grib: https://github.com/SciTools/iris-grib
-.. _NumPy: https://numpy.org/
-.. _Python-Redmine: https://python-redmine.com/
-.. _Imageio: http://imageio.github.io/
 .. _Pytest: https://docs.pytest.org/en/latest
 .. _Sphinx: https://www.sphinx-doc.org/
 .. _Read the Docs Sphinx Theme:  https://sphinx-rtd-theme.readthedocs.io/en/stable/index.html

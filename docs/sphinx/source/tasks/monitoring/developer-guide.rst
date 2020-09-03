@@ -4,6 +4,23 @@ Developer's Guide
 
 This part summarizes guidelines for extending the monitoring tool.
 
+Code Structure
+==============
+
+All monitoring tasks are contained in `scriptengine/tasks/ecearth/monitoring`_.
+`helpers`_ contains modules with functions and classes that are needed in multiple, unrelated, processing and presentation tasks.
+
+All monitoring tasks inherit from the generic `ScriptEngine Task`_.
+Processing tasks have an inheritance substructure defined by their diagnostic type.
+New processing tasks should adhere to these structure: 
+Either inherit from the corresponding Diagnostictype class (Scalar, Timeseries, Map, Temporalmap) or create a new one if it is a new diagnostic type.
+The Diagnostictype class provides a ``save()`` method that can be reused by all inherited tasks.
+This structure is illustrated below:
+
+.. image:: class_diagram.png
+
+To make a task accessible to users, add it to `scriptengine/tasks/ecearth/__init__.py`_.
+
 Logging Policy
 ==============
 
@@ -56,3 +73,7 @@ Naming Presentation Tasks
 Naming presentation tasks is not as standardized as for processing tasks.
 The task/class/module name should be the presentation outlet, e.g. Markdown.
 Their YAML representation is preceded by *ece.mon.presentation* to make them distinguishable from processing tasks.
+
+.. _`scriptengine/tasks/ecearth/monitoring`: https://github.com/uwefladrich/scriptengine-tasks-ecearth/tree/master/scriptengine/tasks/ecearth/monitoring
+.. _`ScriptEngine Task`: https://github.com/uwefladrich/scriptengine/blob/master/scriptengine/tasks/base/task.py
+.. _`scriptengine/tasks/ecearth/__init__.py`: https://github.com/uwefladrich/scriptengine-tasks-ecearth/tree/master/scriptengine/tasks/ecearth/__init__.py
