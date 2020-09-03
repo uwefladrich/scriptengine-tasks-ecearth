@@ -1,7 +1,7 @@
 channels:
     - conda-forge
 dependencies:
+    - python>=3.6
     - iris>=2.4
     - cartopy>=0.18
     - python-eccodes
-    - pep8
