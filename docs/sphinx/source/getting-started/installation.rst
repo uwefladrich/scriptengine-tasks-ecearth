@@ -18,7 +18,7 @@ Installation using conda and pip
 
 This is the recommended way to install this package.
 
-Get the conda package manager following the `instructions`_. 
+Get the conda package manager following the `instructions`_ for your operating system. 
 Create an environment and activate it with 
 
 ::
