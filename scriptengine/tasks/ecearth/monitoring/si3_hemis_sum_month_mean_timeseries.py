@@ -17,7 +17,7 @@ meta_dict = {
             'standard_name': 'sea_ice_volume',
             'var_name': 'sivol',
             'old_unit': 'm3',
-            'new_unit': '1e3 m3',
+            'new_unit': '1e3 km3',
         },
     'siconc':
         {
@@ -25,7 +25,7 @@ meta_dict = {
             'standard_name': 'sea_ice_area',
             'var_name': 'siarea',
             'old_unit': 'm2',
-            'new_unit': '1e6 m2',
+            'new_unit': '1e6 km2',
         },
 }
 
