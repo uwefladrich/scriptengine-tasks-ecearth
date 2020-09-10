@@ -86,6 +86,6 @@ This presentation task creates a Redmine issue on the EC-Earth development porta
         subject: "{{exp_id}}: Short Description"
         template: "scriptengine-tasks-ecearth/docs/templates/redmine_template.txt.j2"
 
-.. _repository: https://github.com/valentinaschueller/scriptengine-tasks-ecearth/tree/master/docs/templates
+.. _repository: https://github.com/uwefladrich/scriptengine-tasks-ecearth/tree/master/docs/templates
 .. _account settings: https://dev.ec-earth.org/my/account
 .. _Matplotlib documentation: https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html
