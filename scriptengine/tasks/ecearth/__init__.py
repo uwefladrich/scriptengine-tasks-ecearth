@@ -3,39 +3,40 @@
 This module provides SE tasks for the EC-Earth ESM
 """
 
-from .monitoring.simulated_legs import SimulatedLegs
-from .monitoring.simulated_years import SimulatedYears
-from .monitoring.write_scalar import WriteScalar
-from .monitoring.markdown_output import MarkdownOutput
-from .monitoring.global_average import GlobalAverage
-from .monitoring.disk_usage import DiskUsage
-from .monitoring.ice_volume import SeaIceVolume
-from .monitoring.ice_area import SeaIceArea
-from .monitoring.ocean_static_map import OceanStaticMap
-from .monitoring.ocean_dynamic_map import OceanDynamicMap
-from .monitoring.atmosphere_static_map import AtmosphereStaticMap
-from .monitoring.atmosphere_dynamic_map import AtmosphereDynamicMap
-from .monitoring.sithic_static_map import SithicStaticMap
-from .monitoring.siconc_dynamic_map import SiconcDynamicMap
-from .monitoring.atmosphere_time_series import AtmosphereTimeSeries
+from .monitoring.simulatedyears_rte_scalar import SimulatedyearsRteScalar
+from .monitoring.scalar import Scalar
+from .monitoring.markdown import Markdown
+from .monitoring.nemo_global_mean_year_mean_timeseries import NemoGlobalMeanYearMeanTimeseries
+from .monitoring.diskusage_rte_scalar import DiskusageRteScalar
+from .monitoring.si3_hemis_sum_month_mean_timeseries import Si3HemisSumMonthMeanTimeseries
+from .monitoring.nemo_all_mean_map import NemoAllMeanMap
+from .monitoring.nemo_time_mean_temporalmap import NemoYearMeanTemporalmap, NemoMonthMeanTemporalmap
+from .monitoring.oifs_all_mean_map import OifsAllMeanMap
+from .monitoring.oifs_year_mean_temporalmap import OifsYearMeanTemporalmap
+from .monitoring.si3_hemis_point_month_mean_all_mean_map import Si3HemisPointMonthMeanAllMeanMap
+from .monitoring.si3_hemis_point_month_mean_temporalmap import Si3HemisPointMonthMeanTemporalmap
+from .monitoring.oifs_global_mean_year_mean_timeseries import OifsGlobalMeanYearMeanTimeseries
+from .monitoring.timeseries import Timeseries
+from .monitoring.redmine import Redmine
 from .slurm import Sbatch
 
 def task_loader_map():
     return {
         'sbatch': Sbatch,
-        'ece.mon.sim_legs': SimulatedLegs,
-        'ece.mon.sim_years': SimulatedYears,
-        'ece.mon.write_scalar': WriteScalar,
-        'ece.mon.markdown_report': MarkdownOutput,
-        'ece.mon.global_avg': GlobalAverage,
-        'ece.mon.disk_usage': DiskUsage,
-        'ece.mon.ice_volume': SeaIceVolume,
-        'ece.mon.ice_area': SeaIceArea,
-        'ece.mon.ocean_static_map': OceanStaticMap,
-        'ece.mon.ocean_dynamic_map': OceanDynamicMap,
-        'ece.mon.atmosphere_static_map': AtmosphereStaticMap,
-        'ece.mon.atmosphere_dynamic_map': AtmosphereDynamicMap,
-        'ece.mon.sithic_static_map': SithicStaticMap,
-        'ece.mon.siconc_dynamic_map': SiconcDynamicMap,
-        'ece.mon.atmosphere_ts': AtmosphereTimeSeries,
+        'ece.mon.scalar': Scalar,
+        'ece.mon.timeseries': Timeseries,
+        'ece.mon.diskusage_rte_scalar': DiskusageRteScalar,
+        'ece.mon.simulatedyears_rte_scalar': SimulatedyearsRteScalar,
+        'ece.mon.nemo_global_mean_year_mean_timeseries': NemoGlobalMeanYearMeanTimeseries,
+        'ece.mon.nemo_all_mean_map': NemoAllMeanMap,
+        'ece.mon.nemo_month_mean_temporalmap': NemoMonthMeanTemporalmap,
+        'ece.mon.nemo_year_mean_temporalmap': NemoYearMeanTemporalmap,
+        'ece.mon.si3_hemis_sum_month_mean_timeseries': Si3HemisSumMonthMeanTimeseries,
+        'ece.mon.si3_hemis_point_month_mean_all_mean_map': Si3HemisPointMonthMeanAllMeanMap,
+        'ece.mon.si3_hemis_point_month_mean_temporalmap': Si3HemisPointMonthMeanTemporalmap,
+        'ece.mon.oifs_all_mean_map': OifsAllMeanMap,
+        'ece.mon.oifs_year_mean_temporalmap': OifsYearMeanTemporalmap,
+        'ece.mon.oifs_global_mean_year_mean_timeseries': OifsGlobalMeanYearMeanTimeseries,
+        'ece.mon.presentation.markdown': Markdown,
+        'ece.mon.presentation.redmine': Redmine,
         }

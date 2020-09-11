@@ -5,7 +5,6 @@ import warnings
 import iris
 import iris.plot as iplt
 import matplotlib.pyplot as plt
-import matplotlib.cm as mpl_cm
 import cftime
 import cf_units as unit
 import cartopy.crs as ccrs
@@ -18,9 +17,9 @@ def function_mapper(map_type_string):
     }
     return mapper.get(map_type_string, None)
 
-def global_ocean_plot(cube, title=None, dates=None, units=None, min_value=None, max_value=None):
+def global_ocean_plot(cube, title=None, dates=None, units=None, value_range=[None, None], colormap='RdBu_r', **kwargs):
     """Map Type Handling for Global Ocean Maps"""
-    fig = plt.figure(figsize=(6, 4), dpi=300)
+    fig = plt.figure(figsize=(6, 4), dpi=150)
     fig.suptitle(title)
     ax = fig.add_subplot(
         1, 1, 1,
@@ -47,9 +46,9 @@ def global_ocean_plot(cube, title=None, dates=None, units=None, min_value=None, 
         im = iplt.pcolormesh(
             projected_cube,
             axes=ax,
-            vmin=min_value,
-            vmax=max_value,
-            cmap='RdBu_r',
+            vmin=value_range[0],
+            vmax=value_range[1],
+            cmap=colormap,
             )
     cbar = fig.colorbar(im, orientation='horizontal')
     cbar.set_label(units)
@@ -57,9 +56,9 @@ def global_ocean_plot(cube, title=None, dates=None, units=None, min_value=None, 
     ax.coastlines()
     return fig
 
-def global_atmosphere_plot(cube, title=None, dates=None, min_value=None, max_value=None, units=None):
+def global_atmosphere_plot(cube, title=None, dates=None, units=None, value_range=[None, None], colormap='RdBu_r', **kwargs):
     """Map Type Handling for Global Atmosphere Maps"""
-    fig = plt.figure(figsize=(6, 4), dpi=300)
+    fig = plt.figure(figsize=(6, 4), dpi=150)
     fig.suptitle(title)
     ax = fig.add_subplot(
         1, 1, 1,
@@ -75,10 +74,10 @@ def global_atmosphere_plot(cube, title=None, dates=None, min_value=None, max_val
         s=1,
         c=data,
         axes=ax,
-        vmin=min_value,
-        vmax=max_value,
+        vmin=value_range[0],
+        vmax=value_range[1],
+        cmap=colormap,
         transform=ccrs.PlateCarree(),
-        cmap='RdBu_r',
     )
     cbar = fig.colorbar(im, orientation='horizontal')
     cbar.set_label(units)
@@ -86,10 +85,10 @@ def global_atmosphere_plot(cube, title=None, dates=None, min_value=None, max_val
     ax.coastlines()
     return fig
 
-def polar_ice_sheet_plot(cube, title=None, dates=None, min_value=None, max_value=None, units=None):
-    fig = plt.figure(figsize=(6,4), dpi=300)
+def polar_ice_sheet_plot(cube, title=None, dates=None, units=None, value_range=[None, None], colormap='RdBu_r', **kwargs):
+    fig = plt.figure(figsize=(6,4), dpi=150)
     fig.suptitle(title)
-    if "North" in cube.long_name:
+    if "north" in cube.long_name or "North" in cube.long_name:
         center = 90.0
     else:
         center = -90.0
@@ -118,9 +117,9 @@ def polar_ice_sheet_plot(cube, title=None, dates=None, min_value=None, max_value
         im = iplt.pcolormesh(
             projected_cube,
             axes=ax,
-            vmin=min_value,
-            vmax=max_value,
-            cmap='RdBu_r',
+            vmin=value_range[0],
+            vmax=value_range[1],
+            cmap=colormap,
             )
     bar = fig.colorbar(im, orientation='horizontal')
     if units:

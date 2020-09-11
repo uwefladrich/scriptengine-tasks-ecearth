@@ -20,19 +20,14 @@ class ChangeDirectory:
     def __exit__(self, etype, value, traceback):
         os.chdir(self.saved_path)
 
-def get_month_from_src(month, path_list):
-    """
-    function to get path for desired month from path_list
-    """
-    for path in path_list:
-        if path[-5:-3] == month:
-            return path
-    raise FileNotFoundError(f"Month {month} not found in {path_list}!")
-
-def compute_spatial_weights(domain_src, array_shape):
+def compute_spatial_weights(domain_src, array_shape, grid):
     "Compute weights for spatial averaging"
     domain_cfg = iris.load(domain_src)
-    cell_areas = domain_cfg.extract('e1t')[0][0] * domain_cfg.extract('e2t')[0][0]
+    scale_factors = [
+        domain_cfg.extract(f'e1{grid.lower()}')[0][0],
+        domain_cfg.extract(f'e2{grid.lower()}')[0][0],
+    ]
+    cell_areas = scale_factors[0] * scale_factors[1]
     cell_weights = np.broadcast_to(cell_areas.data, array_shape)
     return cell_weights
 
@@ -62,14 +57,13 @@ def load_input_cube(src, varname):
     leg_cube = month_cubes.concatenate_cube()
     return leg_cube
 
-def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs):
+def set_metadata(cube, title=None, comment=None, **kwargs):
     """Set metadata for diagnostic."""
     metadata = {
         'title': title,
         'comment': comment,
-        'type': diagnostic_type,
         'source': 'EC-Earth 4',
-        'Conventions': 'CF-1.7',
+        'Conventions': 'CF-1.8',
         }
     for key, value in kwargs.items():
         metadata[f'{key}'] = value
@@ -82,7 +76,8 @@ def set_metadata(cube, title=None, comment=None, diagnostic_type=None, **kwargs)
         'online_operation',
         ]
     for key, value in metadata.items():
-        cube.attributes[key] = value
+        if value is not None:
+            cube.attributes[key] = value
     for key in metadata_to_discard:
         cube.attributes.pop(key, None)
     return cube
