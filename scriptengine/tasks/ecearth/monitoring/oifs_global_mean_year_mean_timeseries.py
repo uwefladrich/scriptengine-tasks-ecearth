@@ -16,7 +16,7 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
 
     _required_arguments = ('src', 'grib_code', 'dst', )
 
-    def __init__(self, arguments):
+    def __init__(self, arguments=None):
         OifsGlobalMeanYearMeanTimeseries.check_arguments(arguments)
         super().__init__({**arguments, 'title': None, 'coord_value': None, 'data_value': None})
 
