@@ -13,11 +13,11 @@ from .temporalmap import Temporalmap
 class OifsYearMeanTemporalmap(Temporalmap):
     """OifsYearMeanTemporalmap Processing Task"""
 
-    def __init__(self, parameters):
-        super().__init__(
-            parameters,
-            required_parameters=['src', 'dst', 'grib_code']
-            )
+    _required_arguments = ('src', 'dst', 'grib_code', )
+
+    def __init__(self, arguments=None):
+        OifsYearMeanTemporalmap.check_arguments(arguments)
+        super().__init__(arguments)
 
     @timed_runner
     def run(self, context):

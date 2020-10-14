@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pytest
 import yaml
+import scriptengine.exceptions
 
 from scriptengine.tasks.ecearth.monitoring.scalar import Scalar
 
@@ -79,7 +80,7 @@ def test_scalar_runtime_error(tmpdir):
         'dst': path,
     }
     pytest.raises(
-        RuntimeError,
+        scriptengine.exceptions.ScriptEngineTaskArgumentMissingError,
         Scalar,
         init,
         )

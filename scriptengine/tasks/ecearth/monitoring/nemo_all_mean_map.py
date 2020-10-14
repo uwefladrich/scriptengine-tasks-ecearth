@@ -9,11 +9,11 @@ from .map import Map
 class NemoAllMeanMap(Map):
     """NemoAllMeanMap Processing Task"""
 
-    def __init__(self, parameters):
-        super().__init__(
-            parameters,
-            required_parameters=['src', 'dst', 'varname']
-            )
+    _required_arguments = ('src', 'dst', 'varname', )
+
+    def __init__(self, arguments=None):
+        NemoAllMeanMap.check_arguments(arguments)
+        super().__init__(arguments)
 
     @timed_runner
     def run(self, context):

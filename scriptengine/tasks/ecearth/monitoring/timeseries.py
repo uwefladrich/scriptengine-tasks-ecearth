@@ -10,21 +10,15 @@ from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
 
+
 class Timeseries(Task):
     """Processing Task that writes out a generalized time series diagnostic."""
 
-    def __init__(self, parameters, required_parameters = None):
-        required = [
-            "title",
-            "coord_value",
-            "data_value",
-            "dst",
-        ]
-        super().__init__(
-            __name__,
-            parameters,
-            required_parameters=required + (required_parameters or [])
-            )
+    _required_arguments = ('title', 'coord_value', 'data_value', 'dst')
+
+    def __init__(self, arguments=None):
+        Timeseries.check_arguments(arguments)
+        super().__init__(arguments)
 
     @timed_runner
     def run(self, context):

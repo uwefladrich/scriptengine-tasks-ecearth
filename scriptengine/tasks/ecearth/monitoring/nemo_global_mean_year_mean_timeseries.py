@@ -10,11 +10,12 @@ from .timeseries import Timeseries
 
 class NemoGlobalMeanYearMeanTimeseries(Timeseries):
     """NemoGlobalMeanYearMeanTimeseries Processing Task"""
-    def __init__(self, parameters):
-        super().__init__(
-            {**parameters, 'title': None, 'coord_value': None, 'data_value': None},
-            required_parameters=['src', 'domain', 'varname']
-            )
+
+    _required_arguments = ('src', 'domain', 'varname', 'dst', )
+
+    def __init__(self, arguments):
+        NemoGlobalMeanYearMeanTimeseries.check_arguments(arguments)
+        super().__init__({**arguments, 'title': None, 'coord_value': None, 'data_value': None})
 
     @timed_runner
     def run(self, context):

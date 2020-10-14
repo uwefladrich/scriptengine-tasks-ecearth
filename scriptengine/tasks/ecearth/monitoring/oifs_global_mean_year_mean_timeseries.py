@@ -1,6 +1,5 @@
 """Processing Task that creates a 2D map of a given extensive ocean quantity."""
 
-import os
 import warnings
 
 import iris
@@ -14,11 +13,12 @@ from .timeseries import Timeseries
 
 class OifsGlobalMeanYearMeanTimeseries(Timeseries):
     """OifsGlobalMeanYearMeanTimeseries Processing Task"""
-    def __init__(self, parameters):
-        super().__init__(
-            {**parameters, 'title': None, 'coord_value': None, 'data_value': None},
-            required_parameters=['src', 'grib_code']
-            )
+
+    _required_arguments = ('src', 'grib_code', 'dst', )
+
+    def __init__(self, arguments):
+        OifsGlobalMeanYearMeanTimeseries.check_arguments(arguments)
+        super().__init__({**arguments, 'title': None, 'coord_value': None, 'data_value': None})
 
     @timed_runner
     def run(self, context):

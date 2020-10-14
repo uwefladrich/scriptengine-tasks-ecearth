@@ -20,15 +20,18 @@ from helpers.file_handling import ChangeDirectory
 
 class Redmine(Task):
     """Redmine Presentation Task"""
-    def __init__(self, parameters):
-        required = [
-            "src",
-            "local_dst",
-            "subject",
-            "template",
-            "api_key",
-        ]
-        super().__init__(__name__, parameters, required_parameters=required)
+
+    _required_arguments = (
+            'src',
+            'local_dst',
+            'subject',
+            'template',
+            'api_key',
+        )
+
+    def __init__(self, arguments=None):
+        Redmine.check_arguments(arguments)
+        super().__init__(arguments)
 
     @timed_runner
     def run(self, context):

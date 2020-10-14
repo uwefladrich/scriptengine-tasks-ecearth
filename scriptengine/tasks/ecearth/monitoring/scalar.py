@@ -5,20 +5,15 @@ import yaml
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 
+
 class Scalar(Task):
     """Processing Task that writes out a generalized scalar diagnostic."""
 
-    def __init__(self, parameters, required_parameters=None):
-        required = [
-            "title",
-            "value",
-            "dst",
-        ]
-        super().__init__(
-            __name__,
-            parameters,
-            required_parameters=required + (required_parameters or [])
-            )
+    _required_arguments = ('title', 'value', 'dst', )
+
+    def __init__(self, arguments=None):
+        Scalar.check_arguments(arguments)
+        super().__init__(arguments)
 
     @timed_runner
     def run(self, context):

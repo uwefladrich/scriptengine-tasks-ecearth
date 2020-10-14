@@ -15,13 +15,16 @@ from helpers.exceptions import PresentationException
 
 class Markdown(Task):
     """Markdown Presentation Task"""
-    def __init__(self, parameters):
-        required = [
-            "src",
-            "dst",
-            "template",
-        ]
-        super().__init__(__name__, parameters, required_parameters=required)
+
+    _required_arguments = (
+        'src',
+        'dst',
+        'template',
+    )
+
+    def __init__(self, arguments=None):
+        Markdown.check_arguments(arguments)
+        super().__init__(arguments)
 
     @timed_runner
     def run(self, context):

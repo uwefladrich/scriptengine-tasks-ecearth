@@ -5,13 +5,15 @@ from dateutil.relativedelta import relativedelta
 from scriptengine.tasks.base.timing import timed_runner
 from .scalar import Scalar
 
+
 class SimulatedyearsRteScalar(Scalar):
     """SimulatedyearsRteScalar Processing Task"""
-    def __init__(self, parameters):
-        super().__init__(
-            parameters={**parameters, 'value': None, 'title': None},
-            required_parameters=['start', 'end']
-            )
+
+    _required_arguments = ('start', 'end', 'dst', )
+
+    def __init__(self, arguments=None):
+        SimulatedyearsRteScalar.check_arguments(arguments)
+        super().__init__({**arguments, 'value': None, 'title': None})
 
     @timed_runner
     def run(self, context):
