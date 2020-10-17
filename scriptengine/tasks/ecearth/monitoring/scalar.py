@@ -4,6 +4,7 @@ import yaml
 
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
+from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 
 
 class Scalar(Task):
@@ -36,7 +37,9 @@ class Scalar(Task):
             with open(dst, 'w') as outfile:
                 yaml.dump(filtered_dict, outfile, sort_keys=False)
         else:
-            self.log_warning((
+            msg = (
                 f"{dst} does not end in valid YAML file extension. "
                 f"Diagnostic will not be saved."
-            ))
+            )
+            self.log_error(msg)
+            raise ScriptEngineTaskArgumentInvalidError(msg)
