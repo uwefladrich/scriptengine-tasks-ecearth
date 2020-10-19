@@ -3,15 +3,12 @@
 import os
 
 import iris
-import numpy as np
 
+from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.base import Task
 
 class Temporalmap(Task):
     """Temporalmap Processing Task"""
-
-    def __init__(self, parameters, required_parameters = None):
-        super().__init__(__name__, parameters, required_parameters)
 
     def run(self, context):
         raise NotImplementedError('Base class function Temporalmap.run() must not be called')
@@ -45,12 +42,12 @@ class Temporalmap(Task):
         # remove temporary save
         os.remove('temp.nc')
 
-    def correct_file_extension(self, dst):
+    def check_file_extension(self, dst):
         """check if destination file has a valid netCDF extension"""
         if not dst.endswith(".nc"):
-            self.log_warning((
+            msg = (
                 f"{dst} does not end in valid netCDF file extension. "
                 f"Diagnostic will not be treated, returning now."
-            ))
-            return False
-        return True
+            )
+            self.log_error(msg)
+            raise ScriptEngineTaskArgumentInvalidError(msg)

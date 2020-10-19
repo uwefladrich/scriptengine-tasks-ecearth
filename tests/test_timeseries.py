@@ -4,10 +4,12 @@ import datetime
 from unittest.mock import patch
 
 import iris
+import pytest
 
+import scriptengine.exceptions
 from scriptengine.tasks.ecearth.monitoring.timeseries import Timeseries
 
-def test_time_series_dst_error():
+def test_timeseries_dst_error():
     init = {
         "title": "A Test Diagnostic",
         "dst": "dst_file.yml",
@@ -15,7 +17,11 @@ def test_time_series_dst_error():
         "coord_value": 0,
     }
     time_series = Timeseries(init)
-    assert not time_series.correct_file_extension(init['dst'])
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
+        time_series.check_file_extension,
+        init['dst'],
+        )
 
 def test_monotonic_increase():
     init = {
@@ -28,13 +34,24 @@ def test_monotonic_increase():
 
     old_coord = iris.coords.Coord([1])
     new_coord = iris.coords.Coord([2])
-    assert time_series.test_monotonic_increase(old_coord, new_coord)
-    assert not time_series.test_monotonic_increase(new_coord, old_coord)
+    assert time_series.test_monotonic_increase(old_coord, new_coord) is None
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskRunError,
+        time_series.test_monotonic_increase,
+        new_coord,
+        old_coord,
+        )
 
-    old_coord_with_bounds = iris.coords.Coord([2], bounds=[0.5, 1.5])
-    new_coord_with_bounds = iris.coords.Coord([1], bounds=[1.5, 2.5])
-    assert time_series.test_monotonic_increase(old_coord_with_bounds, new_coord_with_bounds)
-    assert not time_series.test_monotonic_increase(new_coord_with_bounds, old_coord_with_bounds)
+    old_coord_with_bounds = iris.coords.Coord([1], bounds=[0.5, 1.5])
+    new_coord_with_bounds = iris.coords.Coord([2], bounds=[1.5, 2.5])
+    assert time_series.test_monotonic_increase(old_coord_with_bounds, new_coord_with_bounds) is None
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskRunError,
+        time_series.test_monotonic_increase,
+        new_coord_with_bounds,
+        old_coord_with_bounds,
+        )
+
 
 def test_time_series_first_save(tmpdir):
     init = {
@@ -104,10 +121,11 @@ def test_time_series_append_nonmonotonic(tmpdir):
     }
 
     time_series = Timeseries(init_b)
-    with patch.object(time_series, 'log_warning') as mock:
-        time_series.run(init_b)
-    mock.assert_called_with("Non-monotonic coordinate. Cube will not be saved.")
-    
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskRunError,
+        time_series.run,
+        init_b,
+    )
 
 
 def test_time_series_date_time(tmpdir):

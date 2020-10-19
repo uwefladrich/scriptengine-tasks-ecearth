@@ -1,9 +1,9 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/oifs_year_mean_temporalmap.py"""
 
-from unittest.mock import patch
-
+import pytest
 import iris
 
+import scriptengine.exceptions
 from scriptengine.tasks.ecearth.monitoring.oifs_year_mean_temporalmap import OifsYearMeanTemporalmap
 
 def test_oifs_year_mean_temporalmap_working(tmpdir):
@@ -29,6 +29,8 @@ def test_oifs_year_mean_temporalmap_wrong_code(tmpdir):
         "grib_code": 500,
     }
     atmos_time_map = OifsYearMeanTemporalmap(init)
-    with patch.object(atmos_time_map, 'log_warning') as mock:
-        atmos_time_map.run(init)
-    mock.assert_called_with(f"CF Phenomenon for {init['grib_code']} not found. Update local table?")
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
+        atmos_time_map.run,
+        init,
+    )

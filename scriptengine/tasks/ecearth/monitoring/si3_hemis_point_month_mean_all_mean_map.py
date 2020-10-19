@@ -6,6 +6,7 @@ import numpy as np
 import iris
 import cftime
 
+from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.base.timing import timed_runner
 import helpers.file_handling as helpers
 from .map import Map
@@ -18,11 +19,11 @@ meta_dict = {
 class Si3HemisPointMonthMeanAllMeanMap(Map):
     """Si3HemisPointMonthMeanAllMeanMap Processing Task"""
 
-    def __init__(self, parameters):
-        super().__init__(
-            parameters,
-            required_parameters=['src', 'dst', 'hemisphere', 'varname']
-            )
+    _required_arguments = ('src', 'dst', 'hemisphere', 'varname', )
+
+    def __init__(self, arguments=None):
+        Si3HemisPointMonthMeanAllMeanMap.check_arguments(arguments)
+        super().__init__(arguments)
 
     @timed_runner
     def run(self, context):
@@ -34,19 +35,20 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
         self.log_debug(f"Source file(s): {src}")
 
         if varname not in meta_dict:
-            self.log_warning((
+            msg = (
                 f"'varname' must be one of the following: {meta_dict.keys()} "
                 f"Diagnostic will not be treated, returning now."
-            ))
-            return
+            )
+            self.log_error(msg)
+            raise ScriptEngineTaskArgumentInvalidError(msg)
         if not hemisphere in ('north', 'south'):
-            self.log_warning((
+            msg = (
                 f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
                 f"Diagnostic will not be treated, returning now."
-            ))
-            return
-        if not self.correct_file_extension(dst):
-            return
+            )
+            self.log_error(msg)
+            raise ScriptEngineTaskArgumentInvalidError(msg)
+        self.check_file_extension(dst)
 
         month_cube = helpers.load_input_cube(src, varname)
         # Remove auxiliary time coordinate

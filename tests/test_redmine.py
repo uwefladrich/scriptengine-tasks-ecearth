@@ -3,12 +3,11 @@
 from unittest.mock import patch, Mock
 
 import pytest
-import iris
-import yaml
 import redminelib
 import redminelib.exceptions
 import jinja2.exceptions
 
+import scriptengine.exceptions
 from scriptengine.tasks.ecearth.monitoring.redmine import Redmine
 
 def test_redmine_presentation_list(tmpdir):
@@ -40,9 +39,12 @@ def test_redmine_connection_error(tmpdir):
     }
     redmine_task = Redmine(init)
     redmine = redminelib.Redmine('https://www.invalid.url', key=init['api_key'])
-    with patch.object(redmine_task, 'log_warning') as mock:
-       redmine_task.get_issue(redmine, init['subject'])
-    mock.assert_called_with("Could not log in to Redmine server (ConnectionError)")
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskRunError,
+        redmine_task.get_issue,
+        redmine,
+        init['subject'],
+    )
 
 def test_redmine_auth_error(tmpdir):
     init = {
@@ -54,9 +56,12 @@ def test_redmine_auth_error(tmpdir):
     }
     redmine_task = Redmine(init)
     redmine = redminelib.Redmine('https://dev.ec-earth.org/', key=init['api_key'])
-    with patch.object(redmine_task, 'log_warning') as mock:
-       redmine_task.get_issue(redmine, init['subject'])
-    mock.assert_called_with("Could not log in to Redmine server (AuthError)")
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskRunError,
+        redmine_task.get_issue,
+        redmine,
+        init['subject'],
+    )
 
 def test_redmine_get_template(tmpdir):
     init = {

@@ -1,12 +1,12 @@
 """Processing Task that creates a 2D map of a given extensive ocean quantity."""
 
-import os
 import warnings
 
 import iris
 import iris_grib
 import numpy as np
 
+from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.base.timing import timed_runner
 from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
@@ -14,11 +14,12 @@ from .timeseries import Timeseries
 
 class OifsGlobalMeanYearMeanTimeseries(Timeseries):
     """OifsGlobalMeanYearMeanTimeseries Processing Task"""
-    def __init__(self, parameters):
-        super().__init__(
-            {**parameters, 'title': None, 'coord_value': None, 'data_value': None},
-            required_parameters=['src', 'grib_code']
-            )
+
+    _required_arguments = ('src', 'grib_code', 'dst', )
+
+    def __init__(self, arguments=None):
+        OifsGlobalMeanYearMeanTimeseries.check_arguments(arguments)
+        super().__init__({**arguments, 'title': None, 'coord_value': None, 'data_value': None})
 
     @timed_runner
     def run(self, context):
@@ -29,8 +30,7 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
         self.log_info(f"Create time series for atmosphere variable {grib_code} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         update_grib_mappings()
         cf_phenomenon = iris_grib.grib_phenom_translation.grib1_phenom_to_cf_info(
@@ -39,8 +39,9 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
             grib_code
         )
         if not cf_phenomenon:
-            self.log_warning(f"CF Phenomenon for {grib_code} not found. Update local table?")
-            return
+            msg = f"CF Phenomenon for {grib_code} not found. Update local table?"
+            self.log_error(msg)
+            raise ScriptEngineTaskArgumentInvalidError(msg)
         self.log_debug(f"Getting variable {cf_phenomenon.standard_name}")
         leg_cube = helpers.load_input_cube(src, cf_phenomenon.standard_name)
 
