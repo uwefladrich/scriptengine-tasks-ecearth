@@ -3,8 +3,10 @@
 from unittest.mock import patch
 
 import iris
+import pytest
 
-from scriptengine.tasks.ecearth.monitoring.si3_hemis_point_month_mean_all_mean_map import Si3HemisPointMonthMeanAllMeanMap, meta_dict
+import scriptengine.exceptions
+from scriptengine.tasks.ecearth.monitoring.si3_hemis_point_month_mean_all_mean_map import Si3HemisPointMonthMeanAllMeanMap
 
 def test_ice_map_once(tmpdir):
     init = {
@@ -52,12 +54,11 @@ def test_ice_map_wrong_varname(tmpdir):
         "varname": "tos",
     }
     ice_map = Si3HemisPointMonthMeanAllMeanMap(init)
-    ice_map.run(init)
-    with patch.object(ice_map, 'log_warning') as mock:
-        ice_map.run(init)
-    mock.assert_called_with((
-                f"'varname' must be one of the following: {meta_dict.keys()} "
-                f"Diagnostic will not be treated, returning now."))
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
+        ice_map.run,
+        init
+    )
 
 def test_ice_map_wrong_hemisphere(tmpdir):
     init = {
@@ -67,11 +68,8 @@ def test_ice_map_wrong_hemisphere(tmpdir):
         "hemisphere": "east",
     }
     ice_map = Si3HemisPointMonthMeanAllMeanMap(init)
-    ice_map.run(init)
-    with patch.object(ice_map, 'log_warning') as mock:
-        ice_map.run(init)
-    mock.assert_called_with((
-                f"'hemisphere' must be 'north' or 'south' but is '{init['hemisphere']}'."
-                f"Diagnostic will not be treated, returning now."))
-
-# missing: wrong dst (covered by test_map.py)
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
+        ice_map.run,
+        init
+    )

@@ -3,6 +3,7 @@
 import os
 
 import iris
+from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError, ScriptEngineTaskRunError
 
 from scriptengine.tasks.base import Task
 import helpers.file_handling as helpers
@@ -23,35 +24,37 @@ class Map(Task):
             iris.save(new_cube, dst)
             return
 
+        current_bounds = current_cube.coord('time').bounds
+        new_bounds = new_cube.coord('time').bounds
+        if current_bounds[-1][-1] > new_bounds[0][0]:
+            msg = "Non-monotonic coordinate. Cube will not be saved."
+            self.log_error(msg)
+            raise ScriptEngineTaskRunError(msg)
+
         # Iris changes metadata when saving/loading cube
         # save & reload to prevent metadata mismatch
         iris.save(new_cube, 'temp.nc')
         new_cube = iris.load_cube('temp.nc')
 
-        current_bounds = current_cube.coord('time').bounds
-        new_bounds = new_cube.coord('time').bounds
-        if not current_bounds[-1][-1] > new_bounds[0][0]:
-            current_cube.cell_methods = new_cube.cell_methods
-            cube_list = iris.cube.CubeList([current_cube, new_cube])
-            merged_cube = cube_list.merge_cube()
-            simulation_avg = self.compute_simulation_avg(merged_cube)
-            iris.save(simulation_avg, f"{dst}-copy.nc")
-            os.remove(dst)
-            os.rename(f"{dst}-copy.nc", dst)
-        else:
-            self.log_warning("Non-monotonic coordinate. Cube will not be saved.")
+        current_cube.cell_methods = new_cube.cell_methods
+        cube_list = iris.cube.CubeList([current_cube, new_cube])
+        merged_cube = cube_list.merge_cube()
+        simulation_avg = self.compute_simulation_avg(merged_cube)
+        iris.save(simulation_avg, f"{dst}-copy.nc")
+        os.remove(dst)
+        os.rename(f"{dst}-copy.nc", dst)   
         # remove temporary save
         os.remove('temp.nc')
 
-    def correct_file_extension(self, dst):
+    def check_file_extension(self, dst):
         """check if destination file has a valid netCDF extension"""
         if not dst.endswith(".nc"):
-            self.log_warning((
+            msg = (
                 f"{dst} does not end in valid netCDF file extension. "
                 f"Diagnostic will not be treated, returning now."
-            ))
-            return False
-        return True
+            )
+            self.log_error(msg)
+            raise ScriptEngineTaskArgumentInvalidError(msg)
 
     def compute_simulation_avg(self, merged_cube):
         """
