@@ -3,8 +3,6 @@
 import os
 
 import jinja2
-import yaml
-import iris
 
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner

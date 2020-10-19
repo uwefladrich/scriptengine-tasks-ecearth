@@ -8,9 +8,8 @@ import redminelib
 import redminelib.exceptions
 
 import jinja2
-import yaml
-import iris
 
+from scriptengine.exceptions import ScriptEngineTaskRunError
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
 from scriptengine.jinja import filters as j2filters
@@ -56,8 +55,6 @@ class Redmine(Task):
 
         self.log_debug("Connecting to Redmine.")
         issue = self.get_issue(redmine, issue_subject)
-        if issue is None:
-            return
 
         self.log_debug("Updating the issue description.")
         issue.description = ""
@@ -133,9 +130,7 @@ class Redmine(Task):
                 issue.assigned_to_id = redmine.auth().id
                 issue.is_private = False
             return issue
-        except redminelib.exceptions.AuthError:
-            self.log_warning('Could not log in to Redmine server (AuthError)')
-            return
-        except requests.exceptions.ConnectionError:
-            self.log_warning('Could not log in to Redmine server (ConnectionError)')
-            return
+        except (redminelib.exceptions.AuthError, requests.exceptions.ConnectionError) as e:
+            msg = f'Could not log in to Redmine server ({e})'
+            self.log_error(msg)
+            raise ScriptEngineTaskRunError(msg)
