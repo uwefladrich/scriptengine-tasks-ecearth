@@ -29,8 +29,7 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
         self.log_info(f"Create time series for atmosphere variable {grib_code} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         update_grib_mappings()
         cf_phenomenon = iris_grib.grib_phenom_translation.grib1_phenom_to_cf_info(

@@ -65,8 +65,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
                 f"Diagnostic will not be treated, returning now."
             ))
             return
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         leg_cube = helpers.load_input_cube(src, varname)
         cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape, 'T')

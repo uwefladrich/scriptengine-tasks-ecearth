@@ -29,8 +29,7 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
         self.log_info(f"Create time series for ocean variable {varname} at {dst}.")
         self.log_debug(f"Domain: {domain}, Source file(s): {src}")
 
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         leg_cube = hlp.load_input_cube(src, varname)
 

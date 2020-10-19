@@ -8,6 +8,7 @@ import numpy as np
 
 from scriptengine.tasks.base import Task
 from scriptengine.tasks.base.timing import timed_runner
+from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError, ScriptEngineTaskRunError
 import helpers.file_handling as helpers
 
 
@@ -47,8 +48,7 @@ class Timeseries(Task):
         
         self.log_debug(f"Value: {data_value} at time: {coord_value}, title: {title}")
 
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         # create coord
         coord = iris.coords.DimCoord(
@@ -86,20 +86,19 @@ class Timeseries(Task):
             iris.save(new_cube, dst)
             return
 
+        self.test_monotonic_increase(current_cube.coords()[0], new_cube.coords()[0])
+
         # Iris changes metadata when saving/loading cube
         # save & reload to prevent metadata mismatch
         iris.save(new_cube, 'temp.nc')
         new_cube = iris.load_cube('temp.nc')
 
-        if self.test_monotonic_increase(current_cube.coords()[0], new_cube.coords()[0]):
-            cube_list = iris.cube.CubeList([current_cube, new_cube])
-            merged_cube = cube_list.concatenate_cube()
-            iris.save(merged_cube, f"{dst}-copy.nc")
-            os.remove(dst)
-            os.rename(f"{dst}-copy.nc", dst)
-        else:
-            self.log_warning("Non-monotonic coordinate. Cube will not be saved.")
+        cube_list = iris.cube.CubeList([current_cube, new_cube])
+        merged_cube = cube_list.concatenate_cube()
+        iris.save(merged_cube, f"{dst}-copy.nc")
 
+        os.remove(dst)
+        os.rename(f"{dst}-copy.nc", dst)
         # remove temporary save
         os.remove('temp.nc')
 
@@ -107,23 +106,21 @@ class Timeseries(Task):
         """Test if coordinate is monotonically increasing."""
         current_bounds = old_coord.bounds
         new_bounds = new_coord.bounds
+        msg = "Non-monotonic time coordinate. Cube will not be saved."
         if current_bounds is not None and new_bounds is not None:
             if current_bounds[-1][-1] > new_bounds[0][0]:
-                self.log_warning("Inserting would lead to non-monotonic time axis.")
-                return False
-            return True
-
+                self.log_error(msg)
+                raise ScriptEngineTaskRunError(msg)
         if old_coord.points[-1] > new_coord.points[0]:
-            self.log_warning("Inserting would lead to non-monotonic time axis.")
-            return False
-        return True
+            self.log_error(msg)
+            raise ScriptEngineTaskRunError(msg)
 
-    def correct_file_extension(self, dst):
+    def check_file_extension(self, dst):
         """check if destination file has a valid netCDF extension"""
         if not dst.endswith(".nc"):
-            self.log_warning((
+            msg = (
                 f"{dst} does not end in valid netCDF file extension. "
                 f"Diagnostic will not be treated, returning now."
-            ))
-            return False
-        return True
+            )
+            self.log_error(msg)
+            raise ScriptEngineTaskArgumentInvalidError(msg)
