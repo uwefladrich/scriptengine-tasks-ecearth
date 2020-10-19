@@ -23,8 +23,7 @@ class NemoTimeMeanTemporalmap(Temporalmap):
         self.log_info(f"Create temporal map for ocean variable {varname} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         leg_cube = helpers.load_input_cube(src, varname)
 

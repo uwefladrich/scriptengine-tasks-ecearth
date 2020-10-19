@@ -5,6 +5,7 @@ import iris_grib
 import numpy as np
 
 from scriptengine.tasks.base.timing import timed_runner
+from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 
 from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
@@ -28,8 +29,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
         self.log_info(f"Create time map for atmosphere variable {grib_code} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         update_grib_mappings()
         cf_phenomenon = iris_grib.grib_phenom_translation.grib1_phenom_to_cf_info(
@@ -38,8 +38,9 @@ class OifsYearMeanTemporalmap(Temporalmap):
             grib_code
         )
         if not cf_phenomenon:
-            self.log_warning(f"CF Phenomenon for {grib_code} not found. Update local table?")
-            return
+            msg = f"CF Phenomenon for {grib_code} not found. Update local table?"
+            self.log_error(msg)
+            raise ScriptEngineTaskArgumentInvalidError(msg)
         self.log_debug(f"Getting variable {cf_phenomenon.standard_name}")
         leg_cube = helpers.load_input_cube(src, cf_phenomenon.standard_name)
 

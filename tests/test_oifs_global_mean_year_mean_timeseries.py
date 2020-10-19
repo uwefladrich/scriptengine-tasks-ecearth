@@ -1,8 +1,9 @@
 """Tests for scriptengine/tasks/ecearth/monitoring/oifs_global_mean_year_mean_timeseries.py"""
 
-from unittest.mock import patch
+import pytest
 import iris
 
+import scriptengine.exceptions
 from scriptengine.tasks.ecearth.monitoring.oifs_global_mean_year_mean_timeseries import OifsGlobalMeanYearMeanTimeseries
 
 def test_oifs_global_mean_year_mean_timeseries_working(tmpdir):
@@ -30,6 +31,8 @@ def test_oifs_global_mean_year_mean_timeseries_wrong_code(tmpdir):
         "grib_code": 0,
     }
     atmo_ts = OifsGlobalMeanYearMeanTimeseries(init)
-    with patch.object(atmo_ts, 'log_warning') as mock:
-        atmo_ts.run(init)
-    mock.assert_called_with(f"CF Phenomenon for {init['grib_code']} not found. Update local table?")
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
+        atmo_ts.run,
+        init,
+    )
