@@ -9,11 +9,11 @@ from .map import Map
 class NemoAllMeanMap(Map):
     """NemoAllMeanMap Processing Task"""
 
-    def __init__(self, parameters):
-        super().__init__(
-            parameters,
-            required_parameters=['src', 'dst', 'varname']
-            )
+    _required_arguments = ('src', 'dst', 'varname', )
+
+    def __init__(self, arguments=None):
+        NemoAllMeanMap.check_arguments(arguments)
+        super().__init__(arguments)
 
     @timed_runner
     def run(self, context):
@@ -23,8 +23,7 @@ class NemoAllMeanMap(Map):
         self.log_info(f"Create map for ocean variable {varname} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         leg_cube = helpers.load_input_cube(src, varname)
 

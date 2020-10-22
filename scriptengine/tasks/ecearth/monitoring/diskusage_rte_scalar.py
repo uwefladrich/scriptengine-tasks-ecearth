@@ -4,13 +4,15 @@ import os
 from scriptengine.tasks.base.timing import timed_runner
 from .scalar import Scalar
 
+
 class DiskusageRteScalar(Scalar):
     """DiskusageRteScalar Processing Task"""
-    def __init__(self, parameters):
-        super().__init__(
-            parameters={**parameters, 'value': None, 'title': None},
-            required_parameters=['src']
-            )
+
+    _required_arguments = ('src', 'dst', )
+
+    def __init__(self, arguments=None):
+        DiskusageRteScalar.check_arguments(arguments)
+        super().__init__({**arguments, 'title': None, 'value': None})
 
     @timed_runner
     def run(self, context):
@@ -41,9 +43,9 @@ class DiskusageRteScalar(Scalar):
                     total += self.get_directory_size(entry.path)
         except (NotADirectoryError, FileNotFoundError):
             self.log_warning(f"{path} is not a directory. Returning -1.")
-            return -1e9 # gets multiplied with 1e-9 again
+            return -1e9  # gets multiplied with 1e-9 again
         except PermissionError:
             self.log_warning(f"No permission to open {path}. Returning -1.")
-            return -1e9 # gets multiplied with 1e-9 again
+            return -1e9  # gets multiplied with 1e-9 again
 
         return total

@@ -10,11 +10,12 @@ from .timeseries import Timeseries
 
 class NemoGlobalMeanYearMeanTimeseries(Timeseries):
     """NemoGlobalMeanYearMeanTimeseries Processing Task"""
-    def __init__(self, parameters):
-        super().__init__(
-            {**parameters, 'title': None, 'coord_value': None, 'data_value': None},
-            required_parameters=['src', 'domain', 'varname']
-            )
+
+    _required_arguments = ('src', 'domain', 'varname', 'dst', )
+
+    def __init__(self, arguments):
+        NemoGlobalMeanYearMeanTimeseries.check_arguments(arguments)
+        super().__init__({**arguments, 'title': None, 'coord_value': None, 'data_value': None})
 
     @timed_runner
     def run(self, context):
@@ -28,8 +29,7 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
         self.log_info(f"Create time series for ocean variable {varname} at {dst}.")
         self.log_debug(f"Domain: {domain}, Source file(s): {src}")
 
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         leg_cube = hlp.load_input_cube(src, varname)
 

@@ -3,7 +3,9 @@
 from unittest.mock import patch
 
 import iris
+import pytest
 
+import scriptengine.exceptions
 from scriptengine.tasks.ecearth.monitoring.oifs_all_mean_map import OifsAllMeanMap
 
 def test_oifs_all_mean_map_working(tmpdir):
@@ -30,6 +32,9 @@ def test_oifs_all_mean_map_wrong_code(tmpdir):
         "grib_code": 500,
     }
     atmo_map = OifsAllMeanMap(init)
-    with patch.object(atmo_map, 'log_warning') as mock:
-        atmo_map.run(init)
-    mock.assert_called_with(f"CF Phenomenon for {init['grib_code']} not found. Update local table?")
+
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
+        atmo_map.run,
+        init
+    )

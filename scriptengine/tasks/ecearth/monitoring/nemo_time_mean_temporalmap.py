@@ -9,11 +9,11 @@ from .temporalmap import Temporalmap
 class NemoTimeMeanTemporalmap(Temporalmap):
     """NemoTimeMeanTemporalmap Processing Task"""
 
-    def __init__(self, parameters, required_parameters = None):
-        super().__init__(
-            parameters,
-            required_parameters=['src', 'dst', 'varname'] + (required_parameters or [])
-            )
+    _required_arguments = ('src', 'dst', 'varname', )
+
+    def __init__(self, arguments=None):
+        NemoMonthMeanTemporalmap.check_arguments(arguments)
+        super().__init__(arguments)
 
     @timed_runner
     def run(self, context):
@@ -23,8 +23,7 @@ class NemoTimeMeanTemporalmap(Temporalmap):
         self.log_info(f"Create temporal map for ocean variable {varname} at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         leg_cube = helpers.load_input_cube(src, varname)
 
@@ -39,9 +38,6 @@ class NemoTimeMeanTemporalmap(Temporalmap):
 
 class NemoYearMeanTemporalmap(NemoTimeMeanTemporalmap):
     """NemoYearMeanTemporalmap Processing Task"""
-
-    def __init__(self, parameters):
-        super().__init__(parameters)
 
     def time_operation(self, varname, leg_cube):
         self.log_debug("Creating an annual mean.")
@@ -66,9 +62,6 @@ class NemoYearMeanTemporalmap(NemoTimeMeanTemporalmap):
 
 class NemoMonthMeanTemporalmap(NemoTimeMeanTemporalmap):
     """NemoMonthMeanTemporalmap Processing Task"""
-
-    def __init__(self, parameters):
-        super().__init__(parameters)
 
     def time_operation(self, varname, leg_cube):
         self.log_debug("Creating monthly means.")

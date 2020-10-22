@@ -31,11 +31,12 @@ meta_dict = {
 
 class Si3HemisSumMonthMeanTimeseries(Timeseries):
     """Si3HemisSumMonthMeanTimeseries Processing Task"""
-    def __init__(self, parameters):
-        super().__init__(
-            {**parameters, 'title': None, 'coord_value': None, 'data_value': None},
-            required_parameters=['src', 'domain', 'hemisphere', 'varname']
-            )
+
+    _required_arguments = ('src', 'domain', 'hemisphere', 'varname', 'dst', )
+
+    def __init__(self, arguments):
+        Si3HemisSumMonthMeanTimeseries.check_arguments(arguments)
+        super().__init__({**arguments, 'title': None, 'coord_value': None, 'data_value': None})
 
     @timed_runner
     def run(self, context):
@@ -64,8 +65,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
                 f"Diagnostic will not be treated, returning now."
             ))
             return
-        if not self.correct_file_extension(dst):
-            return
+        self.check_file_extension(dst)
 
         leg_cube = helpers.load_input_cube(src, varname)
         cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape, 'T')
