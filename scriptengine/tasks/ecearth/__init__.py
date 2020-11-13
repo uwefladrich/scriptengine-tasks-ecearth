@@ -18,11 +18,9 @@ from .monitoring.si3_hemis_point_month_mean_temporalmap import Si3HemisPointMont
 from .monitoring.oifs_global_mean_year_mean_timeseries import OifsGlobalMeanYearMeanTimeseries
 from .monitoring.timeseries import Timeseries
 from .monitoring.redmine import Redmine
-from .slurm import Sbatch
 
 def task_loader_map():
     return {
-        'sbatch': Sbatch,
         'ece.mon.scalar': Scalar,
         'ece.mon.timeseries': Timeseries,
         'ece.mon.diskusage_rte_scalar': DiskusageRteScalar,

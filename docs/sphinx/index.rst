@@ -1,8 +1,7 @@
 ScriptEngine Tasks for EC-Earth 4: Documentation
 =======================================================
 
-This package contains ScriptEngine tasks for the EC-Earth 4 climate model.
-Currently, it contains the EC-Earth 4 monitoring tool, as well as the Sbatch task for Slurm job creation.  
+This package contains ScriptEngine tasks for the EC-Earth 4 climate model, specifically the EC-Earth 4 monitoring tool. 
 
 .. toctree::
    :maxdepth: 2
@@ -22,9 +21,3 @@ Currently, it contains the EC-Earth 4 monitoring tool, as well as the Sbatch tas
    source/tasks/monitoring/openifs-diagnostics
    source/tasks/monitoring/presentation-tasks
    source/tasks/monitoring/developer-guide
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Other Tasks in this Package
-   
-   source/tasks/sbatch
