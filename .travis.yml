@@ -16,10 +16,8 @@ install:
   - conda info -a
   - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
   - conda activate test-environment
-  - >
-    conda env update -n test-environment --quiet --file conda_environment.yml;
-    # Check installation of eccodes.
-    python -m eccodes selfcheck;
+  - conda env update -n test-environment --quiet --file conda_environment.yml
+  - python -m eccodes selfcheck # Check installation of eccodes.
   - conda install pip
   - conda install -c conda-forge iris
   - git clone https://github.com/uwefladrich/scriptengine.git ../scriptengine

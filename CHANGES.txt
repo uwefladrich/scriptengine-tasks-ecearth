@@ -1,0 +1,4 @@
+ScriptEngine Tasks for EC-Earth 0.2.0 (45ef712, Fri 11 Sep 11:33:11 CEST 2020)
+======================================
+
+- First comprehensive set of EC-Earth4 monitoring tasks
