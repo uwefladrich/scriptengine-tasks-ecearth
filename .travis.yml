@@ -21,7 +21,7 @@ install:
   - conda install pip
   - conda install -c conda-forge iris
   - git clone https://github.com/uwefladrich/scriptengine.git ../scriptengine
-  - pip install ../scriptengine
+  - pip install -e ../scriptengine
   - pip install .
   # Install pytest, coveralls for test coverage
   # -----------------------------------

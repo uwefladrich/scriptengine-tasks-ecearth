@@ -42,7 +42,7 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "scriptengine>=0.6",
+        "scriptengine>=0.7.1",
         "pyYAML>=5.1",
         "numpy>=1.16.1",
         "imageio>=2.0",
