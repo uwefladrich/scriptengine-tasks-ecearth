@@ -6,8 +6,7 @@ import datetime
 import iris
 import numpy as np
 
-from scriptengine.tasks.base import Task
-from scriptengine.tasks.base.timing import timed_runner
+from scriptengine.tasks.core import Task, timed_runner
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError, ScriptEngineTaskRunError
 import helpers.file_handling as helpers
 

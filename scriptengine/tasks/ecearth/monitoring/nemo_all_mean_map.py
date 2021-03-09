@@ -2,7 +2,7 @@
 
 import iris
 
-from scriptengine.tasks.base.timing import timed_runner
+from scriptengine.tasks.core import timed_runner
 import helpers.file_handling as helpers
 from .map import Map
 

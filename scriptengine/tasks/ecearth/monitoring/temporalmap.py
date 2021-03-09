@@ -5,7 +5,7 @@ import os
 import iris
 
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
-from scriptengine.tasks.base import Task
+from scriptengine.tasks.core import Task
 
 class Temporalmap(Task):
     """Temporalmap Processing Task"""

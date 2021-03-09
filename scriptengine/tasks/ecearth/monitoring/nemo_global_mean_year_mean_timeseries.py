@@ -4,7 +4,7 @@ import warnings
 
 import iris
 
-from scriptengine.tasks.base.timing import timed_runner
+from scriptengine.tasks.core import timed_runner
 import helpers.file_handling as hlp
 from .timeseries import Timeseries
 
