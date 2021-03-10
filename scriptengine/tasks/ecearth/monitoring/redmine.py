@@ -10,8 +10,7 @@ import redminelib.exceptions
 import jinja2
 
 from scriptengine.exceptions import ScriptEngineTaskRunError
-from scriptengine.tasks.base import Task
-from scriptengine.tasks.base.timing import timed_runner
+from scriptengine.tasks.core import Task, timed_runner
 from scriptengine.jinja import filters as j2filters
 from helpers.presentation_objects import PresentationObject
 from helpers.exceptions import PresentationException

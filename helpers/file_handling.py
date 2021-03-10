@@ -5,7 +5,7 @@ import warnings
 import yaml
 import numpy as np
 import iris
-from iris.experimental.equalise_cubes import equalise_attributes
+from iris.util import equalise_attributes
 
 # Using https://stackoverflow.com/revisions/13197763/9
 class ChangeDirectory:

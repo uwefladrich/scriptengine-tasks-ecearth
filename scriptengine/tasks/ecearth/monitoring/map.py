@@ -5,7 +5,7 @@ import os
 import iris
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError, ScriptEngineTaskRunError
 
-from scriptengine.tasks.base import Task
+from scriptengine.tasks.core import Task
 import helpers.file_handling as helpers
 
 class Map(Task):

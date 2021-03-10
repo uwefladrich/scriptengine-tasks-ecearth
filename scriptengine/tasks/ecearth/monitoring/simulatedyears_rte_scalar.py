@@ -2,7 +2,7 @@
 
 from dateutil.relativedelta import relativedelta
 
-from scriptengine.tasks.base.timing import timed_runner
+from scriptengine.tasks.core import timed_runner
 from .scalar import Scalar
 
 

@@ -4,8 +4,7 @@ import os
 
 import jinja2
 
-from scriptengine.tasks.base import Task
-from scriptengine.tasks.base.timing import timed_runner
+from scriptengine.tasks.core import Task, timed_runner
 from scriptengine.jinja import filters as j2filters
 from helpers.file_handling import ChangeDirectory
 from helpers.presentation_objects import PresentationObject

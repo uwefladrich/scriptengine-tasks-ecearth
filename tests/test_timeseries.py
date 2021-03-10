@@ -32,8 +32,8 @@ def test_monotonic_increase():
     }
     time_series = Timeseries(init)
 
-    old_coord = iris.coords.Coord([1])
-    new_coord = iris.coords.Coord([2])
+    old_coord = iris.coords.DimCoord([1])
+    new_coord = iris.coords.DimCoord([2])
     assert time_series.test_monotonic_increase(old_coord, new_coord) is None
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskRunError,
@@ -42,8 +42,8 @@ def test_monotonic_increase():
         old_coord,
         )
 
-    old_coord_with_bounds = iris.coords.Coord([1], bounds=[0.5, 1.5])
-    new_coord_with_bounds = iris.coords.Coord([2], bounds=[1.5, 2.5])
+    old_coord_with_bounds = iris.coords.DimCoord([1], bounds=[0.5, 1.5])
+    new_coord_with_bounds = iris.coords.DimCoord([2], bounds=[1.5, 2.5])
     assert time_series.test_monotonic_increase(old_coord_with_bounds, new_coord_with_bounds) is None
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskRunError,

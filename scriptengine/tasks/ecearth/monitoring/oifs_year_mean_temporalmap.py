@@ -4,7 +4,7 @@ import iris
 import iris_grib
 import numpy as np
 
-from scriptengine.tasks.base.timing import timed_runner
+from scriptengine.tasks.core import timed_runner
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 
 from helpers.grib_cf_additions import update_grib_mappings
