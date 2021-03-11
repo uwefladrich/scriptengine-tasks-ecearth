@@ -4,9 +4,11 @@ Using the Taskset
 
 To run a YAML script using the ScriptEngine tasks for EC-Earth, use the following command::
 
-    se -t ecearth example_script.yml
+    se example_script.yml
+    
+where ``example_script.yml`` contains tasks from this package.
 
-You can set the logging level using the keywords ``--debug``, ``--warning`` or ``--quiet`` before calling the script.
+See ``se --help`` for additional commands such as setting the logging level etc. 
 
 For more info on how to use ScriptEngine in general, read the ScriptEngine_ documentation.
 
