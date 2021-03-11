@@ -31,8 +31,7 @@ setuptools.setup(
     url="https://github.com/uwefladrich/scriptengine-tasks-ecearth",
     packages=[
         "helpers",
-        "scriptengine.tasks.ecearth",
-        "scriptengine.tasks.ecearth.monitoring",
+        "monitoring",
         "tests",
     ],
     classifiers=[
@@ -53,22 +52,22 @@ setuptools.setup(
     ],
     entry_points={
         'scriptengine.tasks': [
-            'ece.mon.scalar = scriptengine.tasks.ecearth.monitoring.scalar:Scalar',
-            'ece.mon.timeseries = scriptengine.tasks.ecearth.monitoring.timeseries:Timeseries',
-            'ece.mon.diskusage_rte_scalar = scriptengine.tasks.ecearth.monitoring.diskusage_rte_scalar:DiskusageRteScalar',
-            'ece.mon.simulatedyears_rte_scalar = scriptengine.tasks.ecearth.monitoring.simulatedyears_rte_scalar:SimulatedyearsRteScalar',
-            'ece.mon.nemo_global_mean_year_mean_timeseries = scriptengine.tasks.ecearth.monitoring.nemo_global_mean_year_mean_timeseries:NemoGlobalMeanYearMeanTimeseries',
-            'ece.mon.nemo_all_mean_map = scriptengine.tasks.ecearth.monitoring.nemo_all_mean_map:NemoAllMeanMap',
-            'ece.mon.nemo_month_mean_temporalmap = scriptengine.tasks.ecearth.monitoring.nemo_time_mean_temporalmap:NemoMonthMeanTemporalmap',
-            'ece.mon.nemo_year_mean_temporalmap = scriptengine.tasks.ecearth.monitoring.nemo_time_mean_temporalmap:NemoYearMeanTemporalmap',
-            'ece.mon.si3_hemis_sum_month_mean_timeseries = scriptengine.tasks.ecearth.monitoring.si3_hemis_sum_month_mean_timeseries:Si3HemisSumMonthMeanTimeseries',
-            'ece.mon.si3_hemis_point_month_mean_all_mean_map = scriptengine.tasks.ecearth.monitoring.si3_hemis_point_month_mean_all_mean_map:Si3HemisPointMonthMeanAllMeanMap',
-            'ece.mon.si3_hemis_point_month_mean_temporalmap = scriptengine.tasks.ecearth.monitoring.si3_hemis_point_month_mean_temporalmap:Si3HemisPointMonthMeanTemporalmap',
-            'ece.mon.oifs_all_mean_map = scriptengine.tasks.ecearth.monitoring.oifs_all_mean_map:OifsAllMeanMap',
-            'ece.mon.oifs_year_mean_temporalmap = scriptengine.tasks.ecearth.monitoring.oifs_year_mean_temporalmap:OifsYearMeanTemporalmap',
-            'ece.mon.oifs_global_mean_year_mean_timeseries = scriptengine.tasks.ecearth.monitoring.oifs_global_mean_year_mean_timeseries:OifsGlobalMeanYearMeanTimeseries',
-            'ece.mon.presentation.markdown = scriptengine.tasks.ecearth.monitoring.markdown:Markdown',
-            'ece.mon.presentation.redmine = scriptengine.tasks.ecearth.monitoring.redmine:Redmine',
+            'ece.mon.scalar = monitoring.scalar:Scalar',
+            'ece.mon.timeseries = monitoring.timeseries:Timeseries',
+            'ece.mon.diskusage_rte_scalar = monitoring.diskusage_rte_scalar:DiskusageRteScalar',
+            'ece.mon.simulatedyears_rte_scalar = monitoring.simulatedyears_rte_scalar:SimulatedyearsRteScalar',
+            'ece.mon.nemo_global_mean_year_mean_timeseries = monitoring.nemo_global_mean_year_mean_timeseries:NemoGlobalMeanYearMeanTimeseries',
+            'ece.mon.nemo_all_mean_map = monitoring.nemo_all_mean_map:NemoAllMeanMap',
+            'ece.mon.nemo_month_mean_temporalmap = monitoring.nemo_time_mean_temporalmap:NemoMonthMeanTemporalmap',
+            'ece.mon.nemo_year_mean_temporalmap = monitoring.nemo_time_mean_temporalmap:NemoYearMeanTemporalmap',
+            'ece.mon.si3_hemis_sum_month_mean_timeseries = monitoring.si3_hemis_sum_month_mean_timeseries:Si3HemisSumMonthMeanTimeseries',
+            'ece.mon.si3_hemis_point_month_mean_all_mean_map = monitoring.si3_hemis_point_month_mean_all_mean_map:Si3HemisPointMonthMeanAllMeanMap',
+            'ece.mon.si3_hemis_point_month_mean_temporalmap = monitoring.si3_hemis_point_month_mean_temporalmap:Si3HemisPointMonthMeanTemporalmap',
+            'ece.mon.oifs_all_mean_map = monitoring.oifs_all_mean_map:OifsAllMeanMap',
+            'ece.mon.oifs_year_mean_temporalmap = monitoring.oifs_year_mean_temporalmap:OifsYearMeanTemporalmap',
+            'ece.mon.oifs_global_mean_year_mean_timeseries = monitoring.oifs_global_mean_year_mean_timeseries:OifsGlobalMeanYearMeanTimeseries',
+            'ece.mon.presentation.markdown = monitoring.markdown:Markdown',
+            'ece.mon.presentation.redmine = monitoring.redmine:Redmine',
         ]
     }
 )
