@@ -22,7 +22,7 @@ def get_version(rel_path):
 
 setuptools.setup(
     name="scriptengine-tasks-ecearth",
-    version=get_version("scriptengine/tasks/ecearth/version.py"),
+    version=get_version("version.py"),
     author="Uwe Fladrich, Valentina Schueller",
     author_email="uwe.fladrich@protonmail.com, valentina.schueller@gmail.com",
     description="ScriptEngine tasks for use with the EC-Earth climate model",
