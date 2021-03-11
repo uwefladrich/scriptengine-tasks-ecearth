@@ -1,12 +1,10 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/oifs_all_mean_map.py"""
-
-from unittest.mock import patch
+"""Tests for monitoring/oifs_all_mean_map.py"""
 
 import iris
 import pytest
 
 import scriptengine.exceptions
-from scriptengine.tasks.ecearth.monitoring.oifs_all_mean_map import OifsAllMeanMap
+from monitoring.oifs_all_mean_map import OifsAllMeanMap
 
 def test_oifs_all_mean_map_working(tmpdir):
     init = {

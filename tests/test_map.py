@@ -1,10 +1,10 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/map.py"""
+"""Tests for monitoring/map.py"""
 
 import pytest
 import iris
 
 import scriptengine.exceptions
-from scriptengine.tasks.ecearth.monitoring.map import Map
+from monitoring.map import Map
 
 def test_map_dst_error():
     test_map = Map({})

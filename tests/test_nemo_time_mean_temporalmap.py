@@ -1,9 +1,9 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/nemo_time_mean_temporalmap.py"""
+"""Tests for monitoring/nemo_time_mean_temporalmap.py"""
 
 import pytest
 import iris
 
-from scriptengine.tasks.ecearth.monitoring.nemo_time_mean_temporalmap import NemoTimeMeanTemporalmap, NemoMonthMeanTemporalmap, NemoYearMeanTemporalmap
+from monitoring.nemo_time_mean_temporalmap import NemoTimeMeanTemporalmap, NemoMonthMeanTemporalmap, NemoYearMeanTemporalmap
 
 def test_nemo_time_mean_temporalmap_base(tmpdir):
     init = {

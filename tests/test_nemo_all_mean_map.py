@@ -1,8 +1,8 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/nemo_all_mean_map.py"""
+"""Tests for monitoring/nemo_all_mean_map.py"""
 
 import iris
 
-from scriptengine.tasks.ecearth.monitoring.nemo_all_mean_map import NemoAllMeanMap
+from monitoring.nemo_all_mean_map import NemoAllMeanMap
 
 def test_nemo_all_mean_map_once(tmpdir):
     init = {

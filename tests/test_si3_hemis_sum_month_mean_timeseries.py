@@ -1,10 +1,10 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/si3_hemis_sum_month_mean_timeseries.py"""
+"""Tests for monitoring/si3_hemis_sum_month_mean_timeseries.py"""
 
 from unittest.mock import patch
 
 import iris
 
-from scriptengine.tasks.ecearth.monitoring.si3_hemis_sum_month_mean_timeseries import Si3HemisSumMonthMeanTimeseries, meta_dict
+from monitoring.si3_hemis_sum_month_mean_timeseries import Si3HemisSumMonthMeanTimeseries, meta_dict
 
 def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
     init = {

@@ -1,13 +1,12 @@
-"""Tests for scriptengine/tasks/monitoring/markdown.py"""
+"""Tests for monitoring/markdown.py"""
 
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 import os
 
 import pytest
-import iris
 import yaml
 
-from scriptengine.tasks.ecearth.monitoring.markdown import Markdown
+from monitoring.markdown import Markdown
 
 def test_markdown_output_full(tmpdir):
     init = {

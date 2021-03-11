@@ -1,8 +1,8 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/simulatedyears_rte_scalar.py"""
+"""Tests for monitoring/simulatedyears_rte_scalar.py"""
 
 from unittest.mock import patch
 
-from scriptengine.tasks.ecearth.monitoring.simulatedyears_rte_scalar import SimulatedyearsRteScalar
+from monitoring.simulatedyears_rte_scalar import SimulatedyearsRteScalar
 
 def test_simulatedyears_working(tmpdir):
     test_path = str(tmpdir) + '/test.yml'

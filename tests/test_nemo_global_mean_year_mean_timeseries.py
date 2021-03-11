@@ -1,10 +1,8 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/nemo_global_mean_year_mean_timeseries.py"""
-
-from unittest.mock import patch
+"""Tests for monitoring/nemo_global_mean_year_mean_timeseries.py"""
 
 import iris
 
-from scriptengine.tasks.ecearth.monitoring.nemo_global_mean_year_mean_timeseries import NemoGlobalMeanYearMeanTimeseries
+from monitoring.nemo_global_mean_year_mean_timeseries import NemoGlobalMeanYearMeanTimeseries
 
 def test_nemo_global_mean_year_mean_timeseries_working(tmpdir):
     init = {
