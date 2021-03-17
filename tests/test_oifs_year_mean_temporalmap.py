@@ -1,10 +1,10 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/oifs_year_mean_temporalmap.py"""
+"""Tests for monitoring/oifs_year_mean_temporalmap.py"""
 
 import pytest
 import iris
 
 import scriptengine.exceptions
-from scriptengine.tasks.ecearth.monitoring.oifs_year_mean_temporalmap import OifsYearMeanTemporalmap
+from monitoring.oifs_year_mean_temporalmap import OifsYearMeanTemporalmap
 
 def test_oifs_year_mean_temporalmap_working(tmpdir):
     init = {

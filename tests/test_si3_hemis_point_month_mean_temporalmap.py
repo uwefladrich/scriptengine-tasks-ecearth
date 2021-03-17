@@ -1,10 +1,10 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/si3_hemis_point_month_mean_temporalmap.py"""
+"""Tests for monitoring/si3_hemis_point_month_mean_temporalmap.py"""
 
 import iris
 import pytest
 
 import scriptengine.exceptions
-from scriptengine.tasks.ecearth.monitoring.si3_hemis_point_month_mean_temporalmap import Si3HemisPointMonthMeanTemporalmap
+from monitoring.si3_hemis_point_month_mean_temporalmap import Si3HemisPointMonthMeanTemporalmap
 
 def test_si3_hemis_point_month_mean_temporalmap_once(tmpdir):
     init = {

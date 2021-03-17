@@ -1,9 +1,9 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/temporalmap.py"""
+"""Tests for monitoring/temporalmap.py"""
 
 import pytest
 
 import scriptengine.exceptions
-from scriptengine.tasks.ecearth.monitoring.temporalmap import Temporalmap
+from monitoring.temporalmap import Temporalmap
 
 def test_time_map_dst_error():
     time_map = Temporalmap({})

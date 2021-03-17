@@ -1,10 +1,10 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/diskusage_rte_scalar.py"""
+"""Tests for monitoring/diskusage_rte_scalar.py"""
 
 from unittest.mock import patch
 
 import yaml
 
-from scriptengine.tasks.ecearth.monitoring.diskusage_rte_scalar import DiskusageRteScalar
+from monitoring.diskusage_rte_scalar import DiskusageRteScalar
 
 def test_diskusage_working(tmpdir):
     """test full execution of DiskusageRteScalar"""

@@ -1,10 +1,10 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/oifs_global_mean_year_mean_timeseries.py"""
+"""Tests for monitoring/oifs_global_mean_year_mean_timeseries.py"""
 
 import pytest
 import iris
 
 import scriptengine.exceptions
-from scriptengine.tasks.ecearth.monitoring.oifs_global_mean_year_mean_timeseries import OifsGlobalMeanYearMeanTimeseries
+from monitoring.oifs_global_mean_year_mean_timeseries import OifsGlobalMeanYearMeanTimeseries
 
 def test_oifs_global_mean_year_mean_timeseries_working(tmpdir):
     init = {

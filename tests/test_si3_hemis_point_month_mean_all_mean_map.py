@@ -1,12 +1,10 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/si3_hemis_point_month_mean_all_mean_map.py"""
-
-from unittest.mock import patch
+"""Tests for monitoring/si3_hemis_point_month_mean_all_mean_map.py"""
 
 import iris
 import pytest
 
 import scriptengine.exceptions
-from scriptengine.tasks.ecearth.monitoring.si3_hemis_point_month_mean_all_mean_map import Si3HemisPointMonthMeanAllMeanMap
+from monitoring.si3_hemis_point_month_mean_all_mean_map import Si3HemisPointMonthMeanAllMeanMap
 
 def test_ice_map_once(tmpdir):
     init = {

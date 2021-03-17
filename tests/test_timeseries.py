@@ -1,13 +1,12 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/timeseries.py"""
+"""Tests for monitoring/timeseries.py"""
 
 import datetime
-from unittest.mock import patch
 
 import iris
 import pytest
 
 import scriptengine.exceptions
-from scriptengine.tasks.ecearth.monitoring.timeseries import Timeseries
+from monitoring.timeseries import Timeseries
 
 def test_timeseries_dst_error():
     init = {

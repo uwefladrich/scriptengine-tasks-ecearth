@@ -1,4 +1,4 @@
-"""Tests for scriptengine/tasks/monitoring/redmine.py"""
+"""Tests for monitoring/redmine.py"""
 
 from unittest.mock import patch, Mock
 
@@ -8,7 +8,7 @@ import redminelib.exceptions
 import jinja2.exceptions
 
 import scriptengine.exceptions
-from scriptengine.tasks.ecearth.monitoring.redmine import Redmine
+from monitoring.redmine import Redmine
 
 def test_redmine_presentation_list(tmpdir):
     init = {

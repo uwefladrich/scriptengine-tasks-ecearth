@@ -1,12 +1,10 @@
-"""Tests for scriptengine/tasks/ecearth/monitoring/scalar.py"""
-
-from unittest.mock import patch
+"""Tests for monitoring/scalar.py"""
 
 import pytest
 import yaml
 import scriptengine.exceptions
 
-from scriptengine.tasks.ecearth.monitoring.scalar import Scalar
+from monitoring.scalar import Scalar
 
 init = [
     {
