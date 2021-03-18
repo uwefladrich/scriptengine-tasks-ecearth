@@ -26,10 +26,11 @@ Logging Policy
 
 Every (monitoring) task is responsible for logging its execution.
 In the beginning of ``self.run()`` (after *very few* lines of code), a task **must** call ``self.log_info()`` to log that it is active.
+It may include information about its arguments in the log message, but nothing that would require a lot of code processing the arguments (which could fail).
 A task **should** write only one ``log_info`` message during execution.
-General "progression" statements **must** be ``log_debug`` messages. These **should not** be used sparsely.
-If a monitoring task has to abort: It **should** use ``log_error`` and throw one of the `ScriptEngine Task Exceptions`_, unless the problem is unexpected.
-If a monitoring tasks faces a problem but does not need to abort, it **should** use ``log_warning``.
+General "progression" statements **must** be ``log_debug`` messages.
+If a monitoring task experiences an unrecoverable error: It **must** use ``log_error`` and throw one of the `ScriptEngine Task Exceptions`_.
+For problems which do not lead to a ``ScriptEngineTaskException``, use ``log_warning`` instead.
 
 .. _naming-scheme:
 
