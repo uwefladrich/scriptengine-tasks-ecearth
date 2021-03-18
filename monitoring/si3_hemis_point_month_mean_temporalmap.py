@@ -49,14 +49,14 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
                 f"Diagnostic will not be treated, returning now."
             )
             self.log_error(msg)
-            raise ScriptEngineTaskArgumentInvalidError(msg)
+            raise ScriptEngineTaskArgumentInvalidError()
         if not hemisphere in ('north', 'south'):
             msg = (
                 f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
                 f"Diagnostic will not be treated, returning now."
             )
             self.log_error(msg)
-            raise ScriptEngineTaskArgumentInvalidError(msg)
+            raise ScriptEngineTaskArgumentInvalidError()
         self.check_file_extension(dst)
 
         month_cube = helpers.load_input_cube(src, varname)

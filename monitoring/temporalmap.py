@@ -50,4 +50,4 @@ class Temporalmap(Task):
                 f"Diagnostic will not be treated, returning now."
             )
             self.log_error(msg)
-            raise ScriptEngineTaskArgumentInvalidError(msg)
+            raise ScriptEngineTaskArgumentInvalidError()

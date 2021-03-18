@@ -29,7 +29,7 @@ class Map(Task):
         if current_bounds[-1][-1] > new_bounds[0][0]:
             msg = "Non-monotonic coordinate. Cube will not be saved."
             self.log_error(msg)
-            raise ScriptEngineTaskRunError(msg)
+            raise ScriptEngineTaskRunError()
 
         # Iris changes metadata when saving/loading cube
         # save & reload to prevent metadata mismatch
@@ -54,7 +54,7 @@ class Map(Task):
                 f"Diagnostic will not be treated, returning now."
             )
             self.log_error(msg)
-            raise ScriptEngineTaskArgumentInvalidError(msg)
+            raise ScriptEngineTaskArgumentInvalidError()
 
     def compute_simulation_avg(self, merged_cube):
         """
