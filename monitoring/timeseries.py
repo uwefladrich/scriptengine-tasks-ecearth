@@ -109,10 +109,10 @@ class Timeseries(Task):
         if current_bounds is not None and new_bounds is not None:
             if current_bounds[-1][-1] > new_bounds[0][0]:
                 self.log_error(msg)
-                raise ScriptEngineTaskRunError(msg)
+                raise ScriptEngineTaskRunError()
         if old_coord.points[-1] > new_coord.points[0]:
             self.log_error(msg)
-            raise ScriptEngineTaskRunError(msg)
+            raise ScriptEngineTaskRunError()
 
     def check_file_extension(self, dst):
         """check if destination file has a valid netCDF extension"""
@@ -122,4 +122,4 @@ class Timeseries(Task):
                 f"Diagnostic will not be treated, returning now."
             )
             self.log_error(msg)
-            raise ScriptEngineTaskArgumentInvalidError(msg)
+            raise ScriptEngineTaskArgumentInvalidError()

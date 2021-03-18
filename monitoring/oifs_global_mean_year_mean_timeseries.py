@@ -41,7 +41,7 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
         if not cf_phenomenon:
             msg = f"CF Phenomenon for {grib_code} not found. Update local table?"
             self.log_error(msg)
-            raise ScriptEngineTaskArgumentInvalidError(msg)
+            raise ScriptEngineTaskArgumentInvalidError()
         self.log_debug(f"Getting variable {cf_phenomenon.standard_name}")
         leg_cube = helpers.load_input_cube(src, cf_phenomenon.standard_name)
 

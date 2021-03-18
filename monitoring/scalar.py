@@ -41,4 +41,4 @@ class Scalar(Task):
                 f"Diagnostic will not be saved."
             )
             self.log_error(msg)
-            raise ScriptEngineTaskArgumentInvalidError(msg)
+            raise ScriptEngineTaskArgumentInvalidError()

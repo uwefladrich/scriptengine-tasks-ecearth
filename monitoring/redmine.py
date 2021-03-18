@@ -132,4 +132,4 @@ class Redmine(Task):
         except (redminelib.exceptions.AuthError, requests.exceptions.ConnectionError) as e:
             msg = f'Could not log in to Redmine server ({e})'
             self.log_error(msg)
-            raise ScriptEngineTaskRunError(msg)
+            raise ScriptEngineTaskRunError()
