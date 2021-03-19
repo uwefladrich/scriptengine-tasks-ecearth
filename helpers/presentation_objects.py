@@ -98,9 +98,9 @@ class TimeseriesLoader(PresentationObjectLoader):
             fig.autofmt_xdate()
 
         minor_step, major_step = self._determine_intervals(len(coord_points))
-        ax.set_xticks(coord_points[::major_step])
-        ax.set_xticks(coord_points[::minor_step], minor=True)
-        ax.set_xticklabels(coord_points[::major_step])
+        ax.set_xticks(coord_points[minor_step-1::major_step])
+        ax.set_xticks(coord_points[minor_step-1::minor_step], minor=True)
+        ax.set_xticklabels(coord_points[minor_step-1::major_step])
 
         ax.ticklabel_format(axis='y', style='sci', scilimits=(-3, 6), useOffset=False, useMathText=True)
         ax.set_ylim(kwargs.get('value_range', [None, None]))
@@ -128,13 +128,13 @@ class TimeseriesLoader(PresentationObjectLoader):
         if coord_length < 10:
             return 1, 1
         elif coord_length < 20:
-            return 1, 2
+            return 2, 2
+        elif coord_length < 50:
+            return 5, 5
         elif coord_length < 100:
             return 5, 10
-        elif coord_length < 200:
-            return 10, 20
         else:
-            return 50, 100
+            return 10, 20
 
 
 class MapLoader(PresentationObjectLoader):
