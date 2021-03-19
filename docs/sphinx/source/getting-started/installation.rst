@@ -11,6 +11,9 @@ The package supports two different installation methods:
 
 The next sections will detail the procedure to install the package for both methods.
 
+You can check if everything worked out by calling ``se --help`` from the command line.
+ScriptEngine will show all registered tasks, and the tasks in this package start with the prefix ``ece.``.
+
 .. highlight:: bash
 
 Installation using conda and pip
