@@ -94,7 +94,7 @@ class TimeseriesLoader(PresentationObjectLoader):
         fig = plt.figure(figsize=(6, 4), dpi=150)
         ax = fig.add_subplot(1, 1, 1)
         ax.plot(coord_points, self.cube.data, marker='o')
-        if "second since" in x_coord.units.name:
+        if "second since" in x_coord.units.name  or "hour since" in x_coord.units.name:
             fig.autofmt_xdate()
 
         minor_step, major_step = self._determine_intervals(len(coord_points))
