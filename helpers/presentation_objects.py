@@ -90,27 +90,25 @@ class TimeseriesLoader(PresentationObjectLoader):
             coord_points = format_dates(dates)
         else:
             coord_points = x_coord.points
-        
+
         fig = plt.figure(figsize=(6, 4), dpi=150)
         ax = fig.add_subplot(1, 1, 1)
         ax.plot(coord_points, self.cube.data, marker='o')
-        if "second since" in x_coord.units.name:
+        if "second since" in x_coord.units.name  or "hour since" in x_coord.units.name:
             fig.autofmt_xdate()
-        minor_step = math.ceil(len(coord_points) / 40)
-        if len(coord_points) < 10:
-            major_step = minor_step
-        elif len(coord_points) < 20:
-            major_step = 2*minor_step
-        else:
-            major_step = 3*minor_step
-        ax.set_xticks(coord_points[::major_step])
-        ax.set_xticks(coord_points[::minor_step], minor=True)
-        ax.set_xticklabels(coord_points[::major_step])
+
+        minor_step, major_step = self._determine_intervals(len(coord_points))
+        ax.set_xticks(coord_points[minor_step-1::major_step])
+        ax.set_xticks(coord_points[minor_step-1::minor_step], minor=True)
+        ax.set_xticklabels(coord_points[minor_step-1::major_step])
+
         ax.ticklabel_format(axis='y', style='sci', scilimits=(-3, 6), useOffset=False, useMathText=True)
         ax.set_ylim(kwargs.get('value_range', [None, None]))
+
         ax.set_title(format_title(self.cube.long_name))
         ax.set_xlabel(format_title(x_coord.name()))
         ax.set_ylabel(format_title(self.cube.long_name, self.cube.units))
+
         plt.tight_layout()
         with ChangeDirectory(dst_folder):
             fig.savefig(dst_file, bbox_inches="tight")
@@ -122,6 +120,22 @@ class TimeseriesLoader(PresentationObjectLoader):
             'comment': self.cube.attributes['comment'],
         }
         return image_dict
+
+    def _determine_intervals(self, coord_length):
+        """
+        compute the minor and major ticking intervals based on # of data points.
+        """
+        if coord_length < 10:
+            return 1, 1
+        elif coord_length < 20:
+            return 2, 2
+        elif coord_length < 50:
+            return 5, 5
+        elif coord_length < 100:
+            return 5, 10
+        else:
+            return 10, 20
+
 
 class MapLoader(PresentationObjectLoader):
     def __init__(self, path, cube):
