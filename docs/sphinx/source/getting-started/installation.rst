@@ -35,7 +35,7 @@ Update your conda environment using the file ``conda_environment.yml`` in the Gi
 
     conda env update -n your_environment_name --file conda_environment.yml
 
-This YAML file contains necessary dependencies for packages that *should* be installed via conda (like Iris or eccodes).
+This YAML file contains necessary dependencies for packages that *should* be installed via conda (like, e.g., Iris).
 You can also install these packages from source, but this will require a lot more attention during the setup process. 
 Refer to the documentation of the packages in ``conda_environment.yml`` for more information on installing them.
 
@@ -57,7 +57,7 @@ Update your conda environment using the file ``conda_environment.yml`` in the Gi
 
     conda env update -n your_environment_name --file conda_environment.yml
 
-This YAML file contains necessary dependencies for packages that *should* be installed via conda (like Iris or eccodes).
+This YAML file contains necessary dependencies for packages that *should* be installed via conda (like, e.g., Iris).
 You can also install these packages from source, but this will require a lot more attention during the setup process. 
 Refer to the documentation of the packages in ``conda_environment.yml`` for more information on installing them.
 

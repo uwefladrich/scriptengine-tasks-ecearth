@@ -11,6 +11,13 @@ import yaml
 import helpers.presentation_objects as po
 import helpers.exceptions as exceptions
 
+def test_presentation_object():
+    abstract_loader = po.PresentationObjectLoader("")
+    pytest.raises(
+        NotImplementedError,
+        abstract_loader.load,
+    )
+
 def test_format_title():
     assert po.format_title("test_title") == "Test Title"
     test_unit = cf_units.Unit("1")

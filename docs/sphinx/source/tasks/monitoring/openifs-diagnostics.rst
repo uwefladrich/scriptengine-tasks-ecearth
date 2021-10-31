@@ -2,7 +2,7 @@
 OpenIFS Diagnostics
 **********************
 
-These processing tasks assume that the provided input files are GRIB output files from OpenIFS. Further assumptions:
+These processing tasks assume that the provided input file is a NetCDF output file from OpenIFS with monthly data. Further assumptions:
 
 - regularly-spaced in time
 - data in grid-point space on a reduced Gaussian grid
@@ -23,15 +23,15 @@ If it is, e.g., six months long, the task will compute the six month global mean
 
 **Required arguments**
 
-* ``src``: A list of strings containing paths to the desired OpenIFS output files. This list can be manually entered or (often better) created by the ``find`` task. The task removes the initialization file from this list.
-* ``grib_code``: The grib code as it is stored in the output file. Refer to the `ECMWF parameter database`_ for the meaning of the parameters.
+* ``src``: A string containing the path to the OpenIFS output file.
+* ``varname``: The name of the variable in the output file. Refer to the `ECMWF parameter database`_ for the meaning of the variables.
 * ``dst``: A string ending in ``.nc``. This is where the diagnostic will be saved.
 
 ::
 
     - ece.mon.oifs_global_mean_year_mean_timeseries:
-        src: "{{gg_files}}"
-        grib_code: 167
+        src: "{{rundir}}/output/oifs/{{exp_id}}_atm_1m_1990-1990.nc"
+        varname: 2t
         dst: "{{mondir}}/2t_oifs_global_mean_year_mean_timeseries.nc"
 
 
@@ -46,15 +46,15 @@ This task takes the "simulation average climatology" (i.e., a multi-year mean) o
 
 **Required arguments**
 
-* ``src``: A list of strings containing paths to the desired OpenIFS output files. This list can be manually entered or (often better) created by the ``find`` task. The task removes the initialization file from this list.
-* ``grib_code``: The grib code as it is stored in the output file. Refer to the `ECMWF parameter database`_ for the meaning of the parameters.
+* ``src``: A string containing the path to the OpenIFS output file.
+* ``varname``: The name of the variable in the output file. Refer to the `ECMWF parameter database`_ for the meaning of the variables.
 * ``dst``: A string ending in ``.nc``. This is where the diagnostic will be saved.
 
 ::
 
     - ece.mon.oifs_all_mean_map:
-        src: "{{gg_files}}"
-        grib_code: 167
+        src: "{{rundir}}/output/oifs/{{exp_id}}_atm_1m_1990-1990.nc"
+        varname: 2t
         dst: "{{mondir}}/2t_oifs_all_mean_map.nc"
 
 OifsYearMeanTemporalmap
@@ -69,15 +69,15 @@ It assumes the leg is one year long, which is why it is called "YearMeanTemporal
 
 **Required arguments**
 
-* ``src``: A list of strings containing paths to the desired OpenIFS output files. This list can be manually entered or (often better) created by the ``find`` task. The task removes the initialization file from this list.
-* ``grib_code``: The grib code as it is stored in the output file. Refer to the `ECMWF parameter database`_ for the meaning of the parameters.
+* ``src``: A string containing the path to the OpenIFS output file.
+* ``varname``: The name of the variable in the output file. Refer to the `ECMWF parameter database`_ for the meaning of the variables.
 * ``dst``: A string ending in ``.nc``. This is where the diagnostic will be saved.
 
 ::
 
     - ece.mon.oifs_year_mean_temporalmap:
-        src: "{{gg_files}}"
-        grib_code: 167
+        src: "{{rundir}}/output/oifs/{{exp_id}}_atm_1m_1990-1990.nc"
+        varname: 2t
         dst: "{{mondir}}/2t_oifs_year_mean_temporalmap.nc"
 
 .. _ECMWF parameter database: https://apps.ecmwf.int/codes/grib/param-db?&filter=grib1&table=128

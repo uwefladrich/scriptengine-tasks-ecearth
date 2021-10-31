@@ -47,7 +47,6 @@ setuptools.setup(
         "imageio>=2.0",
         "scitools-iris>=3",
         "cartopy>=0.18",
-        "iris-grib>=0.15",
         "python-redmine",
     ],
     entry_points={

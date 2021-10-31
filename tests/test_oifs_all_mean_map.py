@@ -8,14 +8,14 @@ from monitoring.oifs_all_mean_map import OifsAllMeanMap
 
 def test_oifs_all_mean_map_working(tmpdir):
     init = {
-        "src": ['./tests/testdata/OIFSGG34199001'],
+        "src": ['./tests/testdata/TES1_atm_1m_1990_2t.nc'],
         "dst": str(tmpdir) + '/test.nc',
-        "grib_code": 34,
+        "varname": "2t",
     }
     atmo_map = OifsAllMeanMap(init)
     atmo_map.run(init)
     cube = iris.load_cube(str(tmpdir) + '/test.nc')
-    assert cube.name() == 'sea_surface_temperature'
+    assert cube.name() == "2 metre temperature"
     assert cube.attributes['title'] is not None
     assert cube.attributes['comment'] is not None
     assert cube.attributes['diagnostic_type'] == 'map'
@@ -25,9 +25,9 @@ def test_oifs_all_mean_map_working(tmpdir):
 
 def test_oifs_all_mean_map_wrong_code(tmpdir):
     init = {
-        "src": ['./tests/testdata/NEMO_output_sivolu-199003.nc'],
+        "src": ['./tests/testdata/TES1_atm_1m_1990_2t.nc'],
         "dst": str(tmpdir) + '/test.nc',
-        "grib_code": 500,
+        "varname": "sivolu",
     }
     atmo_map = OifsAllMeanMap(init)
 
