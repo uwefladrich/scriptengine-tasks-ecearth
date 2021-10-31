@@ -41,13 +41,12 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "scriptengine>=0.7.1",
+        "scriptengine>=0.8.1",
         "pyYAML>=5.1",
         "numpy>=1.16.1",
         "imageio>=2.0",
         "scitools-iris>=3",
         "cartopy>=0.18",
-        "iris-grib>=0.15",
         "python-redmine",
     ],
     entry_points={

@@ -3,8 +3,20 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
 # command to install dependencies
 install:
+  # Download test data
+  # -----------------------------------
+  - >
+    export TEST_DATA_REF="https://github.com/valentinaschueller/ece-4-monitoring-test-data/archive/refs/heads/main.zip";
+    export TEST_DATA_DOWNLOAD="${HOME}/test-data";
+    mkdir ${TEST_DATA_DOWNLOAD};
+    wget -O ${TEST_DATA_DOWNLOAD}/test-data.zip ${TEST_DATA_REF};
+    unzip -q ${TEST_DATA_DOWNLOAD}/test-data.zip -d ${TEST_DATA_DOWNLOAD};
+    mv ${TEST_DATA_DOWNLOAD}/ece-4-monitoring-test-data-main/ tests/testdata;
+  # Download and set up conda
+  # -----------------------------------
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - source "$HOME/miniconda/etc/profile.d/conda.sh"
@@ -17,11 +29,10 @@ install:
   - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
   - conda activate test-environment
   - conda env update -n test-environment --quiet --file conda_environment.yml
-  - python -m eccodes selfcheck # Check installation of eccodes.
   - conda install pip
   - conda install -c conda-forge iris
-  - git clone https://github.com/uwefladrich/scriptengine.git ../scriptengine
-  - pip install -e ../scriptengine
+  #- git clone https://github.com/uwefladrich/scriptengine.git ../scriptengine
+  #- pip install -e ../scriptengine
   - pip install .
   # Install pytest, coveralls for test coverage
   # -----------------------------------

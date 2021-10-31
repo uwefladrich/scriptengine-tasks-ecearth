@@ -1,20 +1,17 @@
 """Processing Task that creates a 2D time map of a given extensive atmosphere quantity."""
 
 import iris
-import iris_grib
 import numpy as np
 
 from scriptengine.tasks.core import timed_runner
-from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 
-from helpers.grib_cf_additions import update_grib_mappings
 import helpers.file_handling as helpers
 from .temporalmap import Temporalmap
 
 class OifsYearMeanTemporalmap(Temporalmap):
     """OifsYearMeanTemporalmap Processing Task"""
 
-    _required_arguments = ('src', 'dst', 'grib_code', )
+    _required_arguments = ("src", "dst", "varname")
 
     def __init__(self, arguments=None):
         OifsYearMeanTemporalmap.check_arguments(arguments)
@@ -22,62 +19,53 @@ class OifsYearMeanTemporalmap(Temporalmap):
 
     @timed_runner
     def run(self, context):
-        src = self.getarg('src', context)
-        dst = self.getarg('dst', context)
-        grib_code = self.getarg('grib_code', context)
-        src = [path for path in src if not path.endswith('000000')]
-        self.log_info(f"Create time map for atmosphere variable {grib_code} at {dst}.")
-        self.log_debug(f"Source file(s): {src}")
+        src = self.getarg("src", context)
+        dst = self.getarg("dst", context)
+        varname = self.getarg("varname", context)
+        self.log_info(f"Create time map for atmosphere variable {varname} at {dst}.")
+        self.log_debug(f"Source file: {src}")
 
         self.check_file_extension(dst)
 
-        update_grib_mappings()
-        cf_phenomenon = iris_grib.grib_phenom_translation.grib1_phenom_to_cf_info(
-            128, # table
-            98, # institution: ECMWF
-            grib_code
-        )
-        if not cf_phenomenon:
-            msg = f"CF Phenomenon for {grib_code} not found. Update local table?"
-            self.log_error(msg)
-            raise ScriptEngineTaskArgumentInvalidError()
-        self.log_debug(f"Getting variable {cf_phenomenon.standard_name}")
-        leg_cube = helpers.load_input_cube(src, cf_phenomenon.standard_name)
+        oifs_cube = helpers.load_input_cube(src, varname)
 
-        leg_cube.long_name = leg_cube.long_name.replace("_", " ")
+        temporalmap_cube = self.compute_time_mean(oifs_cube)
 
-        if leg_cube.units.name == 'kelvin':
-            leg_cube.convert_units('degC')
+        temporalmap_cube = self.set_cell_methods(temporalmap_cube)
+        temporalmap_cube = self.adjust_metadata(temporalmap_cube, varname)
+        self.save(temporalmap_cube, dst)
 
-        time_coord = leg_cube.coord('time')
-        step = time_coord.points[1] - time_coord.points[0]
-        time_coord.bounds = np.array([[point - step, point] for point in time_coord.points])
+    def set_cell_methods(self, cube):
+        """Set the correct cell methods."""
+        cube.cell_methods = ()
+        cube.add_cell_method(iris.coords.CellMethod("mean", coords="time", intervals="1 year"))
+        cube.add_cell_method(iris.coords.CellMethod("1 year", coords=["latitude", "longitude"]))
+        return cube
 
-        leg_mean = leg_cube.collapsed(
-            'time',
+    def compute_time_mean(self, output_cube):
+        """Apply the temporal average."""
+        # Remove auxiliary time coordinate before collapsing cube
+        try:
+            output_cube.coord("time")
+        except CoordinateNotFoundError as e:
+            output_cube.remove_coord(output_cube.coord("time", dim_coords=False))
+        time_mean_cube = output_cube.collapsed(
+            "time",
             iris.analysis.MEAN,
         )
         # Promote time from scalar to dimension coordinate
-        leg_mean = iris.util.new_axis(leg_mean, 'time')
+        time_mean_cube = iris.util.new_axis(time_mean_cube, "time")
+        return time_mean_cube
 
-        leg_mean = self.set_cell_methods(leg_mean, step)
-
-        leg_mean = helpers.set_metadata(
-            leg_mean,
-            title=f'{leg_mean.long_name.title()} (Annual Mean Map)',
-            comment=f"Leg Mean of **{grib_code}**.",
+    def adjust_metadata(self, temporalmap_cube, varname: str):
+        """Do further adjustments to the cube metadata before saving."""
+        temporalmap_cube = helpers.set_metadata(
+            temporalmap_cube,
+            title=f"{temporalmap_cube.long_name.title()} (Annual Mean Map)",
+            comment=f"Annual Mean of **{varname}**.",
             map_type="global atmosphere",
         )
-
-        self.save(leg_mean, dst)
-
-    def set_cell_methods(self, cube, step):
-        """Set the correct cell methods."""
-        cube.cell_methods = ()
-        cube.add_cell_method(iris.coords.CellMethod(
-            'mean',
-            coords='time',
-            intervals=f'{step * 3600} seconds',
-            ))
-        cube.add_cell_method(iris.coords.CellMethod('point', coords=['latitude', 'longitude']))
-        return cube
+        # Convert unit to °C if varname is given in K
+        if temporalmap_cube.units.name == "kelvin":
+            temporalmap_cube.convert_units("degC")
+        return temporalmap_cube

@@ -6,6 +6,7 @@ import yaml
 import numpy as np
 import iris
 from iris.util import equalise_attributes
+from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 
 # Using https://stackoverflow.com/revisions/13197763/9
 class ChangeDirectory:
@@ -50,6 +51,8 @@ def load_input_cube(src, varname):
             category=UserWarning,
             )
         month_cubes = iris.load(src, varname)
+    if len(month_cubes) == 0:
+        raise ScriptEngineTaskArgumentInvalidError(f"varname {varname} not found in {src}")
     if len(month_cubes) == 1:
         month_cube = remove_unique_attributes(month_cubes[0])
         return month_cube

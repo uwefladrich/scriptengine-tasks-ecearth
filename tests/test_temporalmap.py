@@ -5,10 +5,19 @@ import pytest
 import scriptengine.exceptions
 from monitoring.temporalmap import Temporalmap
 
-def test_time_map_dst_error():
-    time_map = Temporalmap({})
+def test_temporalmap_dst_error():
+    temporalmap = Temporalmap({})
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
-        time_map.check_file_extension,
+        temporalmap.check_file_extension,
         'test.yml',
     )
+
+def test_temporalmap_run():
+    temporalmap = Temporalmap({})
+    pytest.raises(
+        NotImplementedError,
+        temporalmap.run,
+        {}
+    )
+
