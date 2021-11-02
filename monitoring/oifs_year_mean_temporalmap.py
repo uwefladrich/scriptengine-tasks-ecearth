@@ -39,7 +39,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
         """Set the correct cell methods."""
         cube.cell_methods = ()
         cube.add_cell_method(iris.coords.CellMethod("mean", coords="time", intervals="1 year"))
-        cube.add_cell_method(iris.coords.CellMethod("1 year", coords=["latitude", "longitude"]))
+        cube.add_cell_method(iris.coords.CellMethod("point", coords=["latitude", "longitude"]))
         return cube
 
     def compute_time_mean(self, output_cube):
@@ -47,7 +47,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
         # Remove auxiliary time coordinate before collapsing cube
         try:
             output_cube.coord("time")
-        except CoordinateNotFoundError as e:
+        except iris.exceptions.CoordinateNotFoundError as e:
             output_cube.remove_coord(output_cube.coord("time", dim_coords=False))
         time_mean_cube = output_cube.collapsed(
             "time",
