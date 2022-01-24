@@ -2,5 +2,5 @@ channels:
     - conda-forge
 dependencies:
     - python>=3.6
-    - iris>=3
+    - iris>=3.1
     - cartopy>=0.18
