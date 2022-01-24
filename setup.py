@@ -45,7 +45,7 @@ setuptools.setup(
         "pyYAML>=5.1",
         "numpy>=1.16.1",
         "imageio>=2.0",
-        "scitools-iris>=3",
+        "scitools-iris>=3.1",
         "cartopy>=0.18",
         "python-redmine",
     ],
