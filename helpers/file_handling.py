@@ -24,16 +24,31 @@ class ChangeDirectory:
         os.chdir(self.saved_path)
 
 
-def compute_spatial_weights(domain_src, array_shape, grid):
-    "Compute weights for spatial averaging"
-    domain_cfg = iris.load(domain_src)
-    scale_factors = [
-        domain_cfg.extract(f"e1{grid.lower()}")[0][0],
-        domain_cfg.extract(f"e2{grid.lower()}")[0][0],
-    ]
-    cell_areas = scale_factors[0] * scale_factors[1]
-    cell_weights = np.broadcast_to(cell_areas.data, array_shape)
-    return cell_weights
+def spatial_coord_names(cube):
+    """Returns the names of all cube coordinates that are listed as 'spatial' coordinates"""
+    for cname in (c.name() for c in cube.coords()):
+        if cname in (
+            "latitude",
+            "longitude",
+            "Vertical T levels",
+            "Vertical U levels",
+            "Vertical V levels",
+        ):
+            yield cname
+
+
+def spatial_weights(cube, domain_fname, grid="t"):
+    """Compute weights for spatial averaging"""
+    volume = len(cube.shape) == 4
+    domain = iris.load(domain_fname)
+    e1, e2 = (
+        domain.extract(f"e1{grid.lower()}")[0][0],
+        domain.extract(f"e2{grid.lower()}")[0][0],
+    )
+    if volume:
+        e3 = domain.extract(f"e3{grid.lower()}_0")[0][0]
+    weights = e1 * e2 * e3 if volume else e1 * e2
+    return np.broadcast_to(weights.data, cube.shape)
 
 
 def compute_time_weights(monthly_data_cube, cube_shape=None):

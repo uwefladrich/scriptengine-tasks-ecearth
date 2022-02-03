@@ -10,6 +10,19 @@ import helpers.file_handling as hlp
 from .timeseries import Timeseries
 
 
+def _spatial_coord_names(cube):
+    """Returns the names of all cube coordinates that are listed as 'spatial' coordinates"""
+    for cname in (c.name() for c in cube.coords()):
+        if cname in (
+            "latitude",
+            "longitude",
+            "Vertical T levels",
+            "Vertical U levels",
+            "Vertical V levels",
+        ):
+            yield cname
+
+
 class NemoGlobalMeanYearMeanTimeseries(Timeseries):
     """NemoGlobalMeanYearMeanTimeseries Processing Task"""
 
@@ -53,7 +66,7 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
                 UserWarning,
             )
             spatial_avg = leg_cube.collapsed(
-                ["latitude", "longitude"],
+                _spatial_coord_names(leg_cube),
                 iris.analysis.MEAN,
                 weights=hlp.compute_spatial_weights(domain, leg_cube.shape, grid=grid),
             )
