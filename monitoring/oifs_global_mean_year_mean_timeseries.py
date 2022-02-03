@@ -4,10 +4,12 @@ import warnings
 
 import iris
 import numpy as np
-
 from scriptengine.tasks.core import timed_runner
+
 import helpers.file_handling as helpers
+
 from .timeseries import Timeseries
+
 
 class OifsGlobalMeanYearMeanTimeseries(Timeseries):
     """OifsGlobalMeanYearMeanTimeseries Processing Task"""
@@ -16,7 +18,9 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
 
     def __init__(self, arguments=None):
         OifsGlobalMeanYearMeanTimeseries.check_arguments(arguments)
-        super().__init__({**arguments, "title": None, "coord_value": None, "data_value": None})
+        super().__init__(
+            {**arguments, "title": None, "coord_value": None, "data_value": None}
+        )
 
     @timed_runner
     def run(self, context):
@@ -51,7 +55,9 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
         for latitude, amount in zip(unique_lats, gridpoints_per_lat):
             delta = latitude - last_angle
             current_angle = last_angle + 2 * delta
-            sin_diff = np.sin(np.deg2rad(current_angle)) - np.sin(np.deg2rad(last_angle))
+            sin_diff = np.sin(np.deg2rad(current_angle)) - np.sin(
+                np.deg2rad(last_angle)
+            )
             ring_area = 2 * np.pi * earth_radius**2 * sin_diff
             grid_area = ring_area / amount
             areas.extend([grid_area] * amount)
@@ -63,7 +69,9 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
     def set_cell_methods(self, timeseries_cube):
         """add the correct cell methods"""
         timeseries_cube.cell_methods = ()
-        timeseries_cube.add_cell_method(iris.coords.CellMethod("mean", coords="time", intervals="1 year"))
+        timeseries_cube.add_cell_method(
+            iris.coords.CellMethod("mean", coords="time", intervals="1 year")
+        )
         timeseries_cube.add_cell_method(iris.coords.CellMethod("mean", coords="area"))
 
     def compute_time_mean(self, output_cube):
@@ -86,15 +94,19 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
         """Apply the spatial average."""
         self.log_debug("Averaging over latitude and longitude.")
         # Remove duplicate boundary values before averaging
-        time_mean_cube.coord("latitude").bounds = time_mean_cube.coord("latitude").bounds[:,[0,1]]
-        time_mean_cube.coord("longitude").bounds = time_mean_cube.coord("longitude").bounds[:,[0,2]]
+        time_mean_cube.coord("latitude").bounds = time_mean_cube.coord(
+            "latitude"
+        ).bounds[:, [0, 1]]
+        time_mean_cube.coord("longitude").bounds = time_mean_cube.coord(
+            "longitude"
+        ).bounds[:, [0, 2]]
         with warnings.catch_warnings():
             # Suppress warning about insufficient metadata.
             warnings.filterwarnings(
                 "ignore",
                 "Collapsing a non-contiguous coordinate.",
                 UserWarning,
-                )
+            )
             spatial_mean_cube = time_mean_cube.collapsed(
                 ["latitude", "longitude"],
                 iris.analysis.MEAN,
@@ -105,9 +117,11 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
     def adjust_metadata(self, timeseries_cube, varname: str):
         """Do further adjustments to the cube metadata before saving."""
         # Add File Metadata
-        comment = (f"Global average time series of **{varname}**. "
-                   f"Each data point represents the (spatial and temporal) "
-                   f"average over one year.")
+        comment = (
+            f"Global average time series of **{varname}**. "
+            "Each data point represents the (spatial and temporal) "
+            "average over one year."
+        )
         timeseries_cube = helpers.set_metadata(
             timeseries_cube,
             title=f"{timeseries_cube.long_name} (Annual Mean)",
