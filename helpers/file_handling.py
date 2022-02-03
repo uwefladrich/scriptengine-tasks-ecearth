@@ -5,7 +5,6 @@ import warnings
 
 import iris
 import numpy as np
-import yaml
 from iris.util import equalise_attributes
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 
