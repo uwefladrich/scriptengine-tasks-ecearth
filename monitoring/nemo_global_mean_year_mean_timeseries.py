@@ -3,24 +3,12 @@
 import warnings
 
 import iris
+import numpy as np
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as hlp
+import helpers.file_handling as helpers
 
 from .timeseries import Timeseries
-
-
-def _spatial_coord_names(cube):
-    """Returns the names of all cube coordinates that are listed as 'spatial' coordinates"""
-    for cname in (c.name() for c in cube.coords()):
-        if cname in (
-            "latitude",
-            "longitude",
-            "Vertical T levels",
-            "Vertical U levels",
-            "Vertical V levels",
-        ):
-            yield cname
 
 
 class NemoGlobalMeanYearMeanTimeseries(Timeseries):
@@ -55,7 +43,7 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
 
         self.check_file_extension(dst)
 
-        leg_cube = hlp.load_input_cube(src, varname)
+        leg_cube = helpers.load_input_cube(src, varname)
 
         grid = self.getarg("grid", context, default="T")
         with warnings.catch_warnings():
@@ -66,21 +54,21 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
                 UserWarning,
             )
             spatial_avg = leg_cube.collapsed(
-                _spatial_coord_names(leg_cube),
+                helpers.spatial_coord_names(leg_cube),
                 iris.analysis.MEAN,
-                weights=hlp.compute_spatial_weights(domain, leg_cube.shape, grid=grid),
+                weights=helpers.spatial_weights(leg_cube, domain, grid),
             )
         # Remove auxiliary time coordinate before collapsing cube
         spatial_avg.remove_coord(spatial_avg.coord("time", dim_coords=False))
         ann_spatial_avg = spatial_avg.collapsed(
             "time",
             iris.analysis.MEAN,
-            weights=hlp.compute_time_weights(spatial_avg),
+            weights=helpers.compute_time_weights(spatial_avg),
         )
         # Promote time from scalar to dimension coordinate
         ann_spatial_avg = iris.util.new_axis(ann_spatial_avg, "time")
 
-        ann_spatial_avg = hlp.set_metadata(
+        ann_spatial_avg = helpers.set_metadata(
             ann_spatial_avg,
             title=f"{ann_spatial_avg.long_name} (Annual Mean)",
             comment=comment,
