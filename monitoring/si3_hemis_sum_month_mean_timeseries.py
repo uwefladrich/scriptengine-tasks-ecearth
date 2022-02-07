@@ -11,7 +11,7 @@ import helpers.file_handling as helpers
 
 from .timeseries import Timeseries
 
-meta_dict = {
+_meta_dict = {
     "sivolu": {
         "long_name": "Sea-Ice Volume",
         "standard_name": "sea_ice_volume",
@@ -56,15 +56,16 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
             f"Create {varname} time series for {hemisphere}ern hemisphere at {dst}."
         )
 
-        if varname not in meta_dict:
+        try:
+            long_name = _meta_dict[varname]["long_name"]
+        except KeyError:
             self.log_warning(
                 (
-                    f"'varname' must be one of the following: {meta_dict.keys()} "
-                    "Diagnostic will not be treated, returning now."
+                    f"Invalid varname argument: '{varname}', must be one of {_meta_dict.keys()}."
+                    " Diagnostic will not be included!"
                 )
             )
             return
-        long_name = meta_dict[varname]["long_name"]
 
         src = self.getarg("src", context)
         domain = self.getarg("domain", context)
@@ -74,8 +75,8 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
         if not hemisphere in ("north", "south"):
             self.log_warning(
                 (
-                    f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'. "
-                    "Diagnostic will not be treated, returning now."
+                    f"Invalid hemisphere argument '{hemisphere}', must be 'north' or 'south'."
+                    " Diagnostic will not be included!"
                 )
             )
             return
@@ -103,11 +104,11 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
 
         # Remove auxiliary time coordinate
         hemispheric_sum.remove_coord(hemispheric_sum.coord("time", dim_coords=False))
-        hemispheric_sum.standard_name = meta_dict[varname]["standard_name"]
-        hemispheric_sum.units = cf_units.Unit(meta_dict[varname]["old_unit"])
-        hemispheric_sum.convert_units(meta_dict[varname]["new_unit"])
+        hemispheric_sum.standard_name = _meta_dict[varname]["standard_name"]
+        hemispheric_sum.units = cf_units.Unit(_meta_dict[varname]["old_unit"])
+        hemispheric_sum.convert_units(_meta_dict[varname]["new_unit"])
         hemispheric_sum.long_name = f"{long_name} {hemisphere.capitalize()}"
-        hemispheric_sum.var_name = meta_dict[varname]["var_name"] + hemisphere[0]
+        hemispheric_sum.var_name = _meta_dict[varname]["var_name"] + hemisphere[0]
 
         metadata = {
             "comment": (
