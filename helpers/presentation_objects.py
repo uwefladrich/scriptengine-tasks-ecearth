@@ -2,8 +2,6 @@
 Initialize presentation objects for visualization
 """
 
-import abc
-import math
 import os
 
 import cftime

@@ -3,8 +3,6 @@
 import warnings
 
 import cartopy.crs as ccrs
-import cf_units as unit
-import cftime
 import iris
 import iris.plot as iplt
 import matplotlib.pyplot as plt
