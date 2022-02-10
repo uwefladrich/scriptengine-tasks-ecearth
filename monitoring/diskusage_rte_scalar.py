@@ -2,22 +2,26 @@
 import os
 
 from scriptengine.tasks.core import timed_runner
+
 from .scalar import Scalar
 
 
 class DiskusageRteScalar(Scalar):
     """DiskusageRteScalar Processing Task"""
 
-    _required_arguments = ('src', 'dst', )
+    _required_arguments = (
+        "src",
+        "dst",
+    )
 
     def __init__(self, arguments=None):
         DiskusageRteScalar.check_arguments(arguments)
-        super().__init__({**arguments, 'title': None, 'value': None})
+        super().__init__({**arguments, "title": None, "value": None})
 
     @timed_runner
     def run(self, context):
-        src = self.getarg('src', context)
-        dst = self.getarg('dst', context)
+        src = self.getarg("src", context)
+        dst = self.getarg("dst", context)
         self.log_info(f"Write disk usage of {src} to {dst}")
 
         self.value = round(self.get_directory_size(src) * 1e-9, 1)
@@ -27,7 +31,7 @@ class DiskusageRteScalar(Scalar):
         self.save(
             dst,
             title=self.title,
-            comment=f"Current size of {src}.",
+            comment=f"Current size of {src}",
             value=self.value,
         )
 
