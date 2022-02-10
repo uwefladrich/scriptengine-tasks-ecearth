@@ -1,6 +1,6 @@
 """Presentation Task that saves Data and Plots to a Markdown File."""
 
-import os
+from pathlib import Path
 
 import jinja2
 from scriptengine.jinja import filters as j2filters
@@ -68,7 +68,7 @@ class Markdown(Task):
             search_path.extend(
                 [
                     context["_se_cmd_cwd"],
-                    os.path.join(context["_se_cmd_cwd"], "templates"),
+                    Path(context["_se_cmd_cwd"]) / "templates",
                 ]
             )
         self.log_debug(f"Search path for template: {search_path}")

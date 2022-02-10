@@ -1,7 +1,7 @@
 """Presentation Task that uploads Data and Plots to the EC-Earth dev portal."""
 
-import os
 import urllib.parse
+from pathlib import Path
 
 import jinja2
 import redminelib
@@ -64,7 +64,7 @@ class Redmine(Task):
         issue.uploads = []
         for item in presentation_list:
             if item["presentation_type"] == "image":
-                file_name = os.path.basename(item["path"])
+                file_name = Path(item["path"]).name
                 try:
                     for attachment in issue.attachments or []:
                         if attachment.filename == file_name:
@@ -102,7 +102,7 @@ class Redmine(Task):
             search_path.extend(
                 [
                     context["_se_cmd_cwd"],
-                    os.path.join(context["_se_cmd_cwd"], "templates"),
+                    Path(context["_se_cmd_cwd"]) / "templates",
                 ]
             )
         self.log_debug(f"Search path for template: {search_path}")
