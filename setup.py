@@ -1,6 +1,5 @@
-"""setup.py for package scriptengine-tasks-ecearth."""
 import codecs
-import os
+from pathlib import Path
 
 import setuptools
 
@@ -9,8 +8,8 @@ def read(rel_path):
     """
     Helper function to read file in relative path.
     """
-    here = os.path.abspath(os.path.dirname(__file__))
-    with codecs.open(os.path.join(here, rel_path), "r") as fp:
+    here = Path(__file__).parent.resolve()
+    with codecs.open(here / rel_path, "r") as fp:
         return fp.read()
 
 
