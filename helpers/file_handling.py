@@ -2,6 +2,7 @@
 
 import os
 import warnings
+from pathlib import Path
 
 import iris
 import numpy as np
@@ -14,8 +15,8 @@ class ChangeDirectory:
     """Context manager for changing the current working directory"""
 
     def __init__(self, new_path):
-        self.new_path = os.path.expanduser(new_path)
-        self.saved_path = os.getcwd()
+        self.new_path = Path(new_path).expanduser()
+        self.saved_path = Path.cwd()
 
     def __enter__(self):
         os.chdir(self.new_path)

@@ -2,7 +2,7 @@
 Initialize presentation objects for visualization
 """
 
-import os
+from pathlib import Path
 
 import cftime
 import imageio
@@ -18,10 +18,10 @@ from helpers.file_handling import ChangeDirectory
 
 class PresentationObject:
     def __init__(self, dst_folder, path, **kwargs):
-        self.dst_folder = dst_folder
-        self.path = path
+        self.dst_folder = Path(dst_folder)
+        self.path = Path(path)
         self.custom_input = kwargs
-        self.loader = get_loader(path)
+        self.loader = get_loader(self.path)
 
     def create_dict(self):
         loaded_dict = self.loader.load(self.dst_folder, **self.custom_input)
@@ -29,11 +29,12 @@ class PresentationObject:
 
 
 def get_loader(path):
-    if path.endswith(".yml") or path.endswith(".yaml"):
+    if path.suffix in (".yml", ".yaml"):
         return ScalarLoader(path)
-    if path.endswith(".nc"):
+    if path.suffix == ".nc":
         try:
-            loaded_cube = iris.load_cube(path)
+            # Iris before 3.3 can't handle pathlib's Path, needs string
+            loaded_cube = iris.load_cube(str(path))
         except OSError:
             raise exceptions.PresentationException(f"File not found! Ignoring {path}")
         if loaded_cube.attributes["diagnostic_type"] == "time series":
@@ -50,7 +51,7 @@ def get_loader(path):
 
 class PresentationObjectLoader:
     def __init__(self, path):
-        self.path = path
+        self.path = Path(path)
         self.diag_type = "invalid"
         self.pres_type = "invalid"
 
@@ -60,7 +61,7 @@ class PresentationObjectLoader:
 
 class ScalarLoader(PresentationObjectLoader):
     def __init__(self, path):
-        self.path = path
+        self.path = Path(path)
         self.diag_type = "scalar"
         self.pres_type = "text"
 
@@ -77,7 +78,7 @@ class ScalarLoader(PresentationObjectLoader):
 
 class TimeseriesLoader(PresentationObjectLoader):
     def __init__(self, path, cube):
-        self.path = path
+        self.path = Path(path)
         self.cube = cube
         self.diag_type = "time series"
         self.pres_type = "image"
@@ -86,9 +87,7 @@ class TimeseriesLoader(PresentationObjectLoader):
         """
         Load time series diagnostic and call plot creator.
         """
-        # get file name without extension
-        base_name = os.path.splitext(os.path.basename(self.path))[0]
-        dst_file = f"./{base_name}.png"
+        dst_file = f"./{self.path.stem}.png"
 
         x_coord = self.cube.coords()[0]
         if "second since" in x_coord.units.name or "hour since" in x_coord.units.name:
@@ -147,7 +146,7 @@ class TimeseriesLoader(PresentationObjectLoader):
 
 class MapLoader(PresentationObjectLoader):
     def __init__(self, path, cube):
-        self.path = path
+        self.path = Path(path)
         self.cube = cube
         self.diag_type = "map"
         self.pres_type = "image"
@@ -156,8 +155,6 @@ class MapLoader(PresentationObjectLoader):
         """
         Load map diagnostic and determine map type.
         """
-        # get file name without extension
-        base_name = os.path.splitext(os.path.basename(self.path))[0]
         map_type = self.cube.attributes["map_type"]
         map_handler = type_handling.function_mapper(map_type)
         if map_handler is None:
@@ -176,7 +173,7 @@ class MapLoader(PresentationObjectLoader):
             units=unit_text,
             **kwargs,
         )
-        dst_file = f"./{base_name}.png"
+        dst_file = f"./{self.path.stem}.png"
         with ChangeDirectory(dst_folder):
             fig.savefig(dst_file, bbox_inches="tight")
             plt.close(fig)
@@ -191,7 +188,7 @@ class MapLoader(PresentationObjectLoader):
 
 class TemporalmapLoader(PresentationObjectLoader):
     def __init__(self, path, cube):
-        self.path = path
+        self.path = Path(path)
         self.cube = cube
         self.diag_type = "temporal map"
         self.pres_type = "image"
@@ -200,22 +197,19 @@ class TemporalmapLoader(PresentationObjectLoader):
         """
         Load map diagnostic and determine map type.
         """
-        # get file name without extension
-        base_name = os.path.splitext(os.path.basename(self.path))[0]
         map_type = self.cube.attributes["map_type"]
         map_handler = type_handling.function_mapper(map_type)
         if map_handler is None:
             raise exceptions.InvalidMapTypeException(map_type)
 
-        png_dir = f"{base_name}_frames"
-        number_of_time_steps = len(self.cube.coord("time").points)
+        png_dir = self.path.stem + "_frames"
         with ChangeDirectory(dst_folder):
-            if not os.path.isdir(png_dir):
-                os.mkdir(png_dir)
-            number_of_pngs = len(os.listdir(png_dir))
+            png_dir.mkdir(exist_ok=True)
+            number_of_pngs = len(png_dir.iterdir())
 
         unit_text = f"{format_units(self.cube.units)}"
-        dst_file = f"./{base_name}.gif"
+        dst_file = f"./{self.path.stem}.gif"
+        number_of_time_steps = len(self.cube.coord("time").points)
         with ChangeDirectory(f"{dst_folder}/{png_dir}"):
             for time_step in range(number_of_pngs, number_of_time_steps):
                 time_coord = self.cube.coord("time")
@@ -230,10 +224,12 @@ class TemporalmapLoader(PresentationObjectLoader):
                     units=unit_text,
                     **kwargs,
                 )
-                fig.savefig(f"./{base_name}-{time_step:03}.png", bbox_inches="tight")
+                fig.savefig(
+                    f"./{self.path.stem}-{time_step:03}.png", bbox_inches="tight"
+                )
                 plt.close(fig)
             images = []
-            for file_name in sorted(os.listdir(".")):
+            for file_name in sorted(Path().iterdir()):
                 images.append(imageio.imread(file_name))
             imageio.mimsave(f".{dst_file}", images, fps=2)
 
