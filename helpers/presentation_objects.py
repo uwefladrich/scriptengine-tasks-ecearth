@@ -2,20 +2,21 @@
 Initialize presentation objects for visualization
 """
 
-import os
-import math
 import abc
+import math
+import os
 
-import yaml
 import cftime
-import matplotlib.pyplot as plt
 import imageio
 import iris
 import iris.quickplot as qplt
+import matplotlib.pyplot as plt
+import yaml
 
-from helpers.file_handling import ChangeDirectory
 import helpers.exceptions as exceptions
 import helpers.map_type_handling as type_handling
+from helpers.file_handling import ChangeDirectory
+
 
 class PresentationObject:
     def __init__(self, dst_folder, path, **kwargs):
@@ -26,12 +27,13 @@ class PresentationObject:
 
     def create_dict(self):
         loaded_dict = self.loader.load(self.dst_folder, **self.custom_input)
-        return {'presentation_type': self.loader.pres_type, **loaded_dict}
+        return {"presentation_type": self.loader.pres_type, **loaded_dict}
+
 
 def get_loader(path):
-    if path.endswith('.yml') or path.endswith('.yaml'):
+    if path.endswith(".yml") or path.endswith(".yaml"):
         return ScalarLoader(path)
-    if path.endswith('.nc'):
+    if path.endswith(".nc"):
         try:
             loaded_cube = iris.load_cube(path)
         except OSError:
@@ -42,23 +44,27 @@ def get_loader(path):
             return MapLoader(path, loaded_cube)
         if loaded_cube.attributes["diagnostic_type"] == "temporal map":
             return TemporalmapLoader(path, loaded_cube)
-        raise exceptions.PresentationException(f"Invalid diagnostic type {loaded_cube.attributes['diagnostic_type']}")
+        raise exceptions.PresentationException(
+            f"Invalid diagnostic type {loaded_cube.attributes['diagnostic_type']}"
+        )
     raise exceptions.PresentationException(f"Invalid file extension of {path}")
+
 
 class PresentationObjectLoader:
     def __init__(self, path):
         self.path = path
-        self.diag_type = 'invalid'
-        self.pres_type = 'invalid'
+        self.diag_type = "invalid"
+        self.pres_type = "invalid"
 
     def load(self, **kwargs):
         raise NotImplementedError
 
+
 class ScalarLoader(PresentationObjectLoader):
     def __init__(self, path):
         self.path = path
-        self.diag_type = 'scalar'
-        self.pres_type = 'text'
+        self.diag_type = "scalar"
+        self.pres_type = "text"
 
     def load(self, *args, **kwargs):
         try:
@@ -66,15 +72,17 @@ class ScalarLoader(PresentationObjectLoader):
                 loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
             return loaded_dict
         except FileNotFoundError:
-            raise exceptions.PresentationException(f"File not found! Ignoring {self.path}")
+            raise exceptions.PresentationException(
+                f"File not found! Ignoring {self.path}"
+            )
 
 
 class TimeseriesLoader(PresentationObjectLoader):
     def __init__(self, path, cube):
         self.path = path
         self.cube = cube
-        self.diag_type = 'time series'
-        self.pres_type = 'image'
+        self.diag_type = "time series"
+        self.pres_type = "image"
 
     def load(self, dst_folder, **kwargs):
         """
@@ -93,17 +101,19 @@ class TimeseriesLoader(PresentationObjectLoader):
 
         fig = plt.figure(figsize=(6, 4), dpi=150)
         ax = fig.add_subplot(1, 1, 1)
-        ax.plot(coord_points, self.cube.data, marker='o')
-        if "second since" in x_coord.units.name  or "hour since" in x_coord.units.name:
+        ax.plot(coord_points, self.cube.data, marker="o")
+        if "second since" in x_coord.units.name or "hour since" in x_coord.units.name:
             fig.autofmt_xdate()
 
         minor_step, major_step = self._determine_intervals(len(coord_points))
-        ax.set_xticks(coord_points[minor_step-1::major_step])
-        ax.set_xticks(coord_points[minor_step-1::minor_step], minor=True)
-        ax.set_xticklabels(coord_points[minor_step-1::major_step])
+        ax.set_xticks(coord_points[minor_step - 1 :: major_step])
+        ax.set_xticks(coord_points[minor_step - 1 :: minor_step], minor=True)
+        ax.set_xticklabels(coord_points[minor_step - 1 :: major_step])
 
-        ax.ticklabel_format(axis='y', style='sci', scilimits=(-3, 6), useOffset=False, useMathText=True)
-        ax.set_ylim(kwargs.get('value_range', [None, None]))
+        ax.ticklabel_format(
+            axis="y", style="sci", scilimits=(-3, 6), useOffset=False, useMathText=True
+        )
+        ax.set_ylim(kwargs.get("value_range", [None, None]))
 
         ax.set_title(format_title(self.cube.long_name))
         ax.set_xlabel(format_title(x_coord.name()))
@@ -115,9 +125,9 @@ class TimeseriesLoader(PresentationObjectLoader):
             plt.close(fig)
 
         image_dict = {
-            'title': self.cube.attributes['title'],
-            'path': dst_file,
-            'comment': self.cube.attributes['comment'],
+            "title": self.cube.attributes["title"],
+            "path": dst_file,
+            "comment": self.cube.attributes["comment"],
         }
         return image_dict
 
@@ -141,8 +151,8 @@ class MapLoader(PresentationObjectLoader):
     def __init__(self, path, cube):
         self.path = path
         self.cube = cube
-        self.diag_type = 'map'
-        self.pres_type = 'image'
+        self.diag_type = "map"
+        self.pres_type = "image"
 
     def load(self, dst_folder, **kwargs):
         """
@@ -150,13 +160,13 @@ class MapLoader(PresentationObjectLoader):
         """
         # get file name without extension
         base_name = os.path.splitext(os.path.basename(self.path))[0]
-        map_type = self.cube.attributes['map_type']
+        map_type = self.cube.attributes["map_type"]
         map_handler = type_handling.function_mapper(map_type)
         if map_handler is None:
             raise exceptions.InvalidMapTypeException(map_type)
-        
+
         unit_text = f"{format_units(self.cube.units)}"
-        time_coord = self.cube.coord('time')
+        time_coord = self.cube.coord("time")
         time_bounds = time_coord.bounds[0]
         dates = cftime.num2pydate(time_bounds, time_coord.units.name)
         plot_title = format_title(self.cube.long_name)
@@ -174,32 +184,33 @@ class MapLoader(PresentationObjectLoader):
             plt.close(fig)
 
         image_dict = {
-            'title': self.cube.attributes['title'],
-            'path': dst_file,
-            'comment': self.cube.attributes['comment'],
+            "title": self.cube.attributes["title"],
+            "path": dst_file,
+            "comment": self.cube.attributes["comment"],
         }
         return image_dict
+
 
 class TemporalmapLoader(PresentationObjectLoader):
     def __init__(self, path, cube):
         self.path = path
         self.cube = cube
-        self.diag_type = 'temporal map'
-        self.pres_type = 'image'
+        self.diag_type = "temporal map"
+        self.pres_type = "image"
 
-    def load(self, dst_folder,**kwargs):
+    def load(self, dst_folder, **kwargs):
         """
         Load map diagnostic and determine map type.
         """
         # get file name without extension
         base_name = os.path.splitext(os.path.basename(self.path))[0]
-        map_type = self.cube.attributes['map_type']
+        map_type = self.cube.attributes["map_type"]
         map_handler = type_handling.function_mapper(map_type)
         if map_handler is None:
             raise exceptions.InvalidMapTypeException(map_type)
-        
+
         png_dir = f"{base_name}_frames"
-        number_of_time_steps = len(self.cube.coord('time').points)
+        number_of_time_steps = len(self.cube.coord("time").points)
         with ChangeDirectory(dst_folder):
             if not os.path.isdir(png_dir):
                 os.mkdir(png_dir)
@@ -209,7 +220,7 @@ class TemporalmapLoader(PresentationObjectLoader):
         dst_file = f"./{base_name}.gif"
         with ChangeDirectory(f"{dst_folder}/{png_dir}"):
             for time_step in range(number_of_pngs, number_of_time_steps):
-                time_coord = self.cube.coord('time')
+                time_coord = self.cube.coord("time")
                 time_bounds = time_coord.bounds[time_step]
                 dates = cftime.num2pydate(time_bounds, time_coord.units.name)
                 date_title = f"{dates[0].strftime('%Y')}"
@@ -222,18 +233,19 @@ class TemporalmapLoader(PresentationObjectLoader):
                     **kwargs,
                 )
                 fig.savefig(f"./{base_name}-{time_step:03}.png", bbox_inches="tight")
-                plt.close(fig)   
+                plt.close(fig)
             images = []
             for file_name in sorted(os.listdir(".")):
                 images.append(imageio.imread(file_name))
-            imageio.mimsave(f'.{dst_file}', images, fps=2)
+            imageio.mimsave(f".{dst_file}", images, fps=2)
 
         image_dict = {
-            'title': self.cube.attributes['title'],
-            'path': dst_file,
-            'comment': self.cube.attributes['comment'],
+            "title": self.cube.attributes["title"],
+            "path": dst_file,
+            "comment": self.cube.attributes["comment"],
         }
         return image_dict
+
 
 def format_title(name, units=None):
     """
@@ -247,19 +259,17 @@ def format_title(name, units=None):
         title += " / {}".format(unit_text)
     return title
 
+
 def format_units(units):
     """Format Cube Units as String"""
-    if not (
-            units is None
-            or units.is_unknown()
-            or units.is_no_unit()
-        ):
+    if not (units is None or units.is_unknown() or units.is_no_unit()):
         if qplt._use_symbol(units):
             return units.symbol
         else:
             return units
     else:
         return None
+
 
 def format_dates(dates):
     fmt_dates = []
