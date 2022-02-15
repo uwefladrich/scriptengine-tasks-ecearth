@@ -23,14 +23,14 @@ class Scalar(Task):
     @timed_runner
     def run(self, context):
         title = self.getarg("title", context)
-        dst = self.getarg("dst", context)
+        dst = Path(self.getarg("dst", context))
 
         self.log_info(f"Write scalar {title} to {dst}")
 
         value = self.getarg("value", context)
         comment = self.getarg("comment", context, default=None)
 
-        self.save(Path(dst), title=title, value=value, comment=comment)
+        self.save(dst, title=title, value=value, comment=comment)
 
     def save(self, dst, **kwargs):
         """Saves a scalar diagnostic in a YAML file."""

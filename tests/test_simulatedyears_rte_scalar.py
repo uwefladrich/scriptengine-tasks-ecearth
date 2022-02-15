@@ -1,16 +1,14 @@
 """Tests for monitoring/simulatedyears_rte_scalar.py"""
 
+from pathlib import Path
 from unittest.mock import patch
 
 from monitoring.simulatedyears_rte_scalar import SimulatedyearsRteScalar
 
+
 def test_simulatedyears_working(tmpdir):
-    test_path = str(tmpdir) + '/test.yml'
-    init = {
-        'dst': test_path,
-        'start': "1990-01-01",
-        'end': "1995-01-01"
-    }
+    test_path = Path(tmpdir) / "test.yml"
+    init = {"dst": test_path, "start": "1990-01-01", "end": "1995-01-01"}
     simulated_years = SimulatedyearsRteScalar(init)
     with patch.object(simulated_years, 'save') as mock:
         simulated_years.run(init)

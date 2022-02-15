@@ -1,5 +1,7 @@
 """Processing Task that writes out the number of so far simulated years."""
 
+from pathlib import Path
+
 from dateutil.relativedelta import relativedelta
 from scriptengine.tasks.core import timed_runner
 
@@ -21,7 +23,7 @@ class SimulatedyearsRteScalar(Scalar):
 
     @timed_runner
     def run(self, context):
-        dst = self.getarg("dst", context)
+        dst = Path(self.getarg("dst", context))
         start = self.getarg("start", context)
         end = self.getarg("end", context)
         self.log_info(f"Write simulated years to {dst}")

@@ -1,5 +1,6 @@
 """Processing Task that writes out the disk usage of a given folder."""
 import os
+from pathlib import Path
 
 from scriptengine.tasks.core import timed_runner
 
@@ -20,8 +21,8 @@ class DiskusageRteScalar(Scalar):
 
     @timed_runner
     def run(self, context):
-        src = self.getarg("src", context)
-        dst = self.getarg("dst", context)
+        src = Path(self.getarg("src", context))
+        dst = Path(self.getarg("dst", context))
         self.log_info(f"Write disk usage of {src} to {dst}")
 
         self.value = round(self.get_directory_size(src) * 1e-9, 1)
