@@ -10,11 +10,11 @@ def test_simulatedyears_working(tmpdir):
     test_path = Path(tmpdir) / "test.yml"
     init = {"dst": test_path, "start": "1990-01-01", "end": "1995-01-01"}
     simulated_years = SimulatedyearsRteScalar(init)
-    with patch.object(simulated_years, 'save') as mock:
+    with patch.object(simulated_years, "save") as mock:
         simulated_years.run(init)
     mock.assert_called_with(
-        init['dst'],
+        init["dst"],
         title="Simulated Years",
         comment="Current number of simulated years.",
         value=5,
-        )
+    )
