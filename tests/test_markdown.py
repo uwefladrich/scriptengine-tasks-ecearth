@@ -35,5 +35,5 @@ def test_markdown_presentation_list(tmpdir):
     ]
     with patch.object(markdown, 'log_warning') as mock:
         result = markdown.get_presentation_list(test_sources, str(tmpdir))
-    mock.assert_called_with("Can not present diagnostic: File not found! Ignoring path.yml")
+    mock.assert_called_with("Can not present diagnostic: File not found: path.yml")
     assert result == []

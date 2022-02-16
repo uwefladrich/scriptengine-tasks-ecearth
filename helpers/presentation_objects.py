@@ -11,9 +11,9 @@ import iris.quickplot as qplt
 import matplotlib.pyplot as plt
 import yaml
 
-import helpers.exceptions as exceptions
-import helpers.map_type_handling as type_handling
+from helpers.exceptions import InvalidMapTypeException, PresentationException
 from helpers.file_handling import ChangeDirectory
+from helpers.map_type_handling import function_mapper
 
 
 class PresentationObject:
@@ -29,24 +29,26 @@ class PresentationObject:
 
 
 def get_loader(path):
-    if path.suffix in (".yml", ".yaml"):
+    suffix = Path(path).suffix
+    if suffix in (".yml", ".yaml"):
         return ScalarLoader(path)
-    if path.suffix == ".nc":
+    if suffix == ".nc":
         try:
             # Iris before 3.3 can't handle pathlib's Path, needs string
-            loaded_cube = iris.load_cube(str(path))
+            cube = iris.load_cube(str(path))
         except OSError:
-            raise exceptions.PresentationException(f"File not found! Ignoring {path}")
-        if loaded_cube.attributes["diagnostic_type"] == "time series":
-            return TimeseriesLoader(path, loaded_cube)
-        if loaded_cube.attributes["diagnostic_type"] == "map":
-            return MapLoader(path, loaded_cube)
-        if loaded_cube.attributes["diagnostic_type"] == "temporal map":
-            return TemporalmapLoader(path, loaded_cube)
-        raise exceptions.PresentationException(
-            f"Invalid diagnostic type {loaded_cube.attributes['diagnostic_type']}"
-        )
-    raise exceptions.PresentationException(f"Invalid file extension of {path}")
+            raise PresentationException(f"File not found: {path}")
+        loader_map = {
+            "time series": TimeseriesLoader,
+            "map": MapLoader,
+            "temporal map": TemporalmapLoader,
+        }
+        diag_type = cube.attributes["diagnostic_type"]
+        try:
+            return loader_map[diag_type](path, cube)
+        except KeyError:
+            raise PresentationException(f"Invalid diagnostic type: {diag_type}")
+    raise PresentationException(f"Invalid file extension: {path}")
 
 
 class PresentationObjectLoader:
@@ -71,9 +73,7 @@ class ScalarLoader(PresentationObjectLoader):
                 loaded_dict = yaml.load(yml_file, Loader=yaml.FullLoader)
             return loaded_dict
         except FileNotFoundError:
-            raise exceptions.PresentationException(
-                f"File not found! Ignoring {self.path}"
-            )
+            raise PresentationException(f"File not found: {self.path}")
 
 
 class TimeseriesLoader(PresentationObjectLoader):
@@ -121,12 +121,11 @@ class TimeseriesLoader(PresentationObjectLoader):
             fig.savefig(dst_file, bbox_inches="tight")
             plt.close(fig)
 
-        image_dict = {
+        return {
             "title": self.cube.attributes["title"],
             "path": dst_file,
             "comment": self.cube.attributes["comment"],
         }
-        return image_dict
 
     def _determine_intervals(self, coord_length):
         """
@@ -156,9 +155,9 @@ class MapLoader(PresentationObjectLoader):
         Load map diagnostic and determine map type.
         """
         map_type = self.cube.attributes["map_type"]
-        map_handler = type_handling.function_mapper(map_type)
+        map_handler = function_mapper(map_type)
         if map_handler is None:
-            raise exceptions.InvalidMapTypeException(map_type)
+            raise InvalidMapTypeException(map_type)
 
         unit_text = f"{format_units(self.cube.units)}"
         time_coord = self.cube.coord("time")
@@ -178,12 +177,11 @@ class MapLoader(PresentationObjectLoader):
             fig.savefig(dst_file, bbox_inches="tight")
             plt.close(fig)
 
-        image_dict = {
+        return {
             "title": self.cube.attributes["title"],
             "path": dst_file,
             "comment": self.cube.attributes["comment"],
         }
-        return image_dict
 
 
 class TemporalmapLoader(PresentationObjectLoader):
@@ -198,14 +196,14 @@ class TemporalmapLoader(PresentationObjectLoader):
         Load map diagnostic and determine map type.
         """
         map_type = self.cube.attributes["map_type"]
-        map_handler = type_handling.function_mapper(map_type)
+        map_handler = function_mapper(map_type)
         if map_handler is None:
-            raise exceptions.InvalidMapTypeException(map_type)
+            raise InvalidMapTypeException(map_type)
 
-        png_dir = self.path.stem + "_frames"
+        png_dir = Path(self.path.stem + "_frames")
         with ChangeDirectory(dst_folder):
             png_dir.mkdir(exist_ok=True)
-            number_of_pngs = len(png_dir.iterdir())
+            number_of_pngs = len(list(png_dir.iterdir()))
 
         unit_text = f"{format_units(self.cube.units)}"
         dst_file = f"./{self.path.stem}.gif"
@@ -233,12 +231,11 @@ class TemporalmapLoader(PresentationObjectLoader):
                 images.append(imageio.imread(file_name))
             imageio.mimsave(f".{dst_file}", images, fps=2)
 
-        image_dict = {
+        return {
             "title": self.cube.attributes["title"],
             "path": dst_file,
             "comment": self.cube.attributes["comment"],
         }
-        return image_dict
 
 
 def format_title(name, units=None):
