@@ -4,6 +4,17 @@ import iris
 
 from monitoring.nemo_global_mean_year_mean_timeseries import NemoGlobalMeanYearMeanTimeseries
 
+def test_load_collapse_save(tmp_path):
+    # Tests for issue #53, caused by a bug in Iris 3.2.0.post0
+
+    src = "tests/testdata/NEMO_output_sivolu-199003.nc"
+    dst = tmp_path / "test.nc"
+    var = "sivolu"
+
+    cube = iris.load_cube(src, var).collapsed("latitude", iris.analysis.MEAN)
+#   print(cube)  # Workaround for the Iris bug
+    iris.save(cube, str(dst))
+
 def test_nemo_global_mean_year_mean_timeseries_working(tmpdir):
     init = {
         "src": ['./tests/testdata/NEMO_output_sivolu-199003.nc'],
