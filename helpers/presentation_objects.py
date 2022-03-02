@@ -155,7 +155,7 @@ class MapLoader(PresentationObjectLoader):
         if map_handler is None:
             raise exceptions.InvalidMapTypeException(map_type)
         
-        unit_text = f"{format_units(self.cube.units)}"
+        unit_text = format_units(self.cube.units)
         time_coord = self.cube.coord('time')
         time_bounds = time_coord.bounds[0]
         dates = cftime.num2pydate(time_bounds, time_coord.units.name)
@@ -205,14 +205,14 @@ class TemporalmapLoader(PresentationObjectLoader):
                 os.mkdir(png_dir)
             number_of_pngs = len(os.listdir(png_dir))
 
-        unit_text = f"{format_units(self.cube.units)}"
+        unit_text = format_units(self.cube.units)
         dst_file = f"./{base_name}.gif"
         with ChangeDirectory(f"{dst_folder}/{png_dir}"):
             for time_step in range(number_of_pngs, number_of_time_steps):
                 time_coord = self.cube.coord('time')
                 time_bounds = time_coord.bounds[time_step]
                 dates = cftime.num2pydate(time_bounds, time_coord.units.name)
-                date_title = f"{dates[0].strftime('%Y')}"
+                date_title = dates[0].strftime('%Y')
                 plot_title = format_title(self.cube.long_name)
                 fig = map_handler(
                     self.cube[time_step],
