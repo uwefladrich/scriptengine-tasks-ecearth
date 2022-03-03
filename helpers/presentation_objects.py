@@ -213,7 +213,7 @@ class TemporalmapLoader(PresentationObjectLoader):
                 time_coord = self.cube.coord("time")
                 time_bounds = time_coord.bounds[time_step]
                 dates = cftime.num2pydate(time_bounds, time_coord.units.name)
-                date_title = dates[0].strftime('%Y')
+                date_title = dates[0].strftime("%Y")
                 plot_title = format_title(self.cube.long_name)
                 fig = map_handler(
                     self.cube[time_step],
