@@ -34,28 +34,21 @@ def load_input_cube(src, varname):
     return leg_cube
 
 
-def set_metadata(cube, title=None, comment=None, **kwargs):
+def set_metadata(cube, **kwargs):
     """Set metadata for diagnostic."""
-    metadata = {
-        "title": title,
-        "comment": comment,
+    defaults = {
         "source": "EC-Earth 4",
         "Conventions": "CF-1.8",
     }
-    for key, value in kwargs.items():
-        metadata[f"{key}"] = value
-
-    metadata_to_discard = [
+    drop = (
         "description",
         "interval_operation",
         "interval_write",
         "name",
         "online_operation",
-    ]
-    for key, value in metadata.items():
-        if value is not None:
-            cube.attributes[key] = value
-    for key in metadata_to_discard:
+    )
+    cube.attributes.update(dict(defaults, **kwargs))
+    for key in drop:
         cube.attributes.pop(key, None)
     return cube
 
