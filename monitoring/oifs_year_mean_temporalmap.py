@@ -1,12 +1,12 @@
 """Processing Task that creates a 2D time map of a given extensive atmosphere quantity."""
 
 import iris
-import numpy as np
-
 from scriptengine.tasks.core import timed_runner
 
 import helpers.file_handling as helpers
+
 from .temporalmap import Temporalmap
+
 
 class OifsYearMeanTemporalmap(Temporalmap):
     """OifsYearMeanTemporalmap Processing Task"""
@@ -38,8 +38,12 @@ class OifsYearMeanTemporalmap(Temporalmap):
     def set_cell_methods(self, cube):
         """Set the correct cell methods."""
         cube.cell_methods = ()
-        cube.add_cell_method(iris.coords.CellMethod("mean", coords="time", intervals="1 year"))
-        cube.add_cell_method(iris.coords.CellMethod("point", coords=["latitude", "longitude"]))
+        cube.add_cell_method(
+            iris.coords.CellMethod("mean", coords="time", intervals="1 year")
+        )
+        cube.add_cell_method(
+            iris.coords.CellMethod("point", coords=["latitude", "longitude"])
+        )
         return cube
 
     def compute_time_mean(self, output_cube):

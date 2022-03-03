@@ -1,17 +1,22 @@
 """Processing Task that creates a 2D map of a given extensive atmosphere quantity."""
 
 import iris
-import numpy as np
-
-from scriptengine.tasks.core import timed_runner
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
+from scriptengine.tasks.core import timed_runner
+
 import helpers.file_handling as helpers
+
 from .map import Map
+
 
 class OifsAllMeanMap(Map):
     """OifsAllMeanMap Processing Task"""
 
-    _required_arguments = ("src", "dst", "varname", )
+    _required_arguments = (
+        "src",
+        "dst",
+        "varname",
+    )
 
     def __init__(self, arguments=None):
         OifsAllMeanMap.check_arguments(arguments)
@@ -50,14 +55,22 @@ class OifsAllMeanMap(Map):
         # Promote time from scalar to climatological coordinate
         time_mean_cube.coord("time").climatological = True
         return time_mean_cube
-    
+
     def set_cell_methods(self, map_cube):
         """Add the correct cell methods."""
         map_cube.cell_methods = ()
-        map_cube.add_cell_method(iris.coords.CellMethod("mean within years", coords="time", intervals="1 year"))
-        map_cube.add_cell_method(iris.coords.CellMethod("mean over years", coords="time"))
-        map_cube.add_cell_method(iris.coords.CellMethod("point", coords=["latitude", "longitude"]))
-    
+        map_cube.add_cell_method(
+            iris.coords.CellMethod(
+                "mean within years", coords="time", intervals="1 year"
+            )
+        )
+        map_cube.add_cell_method(
+            iris.coords.CellMethod("mean over years", coords="time")
+        )
+        map_cube.add_cell_method(
+            iris.coords.CellMethod("point", coords=["latitude", "longitude"])
+        )
+
     def adjust_metadata(self, map_cube, varname: str):
         """Do further adjustments to the cube metadata before saving."""
         # Prevent float32/float64 concatenation errors
