@@ -15,8 +15,9 @@ def test_load_collapse_save(tmp_path):
     var = "sivolu"
 
     cube = iris.load_cube(src, var).collapsed("latitude", iris.analysis.MEAN)
-#   print(cube)  # Workaround for the Iris bug
+    #   print(cube)  # Workaround for the Iris bug
     iris.save(cube, str(dst))
+
 
 def test_nemo_global_mean_year_mean_timeseries_working(tmpdir):
     init = {
