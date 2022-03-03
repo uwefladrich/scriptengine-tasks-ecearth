@@ -3,7 +3,7 @@
 import iris
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
 
 from .map import Map
 
@@ -31,12 +31,12 @@ class NemoAllMeanMap(Map):
 
         self.check_file_extension(dst)
 
-        leg_cube = helpers.load_input_cube(src, varname)
+        leg_cube = helpers.cubes.load_input_cube(src, varname)
 
         # Remove auxiliary time coordinate before collapsing cube
         leg_cube.remove_coord(leg_cube.coord("time", dim_coords=False))
 
-        time_weights = helpers.compute_time_weights(leg_cube, leg_cube.shape)
+        time_weights = helpers.cubes.compute_time_weights(leg_cube, leg_cube.shape)
         leg_average = leg_cube.collapsed(
             "time", iris.analysis.MEAN, weights=time_weights
         )
@@ -44,7 +44,7 @@ class NemoAllMeanMap(Map):
         leg_average.coord("time").climatological = True
         leg_average = self.set_cell_methods(leg_average)
 
-        leg_average = helpers.set_metadata(
+        leg_average = helpers.cubes.set_metadata(
             leg_average,
             title=f"{leg_average.long_name.title()} (Annual Mean Climatology)",
             comment=f"Simulation Average of **{varname}**.",

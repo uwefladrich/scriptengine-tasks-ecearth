@@ -1,6 +1,7 @@
 """Helper module for NEMO data."""
 
 import iris
+import numpy as np
 
 
 def compute_spatial_weights(domain_src, array_shape, grid):

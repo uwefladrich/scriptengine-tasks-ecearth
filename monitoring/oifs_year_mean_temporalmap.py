@@ -3,7 +3,7 @@
 import iris
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
 
 from .temporalmap import Temporalmap
 
@@ -27,7 +27,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
 
         self.check_file_extension(dst)
 
-        oifs_cube = helpers.load_input_cube(src, varname)
+        oifs_cube = helpers.cubes.load_input_cube(src, varname)
 
         temporalmap_cube = self.compute_time_mean(oifs_cube)
 
@@ -63,7 +63,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
 
     def adjust_metadata(self, temporalmap_cube, varname: str):
         """Do further adjustments to the cube metadata before saving."""
-        temporalmap_cube = helpers.set_metadata(
+        temporalmap_cube = helpers.cubes.set_metadata(
             temporalmap_cube,
             title=f"{temporalmap_cube.long_name.title()} (Annual Mean Map)",
             comment=f"Annual Mean of **{varname}**.",

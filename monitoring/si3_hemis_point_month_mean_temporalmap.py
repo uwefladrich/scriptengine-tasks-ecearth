@@ -8,7 +8,7 @@ import numpy as np
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
 
 from .temporalmap import Temporalmap
 
@@ -66,7 +66,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
             raise ScriptEngineTaskArgumentInvalidError()
         self.check_file_extension(dst)
 
-        month_cube = helpers.load_input_cube(src, varname)
+        month_cube = helpers.cubes.load_input_cube(src, varname)
         # Remove auxiliary time coordinate
         month_cube.remove_coord(month_cube.coord("time", dim_coords=False))
 
@@ -78,7 +78,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
 
         month_cube.long_name = f"{meta_dict[varname]['long_name']} {hemisphere}"
         comment = f"{meta_dict[varname]['long_name']} / **{varname}** on {hemisphere}ern hemisphere."
-        month_cube = helpers.set_metadata(
+        month_cube = helpers.cubes.set_metadata(
             month_cube,
             title=f"{month_cube.long_name} {self.get_month(time_coord)}",
             comment=comment,

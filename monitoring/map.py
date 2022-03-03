@@ -9,7 +9,7 @@ from scriptengine.exceptions import (
 )
 from scriptengine.tasks.core import Task
 
-import helpers.file_handling as helpers
+import helpers.cubes
 
 
 class Map(Task):
@@ -65,7 +65,9 @@ class Map(Task):
         Compute Time Average for the whole simulation.
         """
         self.log_debug("Computing simulation average.")
-        time_weights = helpers.compute_time_weights(merged_cube, merged_cube.shape)
+        time_weights = helpers.cubes.compute_time_weights(
+            merged_cube, merged_cube.shape
+        )
         simulation_avg = merged_cube.collapsed(
             "time",
             iris.analysis.MEAN,
