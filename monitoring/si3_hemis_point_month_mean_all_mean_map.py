@@ -8,7 +8,7 @@ import numpy as np
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
 
 from .map import Map
 
@@ -57,7 +57,7 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
             raise ScriptEngineTaskArgumentInvalidError()
         self.check_file_extension(dst)
 
-        month_cube = helpers.load_input_cube(src, varname)
+        month_cube = helpers.cubes.load_input_cube(src, varname)
         # Remove auxiliary time coordinate
         month_cube.remove_coord(month_cube.coord("time", dim_coords=False))
         month_cube = month_cube[0]
@@ -78,7 +78,7 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
 
         month_cube.data = month_cube.data.astype("float64")
         comment = f"Simulation Average of {meta_dict[varname]} / **{varname}** on {hemisphere}ern hemisphere."
-        month_cube = helpers.set_metadata(
+        month_cube = helpers.cubes.set_metadata(
             month_cube,
             title=f"{month_cube.long_name} (Climatology)",
             comment=comment,

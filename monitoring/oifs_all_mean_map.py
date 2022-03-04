@@ -4,7 +4,7 @@ import iris
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
 
 from .map import Map
 
@@ -32,7 +32,7 @@ class OifsAllMeanMap(Map):
 
         self.check_file_extension(dst)
 
-        oifs_cube = helpers.load_input_cube(src, varname)
+        oifs_cube = helpers.cubes.load_input_cube(src, varname)
 
         map_cube = self.compute_time_mean(oifs_cube)
 
@@ -76,7 +76,7 @@ class OifsAllMeanMap(Map):
         # Prevent float32/float64 concatenation errors
         map_cube.data = map_cube.data.astype("float64")
         # Add File Metadata
-        map_cube = helpers.set_metadata(
+        map_cube = helpers.cubes.set_metadata(
             map_cube,
             title=f"{map_cube.long_name.title()} (Annual Mean Climatology)",
             comment=f"Simulation Average of **{varname}**.",

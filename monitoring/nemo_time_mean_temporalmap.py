@@ -3,7 +3,7 @@
 import iris
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
 
 from .temporalmap import Temporalmap
 
@@ -31,7 +31,7 @@ class NemoTimeMeanTemporalmap(Temporalmap):
 
         self.check_file_extension(dst)
 
-        leg_cube = helpers.load_input_cube(src, varname)
+        leg_cube = helpers.cubes.load_input_cube(src, varname)
 
         # Remove auxiliary time coordinate before collapsing cube
         leg_cube.remove_coord(leg_cube.coord("time", dim_coords=False))
@@ -50,13 +50,13 @@ class NemoYearMeanTemporalmap(NemoTimeMeanTemporalmap):
 
     def time_operation(self, varname, leg_cube):
         self.log_debug("Creating an annual mean.")
-        month_weights = helpers.compute_time_weights(leg_cube, leg_cube.shape)
+        month_weights = helpers.cubes.compute_time_weights(leg_cube, leg_cube.shape)
         leg_average = leg_cube.collapsed(
             "time", iris.analysis.MEAN, weights=month_weights
         )
         # Promote time from scalar to dimension coordinate
         leg_average = iris.util.new_axis(leg_average, "time")
-        leg_average = helpers.set_metadata(
+        leg_average = helpers.cubes.set_metadata(
             leg_average,
             title=f"{leg_average.long_name.title()} (Annual Mean Map)",
             comment=f"Leg Mean of **{varname}**.",
@@ -77,7 +77,7 @@ class NemoMonthMeanTemporalmap(NemoTimeMeanTemporalmap):
 
     def time_operation(self, varname, leg_cube):
         self.log_debug("Creating monthly means.")
-        leg_cube = helpers.set_metadata(
+        leg_cube = helpers.cubes.set_metadata(
             leg_cube,
             title=f"{leg_cube.long_name.title()} (Monthly Mean Map)",
             comment=f"Monthly Mean of **{varname}**.",

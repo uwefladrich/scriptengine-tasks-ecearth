@@ -11,7 +11,7 @@ from scriptengine.exceptions import (
 )
 from scriptengine.tasks.core import Task, timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
 
 
 class Timeseries(Task):
@@ -72,7 +72,7 @@ class Timeseries(Task):
         )
 
         # set metadata
-        data_cube = helpers.set_metadata(
+        data_cube = helpers.cubes.set_metadata(
             data_cube,
             title=title,
             comment=comment,
