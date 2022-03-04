@@ -72,11 +72,11 @@ def test_3d_spatial_weights(tmp_path):
 def test_load_input_cube():
     src = "./tests/testdata/tos_nemo_all_mean_map.nc"
     varname = "tos"
-    assert isinstance(helpers.cubes.load_input_cube(src, varname), iris.cube.Cube)
+    assert isinstance(helpers.cubes.load_input_cube(src, varname), Cube)
 
 
 def test_set_metadata():
-    cube = iris.cube.Cube([1])
+    cube = Cube([1])
     cube.attributes = {
         "description": None,
         "interval_operation": None,
