@@ -56,7 +56,7 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
             spatial_avg = leg_cube.collapsed(
                 ["latitude", "longitude"],
                 iris.analysis.MEAN,
-                weights=helpers.nemo.spatial_weights(domain, leg_cube.shape, grid=grid),
+                weights=helpers.nemo.spatial_weights(leg_cube, domain, grid),
             )
         # Remove auxiliary time coordinate before collapsing cube
         spatial_avg.remove_coord(spatial_avg.coord("time", dim_coords=False))
