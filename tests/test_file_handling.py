@@ -27,10 +27,7 @@ def test_compute_spatial_weights(tmpdir):
     iris.save(cube_list, domain_path)
     result = np.array([[[2]], [[2]], [[2]]])
     shape = result.shape
-    assert (
-        helpers.nemo.compute_spatial_weights(domain_path, shape, "T").all()
-        == result.all()
-    )
+    assert helpers.nemo.spatial_weights(domain_path, shape, "T").all() == result.all()
 
 
 def test_load_input_cube():
