@@ -17,7 +17,7 @@ def compute_spatial_weights(domain_src, array_shape, grid):
 
 
 def remove_unique_attributes(cube):
-    # NEMO attributes unique to each file:
-    cube.attributes.pop("uuid", None)
-    cube.attributes.pop("timeStamp", None)
+    drop = ("uuid", "timeStamp")  # these are unique for each NEMO file
+    for attribute in drop:
+        cube.attributes.pop(attribute, None)
     return cube
