@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import yaml
 
 from helpers.exceptions import InvalidMapTypeException, PresentationException
-from helpers.file_handling import ChangeDirectory
+from helpers.files import ChangeDirectory
 from helpers.map_type_handling import function_mapper
 
 

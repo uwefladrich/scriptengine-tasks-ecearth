@@ -1,17 +1,20 @@
-"""Tests for helpers/file_handling.py"""
+"""Tests for files and cubes helpers"""
 
 import os
 
 import iris
+import iris.cube
 import numpy as np
 
-import helpers.file_handling as file_handling
+import helpers.cubes
+import helpers.nemo
+from helpers.files import ChangeDirectory
 
 
 def test_change_directory(tmpdir):
     cwd = os.getcwd()
     nwd = tmpdir.mkdir("temp")
-    with file_handling.ChangeDirectory(nwd):
+    with ChangeDirectory(nwd):
         assert os.getcwd() == nwd
     assert os.getcwd() == cwd
 
@@ -25,7 +28,7 @@ def test_compute_spatial_weights(tmpdir):
     result = np.array([[[2]], [[2]], [[2]]])
     shape = result.shape
     assert (
-        file_handling.compute_spatial_weights(domain_path, shape, "T").all()
+        helpers.nemo.compute_spatial_weights(domain_path, shape, "T").all()
         == result.all()
     )
 
@@ -33,7 +36,7 @@ def test_compute_spatial_weights(tmpdir):
 def test_load_input_cube():
     src = "./tests/testdata/tos_nemo_all_mean_map.nc"
     varname = "tos"
-    assert isinstance(file_handling.load_input_cube(src, varname), iris.cube.Cube)
+    assert isinstance(helpers.cubes.load_input_cube(src, varname), iris.cube.Cube)
 
 
 def test_set_metadata():
@@ -45,7 +48,7 @@ def test_set_metadata():
         "name": None,
         "online_operation": None,
     }
-    updated_cube = file_handling.set_metadata(cube)
+    updated_cube = helpers.cubes.set_metadata(cube)
     assert updated_cube.attributes == {"source": "EC-Earth 4", "Conventions": "CF-1.8"}
     new_metadata = {
         "title": "Title",
@@ -55,5 +58,5 @@ def test_set_metadata():
         "Conventions": "CF-1.8",
         "custom": "Custom",
     }
-    updated_cube = file_handling.set_metadata(updated_cube, **new_metadata)
+    updated_cube = helpers.cubes.set_metadata(updated_cube, **new_metadata)
     assert updated_cube.attributes == new_metadata

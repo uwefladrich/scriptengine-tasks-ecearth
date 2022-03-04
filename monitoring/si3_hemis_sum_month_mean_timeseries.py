@@ -7,7 +7,8 @@ import iris
 import numpy as np
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
+import helpers.nemo
 
 from .timeseries import Timeseries
 
@@ -81,8 +82,8 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
             return
         self.check_file_extension(dst)
 
-        leg_cube = helpers.load_input_cube(src, varname)
-        cell_weights = helpers.compute_spatial_weights(domain, leg_cube.shape, "T")
+        leg_cube = helpers.cubes.load_input_cube(src, varname)
+        cell_weights = helpers.nemo.compute_spatial_weights(domain, leg_cube.shape, "T")
         latitudes = np.broadcast_to(leg_cube.coord("latitude").points, leg_cube.shape)
         if hemisphere == "north":
             leg_cube.data = np.ma.masked_where(latitudes < 0, leg_cube.data)
@@ -115,7 +116,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
             ),
             "title": f"{long_name} (Seasonal Cycle)",
         }
-        hemispheric_sum = helpers.set_metadata(hemispheric_sum, **metadata)
+        hemispheric_sum = helpers.cubes.set_metadata(hemispheric_sum, **metadata)
         hemispheric_sum = self.set_cell_methods(hemispheric_sum, hemisphere)
         self.save(hemispheric_sum, dst)
 
