@@ -67,7 +67,8 @@ The package can be installed from inside the *scriptengine-tasks-ecearth* direct
 
     pip install -e .
 
-If you want to run the tests, you will need to install Pytest_.
+If you want to run the tests, you will need to download the `test data`_, put the files into ``tests/testdata``, 
+and install Pytest_.
 You can run them from inside the *scriptengine-tasks-ecearth* directory using
 
 :: 
@@ -78,7 +79,7 @@ To build the documentation manually, you will need Sphinx_.
 The HTML theme is the `Read the Docs Sphinx Theme`_.
 
 .. _instructions: https://docs.conda.io/projects/conda/en/latest/user-guide/install/
-.. _on GitHub: https://github.com/uwefladrich/scriptengine
+.. _test data: https://github.com/valentinaschueller/ece-4-monitoring-test-data
 .. _Pytest: https://docs.pytest.org/en/latest
 .. _Sphinx: https://www.sphinx-doc.org/
 .. _Read the Docs Sphinx Theme:  https://sphinx-rtd-theme.readthedocs.io/en/stable/index.html
