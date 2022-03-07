@@ -3,6 +3,7 @@ Initialize presentation objects for visualization
 """
 
 from pathlib import Path
+from textwrap import wrap
 
 import cftime
 import imageio
@@ -248,6 +249,9 @@ def format_title(name, units=None):
     unit_text = format_units(units)
     if unit_text and unit_text != "1":
         title += " / {}".format(unit_text)
+    # create multiline string if it becomes too long
+    # cf. https://stackoverflow.com/a/10634897
+    title = "\n".join(wrap(title, 40))
     return title
 
 
