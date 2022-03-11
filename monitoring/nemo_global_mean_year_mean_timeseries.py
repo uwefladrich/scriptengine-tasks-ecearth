@@ -75,10 +75,14 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
             comment=comment,
         )
 
-        global_yearly_avg.cell_methods = ()
-        global_yearly_avg.add_cell_method(
-            iris.coords.CellMethod("mean", coords="time", intervals="1 month")
+        global_yearly_avg.cell_methods = (
+            iris.coords.CellMethod("mean", coords="time", intervals="1 month"),
+            iris.coords.CellMethod(
+                "mean",
+                coords=("area", helpers.nemo.depth_coord(global_yearly_avg).name())
+                if helpers.nemo.has_depth(global_yearly_avg)
+                else "area",
+            ),
         )
-        global_yearly_avg.add_cell_method(iris.coords.CellMethod("mean", coords="area"))
 
         self.save(global_yearly_avg, dst)
