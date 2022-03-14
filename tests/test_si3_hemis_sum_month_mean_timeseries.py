@@ -1,12 +1,9 @@
 """Tests for monitoring/si3_hemis_sum_month_mean_timeseries.py"""
 
-from unittest.mock import patch
-
 import iris
 
 from monitoring.si3_hemis_sum_month_mean_timeseries import (
     Si3HemisSumMonthMeanTimeseries,
-    meta_dict,
 )
 
 
@@ -20,6 +17,7 @@ def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
         "domain": "./tests/testdata/domain_cfg_example.nc",
         "varname": "sivolu",
         "hemisphere": "north",
+        "month": 3,
     }
     ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
     ice_time_series.run(init)
@@ -34,41 +32,29 @@ def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
     )
 
 
-def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmpdir):
+def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmpdir, caplog):
     init = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmpdir) + "/test.nc",
         "domain": "./tests/testdata/domain_cfg_example.nc",
-        "varname": "tos",
+        "varname": "foo",
         "hemisphere": "south",
+        "month": 3,
     }
     ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
     ice_time_series.run(init)
-    with patch.object(ice_time_series, "log_warning") as mock:
-        ice_time_series.run(init)
-    mock.assert_called_with(
-        (
-            f"'varname' must be one of the following: {meta_dict.keys()} "
-            f"Diagnostic will not be treated, returning now."
-        )
-    )
+    assert "Invalid varname argument" in caplog.text
 
 
-def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmpdir):
+def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmpdir, caplog):
     init = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmpdir) + "/test.nc",
         "domain": "./tests/testdata/domain_cfg_example.nc",
         "varname": "sivolu",
-        "hemisphere": "east",
+        "hemisphere": "foo",
+        "month": 3,
     }
     ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
     ice_time_series.run(init)
-    with patch.object(ice_time_series, "log_warning") as mock:
-        ice_time_series.run(init)
-    mock.assert_called_with(
-        (
-            f"'hemisphere' must be 'north' or 'south' but is '{init['hemisphere']}'."
-            f"Diagnostic will not be treated, returning now."
-        )
-    )
+    assert "Invalid hemisphere argument " in caplog.text
