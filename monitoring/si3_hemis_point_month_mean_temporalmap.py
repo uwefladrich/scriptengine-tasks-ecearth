@@ -1,15 +1,10 @@
 """Processing Task that creates a 2D time map of sea ice concentration."""
 
-import datetime
-from turtle import shape
-
-import cftime
 import iris
 import numpy as np
-from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
 
 from .temporalmap import Temporalmap
 
@@ -151,7 +146,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
         if varname not in _meta_dict:
             self.log_warning(
                 (
-                    f"Invalid varname argument: '{varname}', must be one of {_meta_dict.keys()}."
+                    f"Invalid varname argument '{varname}', must be one of {_meta_dict.keys()}."
                     " Diagnostic will not be included!"
                 )
             )
@@ -166,7 +161,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
             return
         self.check_file_extension(dst)
 
-        this_leg = helpers.load_input_cube(src, varname)
+        this_leg = helpers.cubes.load_input_cube(src, varname)
         this_leg = _remove_aux_time(this_leg)
         this_leg = _mask_other_hemisphere(this_leg, hemisphere)
         if month:
@@ -192,7 +187,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
             + (f" in {_month_name(month)}" if month else "")
         )
         this_leg.long_name = long_name
-        this_leg = helpers.set_metadata(
+        this_leg = helpers.cubes.set_metadata(
             this_leg,
             title=long_name,
             comment=comment,

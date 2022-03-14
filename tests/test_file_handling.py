@@ -1,56 +1,98 @@
-"""Tests for helpers/file_handling.py"""
+"""Tests for files and cubes helpers"""
 
 import os
 
-import pytest
-import numpy as np
 import iris
+import numpy as np
+from iris.coords import DimCoord
+from iris.cube import Cube, CubeList
 
-import helpers.file_handling as file_handling
+import helpers.cubes
+import helpers.nemo
+from helpers.files import ChangeDirectory
+
 
 def test_change_directory(tmpdir):
     cwd = os.getcwd()
-    nwd = tmpdir.mkdir('temp')
-    with file_handling.ChangeDirectory(nwd):
+    nwd = tmpdir.mkdir("temp")
+    with ChangeDirectory(nwd):
         assert os.getcwd() == nwd
     assert os.getcwd() == cwd
 
-def test_compute_spatial_weights(tmpdir):
-    e1t_cube = iris.cube.Cube([1], var_name='e1t')
-    e2t_cube = iris.cube.Cube([2], var_name='e2t')
-    cube_list = iris.cube.CubeList([e1t_cube, e2t_cube])
-    domain_path = str(tmpdir + "/temp.nc")
-    iris.save(cube_list, domain_path)
-    result = np.array([[[2]], [[2]], [[2]]])
-    shape = result.shape
-    assert file_handling.compute_spatial_weights(domain_path, shape, 'T').all() == result.all()
+
+def test_2d_spatial_weights(tmp_path):
+    data = Cube(
+        [[1.0]],
+        var_name="foo",
+        dim_coords_and_dims=[
+            (DimCoord([0], standard_name="latitude", units="degree"), 0),
+            (DimCoord([0], standard_name="longitude", units="degree"), 1),
+        ],
+    )
+    domain = CubeList(
+        [
+            Cube([2.0], var_name="e1t"),
+            Cube([3.0], var_name="e2t"),
+        ]
+    )
+    domain_file = str(tmp_path / "domain.nc")
+    iris.save(domain, domain_file)
+    expected_weights = np.array([6.0])
+    assert helpers.nemo.spatial_weights(data, domain_file, "t") == expected_weights
+
+
+def test_3d_spatial_weights(tmp_path):
+    data = Cube(
+        [[[1.0]]],
+        var_name="foo",
+        dim_coords_and_dims=[
+            (DimCoord([0], standard_name="latitude", units="degree"), 0),
+            (DimCoord([0], standard_name="longitude", units="degree"), 1),
+            (
+                DimCoord(
+                    [0], var_name="deptht", long_name="Vertical T levels", units="m"
+                ),
+                2,
+            ),
+        ],
+    )
+    domain = CubeList(
+        [
+            Cube([2.0], var_name="e1t"),
+            Cube([3.0], var_name="e2t"),
+            Cube([4.0], var_name="e3t_0"),
+        ]
+    )
+    domain_file = str(tmp_path / "domain.nc")
+    iris.save(domain, domain_file)
+    expected_weights = np.array([24.0])
+    assert helpers.nemo.spatial_weights(data, domain_file, "t") == expected_weights
+
 
 def test_load_input_cube():
     src = "./tests/testdata/tos_nemo_all_mean_map.nc"
     varname = "tos"
-    assert isinstance(file_handling.load_input_cube(src, varname), iris.cube.Cube)
+    assert isinstance(helpers.cubes.load_input_cube(src, varname), Cube)
+
 
 def test_set_metadata():
-    cube = iris.cube.Cube([1])
+    cube = Cube([1])
     cube.attributes = {
-        'description': None,
-        'interval_operation': None,
-        'interval_write': None,
-        'name': None,
-        'online_operation': None,
+        "description": None,
+        "interval_operation": None,
+        "interval_write": None,
+        "name": None,
+        "online_operation": None,
     }
-    updated_cube = file_handling.set_metadata(cube)
-    assert updated_cube.attributes == {
-        'source': 'EC-Earth 4',
-        'Conventions': 'CF-1.8'
-        }
+    updated_cube = helpers.cubes.set_metadata(cube)
+    assert updated_cube.attributes == {"source": "EC-Earth 4", "Conventions": "CF-1.8"}
     new_metadata = {
-        'title': 'Title',
-        'comment': 'Comment',
-        'diagnostic_type': 'Type',
-        'source': 'EC-Earth 4',
-        'Conventions': 'CF-1.8',
-        'custom': 'Custom',
+        "title": "Title",
+        "comment": "Comment",
+        "diagnostic_type": "Type",
+        "source": "EC-Earth 4",
+        "Conventions": "CF-1.8",
+        "custom": "Custom",
     }
-    updated_cube = file_handling.set_metadata(updated_cube, **new_metadata)
+    updated_cube = helpers.cubes.set_metadata(updated_cube, **new_metadata)
     assert updated_cube.attributes == new_metadata

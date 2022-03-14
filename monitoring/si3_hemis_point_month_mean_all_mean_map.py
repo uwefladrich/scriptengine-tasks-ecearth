@@ -2,24 +2,31 @@
 
 import datetime
 
-import numpy as np
-import iris
 import cftime
-
+import iris
+import numpy as np
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.core import timed_runner
-import helpers.file_handling as helpers
+
+import helpers.cubes
+
 from .map import Map
 
 meta_dict = {
-    'sivolu': 'Sea-Ice Volume per Area',
-    'siconc': 'Sea-Ice Area Fraction',
+    "sivolu": "Sea-Ice Volume per Area",
+    "siconc": "Sea-Ice Area Fraction",
 }
+
 
 class Si3HemisPointMonthMeanAllMeanMap(Map):
     """Si3HemisPointMonthMeanAllMeanMap Processing Task"""
 
-    _required_arguments = ('src', 'dst', 'hemisphere', 'varname', )
+    _required_arguments = (
+        "src",
+        "dst",
+        "hemisphere",
+        "varname",
+    )
 
     def __init__(self, arguments=None):
         Si3HemisPointMonthMeanAllMeanMap.check_arguments(arguments)
@@ -27,51 +34,55 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
 
     @timed_runner
     def run(self, context):
-        src = self.getarg('src', context)
-        dst = self.getarg('dst', context)
-        hemisphere = self.getarg('hemisphere', context)
-        varname = self.getarg('varname', context)
+        src = self.getarg("src", context)
+        dst = self.getarg("dst", context)
+        hemisphere = self.getarg("hemisphere", context)
+        varname = self.getarg("varname", context)
         self.log_info(f"Create {varname} map for {hemisphere}ern hemisphere at {dst}.")
         self.log_debug(f"Source file(s): {src}")
 
         if varname not in meta_dict:
             msg = (
                 f"'varname' must be one of the following: {meta_dict.keys()} "
-                f"Diagnostic will not be treated, returning now."
+                "Diagnostic will not be treated, returning now."
             )
             self.log_error(msg)
             raise ScriptEngineTaskArgumentInvalidError()
-        if not hemisphere in ('north', 'south'):
+        if not hemisphere in ("north", "south"):
             msg = (
                 f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
-                f"Diagnostic will not be treated, returning now."
+                "Diagnostic will not be treated, returning now."
             )
             self.log_error(msg)
             raise ScriptEngineTaskArgumentInvalidError()
         self.check_file_extension(dst)
 
-        month_cube = helpers.load_input_cube(src, varname)
+        month_cube = helpers.cubes.load_input_cube(src, varname)
         # Remove auxiliary time coordinate
-        month_cube.remove_coord(month_cube.coord('time', dim_coords=False))
+        month_cube.remove_coord(month_cube.coord("time", dim_coords=False))
         month_cube = month_cube[0]
-        time_coord = month_cube.coord('time')
+        time_coord = month_cube.coord("time")
         time_coord.bounds = self.get_time_bounds(time_coord)
-        latitudes = np.broadcast_to(month_cube.coord('latitude').points, month_cube.shape)
+        latitudes = np.broadcast_to(
+            month_cube.coord("latitude").points, month_cube.shape
+        )
         if hemisphere == "north":
             month_cube.data = np.ma.masked_where(latitudes < 0, month_cube.data)
         else:
             month_cube.data = np.ma.masked_where(latitudes > 0, month_cube.data)
 
-        month_cube.long_name = f"{meta_dict[varname]} {hemisphere} {self.get_month(time_coord)}"
+        month_cube.long_name = (
+            f"{meta_dict[varname]} {hemisphere} {self.get_month(time_coord)}"
+        )
         month_cube.data = np.ma.masked_equal(month_cube.data, 0)
 
-        month_cube.data = month_cube.data.astype('float64')
+        month_cube.data = month_cube.data.astype("float64")
         comment = f"Simulation Average of {meta_dict[varname]} / **{varname}** on {hemisphere}ern hemisphere."
-        month_cube = helpers.set_metadata(
+        month_cube = helpers.cubes.set_metadata(
             month_cube,
-            title=f'{month_cube.long_name} (Climatology)',
+            title=f"{month_cube.long_name} (Climatology)",
             comment=comment,
-            map_type='polar ice sheet',
+            map_type="polar ice sheet",
         )
         time_coord.climatological = True
         month_cube = self.set_cell_methods(month_cube, hemisphere)
@@ -99,15 +110,17 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
         Returns the month of [0] in time_coord.points as a string
         """
         dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
-        return dt_object.strftime('%B')
-    
+        return dt_object.strftime("%B")
+
     def set_cell_methods(self, cube, hemisphere):
         """Set the correct cell methods."""
         self.log_debug("Setting cell methods.")
         cube.cell_methods = ()
-        cube.add_cell_method(iris.coords.CellMethod('mean over years', coords='time'))
-        cube.add_cell_method(iris.coords.CellMethod(
-            'point', coords='latitude', intervals=f'{hemisphere}ern hemisphere'
-            ))
-        cube.add_cell_method(iris.coords.CellMethod('point', coords='longitude'))
+        cube.add_cell_method(iris.coords.CellMethod("mean over years", coords="time"))
+        cube.add_cell_method(
+            iris.coords.CellMethod(
+                "point", coords="latitude", intervals=f"{hemisphere}ern hemisphere"
+            )
+        )
+        cube.add_cell_method(iris.coords.CellMethod("point", coords="longitude"))
         return cube

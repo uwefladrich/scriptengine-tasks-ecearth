@@ -1,31 +1,31 @@
 """Presentation Task that uploads Data and Plots to the EC-Earth dev portal."""
 
-import os
 import urllib.parse
-import requests
-
-import redminelib
-import redminelib.exceptions
+from pathlib import Path
 
 import jinja2
-
+import redminelib
+import redminelib.exceptions
+import requests
 from scriptengine.exceptions import ScriptEngineTaskRunError
-from scriptengine.tasks.core import Task, timed_runner
 from scriptengine.jinja import filters as j2filters
-from helpers.presentation_objects import PresentationObject
+from scriptengine.tasks.core import Task, timed_runner
+
 from helpers.exceptions import PresentationException
-from helpers.file_handling import ChangeDirectory
+from helpers.files import ChangeDirectory
+from helpers.presentation_objects import PresentationObject
+
 
 class Redmine(Task):
     """Redmine Presentation Task"""
 
     _required_arguments = (
-            'src',
-            'local_dst',
-            'subject',
-            'template',
-            'api_key',
-        )
+        "src",
+        "local_dst",
+        "subject",
+        "template",
+        "api_key",
+    )
 
     def __init__(self, arguments=None):
         Redmine.check_arguments(arguments)
@@ -33,23 +33,23 @@ class Redmine(Task):
 
     @timed_runner
     def run(self, context):
-        sources = self.getarg('src', context)
-        dst_folder = self.getarg('local_dst', context)
-        issue_subject = self.getarg('subject', context, parse_yaml=False)
-        template_path = self.getarg('template', context)
-        key = self.getarg('api_key', context)
+        sources = self.getarg("src", context)
+        dst_folder = self.getarg("local_dst", context)
+        issue_subject = self.getarg("subject", context, parse_yaml=False)
+        template_path = self.getarg("template", context)
+        key = self.getarg("api_key", context)
         self.log_info(f"Create Redmine issue '{issue_subject}'.")
         self.log_debug(f"Template: {template_path}, Source File(s): {sources}")
 
         presentation_list = self.get_presentation_list(sources, dst_folder)
         redmine_template = self.get_template(context, template_path)
-        redmine_template.globals['urlencode'] = urllib.parse.quote
+        redmine_template.globals["urlencode"] = urllib.parse.quote
         issue_description = redmine_template.render(presentation_list=presentation_list)
         with ChangeDirectory(dst_folder):
-            with open("./issue_description.txt", 'w') as outfile:
+            with open("./issue_description.txt", "w") as outfile:
                 outfile.write(issue_description)
 
-        url = 'https://dev.ec-earth.org'
+        url = "https://dev.ec-earth.org"
         redmine = redminelib.Redmine(url, key=key)
 
         self.log_debug("Connecting to Redmine.")
@@ -63,15 +63,17 @@ class Redmine(Task):
         self.log_debug("Uploading attachments.")
         issue.uploads = []
         for item in presentation_list:
-            if item['presentation_type'] == 'image':
-                file_name = os.path.basename(item['path'])
+            if item["presentation_type"] == "image":
+                file_name = Path(item["path"]).name
                 try:
                     for attachment in issue.attachments or []:
                         if attachment.filename == file_name:
                             redmine.attachment.delete(attachment.id)
                 except redminelib.exceptions.ResourceNotFoundError:
                     pass
-                issue.uploads.append({'filename': file_name, 'path': f"{dst_folder}/{file_name}"})
+                issue.uploads.append(
+                    {"filename": file_name, "path": f"{dst_folder}/{file_name}"}
+                )
         self.log_debug("Saving issue.")
         issue.save()
 
@@ -85,7 +87,9 @@ class Redmine(Task):
                     pres_object = PresentationObject(dst_folder, **src)
                 except TypeError:
                     pres_object = PresentationObject(dst_folder, src)
-                self.log_debug(f"Loading {pres_object.loader.diag_type} diagnostic from {pres_object.loader.path}.")
+                self.log_debug(
+                    f"Loading {pres_object.loader.diag_type} diagnostic from {pres_object.loader.path}."
+                )
                 presentation_list.append(pres_object.create_dict())
             except PresentationException as msg:
                 self.log_warning(f"Can not present diagnostic: {msg}")
@@ -93,10 +97,14 @@ class Redmine(Task):
 
     def get_template(self, context, template):
         """get Jinja2 template file"""
-        search_path = ['.', 'templates']
+        search_path = [".", "templates"]
         if "_se_cmd_cwd" in context:
-            search_path.extend([context["_se_cmd_cwd"],
-                                os.path.join(context["_se_cmd_cwd"], "templates")])
+            search_path.extend(
+                [
+                    context["_se_cmd_cwd"],
+                    Path(context["_se_cmd_cwd"]) / "templates",
+                ]
+            )
         self.log_debug(f"Search path for template: {search_path}")
 
         loader = jinja2.FileSystemLoader(search_path)
@@ -108,13 +116,15 @@ class Redmine(Task):
     def get_issue(self, redmine, issue_subject):
         """Connect to Redmine server, find and return issue corresponding to the experiment ID"""
 
-        project_identifier = 'ec-earth-experiments'
-        tracker_identifier = 15 # 'Experiment'
-        status_identifier = 14 # 'Ongoing'
-        priority_identifier = 2 # 'Medium'
+        project_identifier = "ec-earth-experiments"
+        tracker_identifier = 15  # 'Experiment'
+        status_identifier = 14  # 'Ongoing'
+        priority_identifier = 2  # 'Medium'
 
         # Find issue or create if none exists
-        filtered_issues = redmine.issue.filter(project_id=project_identifier, tracker_id=tracker_identifier)
+        filtered_issues = redmine.issue.filter(
+            project_id=project_identifier, tracker_id=tracker_identifier
+        )
         try:
             for issue in filtered_issues:
                 if issue.subject == issue_subject:
@@ -129,7 +139,10 @@ class Redmine(Task):
                 issue.assigned_to_id = redmine.auth().id
                 issue.is_private = False
             return issue
-        except (redminelib.exceptions.AuthError, requests.exceptions.ConnectionError) as e:
-            msg = f'Could not log in to Redmine server ({e})'
+        except (
+            redminelib.exceptions.AuthError,
+            requests.exceptions.ConnectionError,
+        ) as e:
+            msg = f"Could not log in to Redmine server ({e})"
             self.log_error(msg)
             raise ScriptEngineTaskRunError()

@@ -4,6 +4,11 @@ Developer's Guide
 
 This part summarizes guidelines for extending the monitoring tool.
 
+General Notes for Contributing
+==============================
+
+Use black_ and isort_ to format the code you add.
+
 Code Structure
 ==============
 
@@ -76,6 +81,8 @@ Naming presentation tasks is not as standardized as for processing tasks.
 The task/class/module name should be the presentation outlet, e.g. Markdown.
 Their YAML representation is preceded by *ece.mon.presentation* to make them distinguishable from processing tasks.
 
+.. _`black`: https://black.readthedocs.io/en/stable/
+.. _`isort`: https://pycqa.github.io/isort/
 .. _`monitoring`: https://github.com/uwefladrich/scriptengine-tasks-ecearth/tree/master/monitoring
 .. _`helpers`: https://github.com/uwefladrich/scriptengine-tasks-ecearth/tree/master/helpers
 .. _`ScriptEngine Task`: https://github.com/uwefladrich/scriptengine/blob/master/scriptengine/tasks/core/task.py

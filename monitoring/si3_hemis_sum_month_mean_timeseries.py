@@ -7,7 +7,8 @@ import iris
 import numpy as np
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
+import helpers.nemo
 
 from .timeseries import Timeseries
 
@@ -177,7 +178,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
             return
         self.check_file_extension(dst)
 
-        this_leg = helpers.load_input_cube(src, varname)
+        this_leg = helpers.cubes.load_input_cube(src, varname)
         this_leg = _remove_aux_time(this_leg)
         this_leg = _extract_month(this_leg, month)
         this_leg = _mask_other_hemisphere(this_leg, hemisphere)
@@ -193,7 +194,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
             this_leg_summed = this_leg.collapsed(
                 ["latitude", "longitude"],
                 iris.analysis.SUM,
-                weights=helpers.spatial_weights(this_leg, domain, "T"),
+                weights=helpers.nemo.spatial_weights(this_leg, domain, "T"),
             )
 
         this_leg_summed.standard_name = _meta_dict[varname]["standard_name"]
@@ -210,6 +211,6 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
             ),
             "title": f"{long_name} ({_month_name(month)} mean on the {hemisphere}ern hemisphere)",
         }
-        this_leg_summed = helpers.set_metadata(this_leg_summed, **metadata)
+        this_leg_summed = helpers.cubes.set_metadata(this_leg_summed, **metadata)
         this_leg_summed = _set_cell_methods(this_leg_summed, hemisphere)
         self.save(this_leg_summed, dst)

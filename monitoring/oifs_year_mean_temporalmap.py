@@ -1,12 +1,12 @@
 """Processing Task that creates a 2D time map of a given extensive atmosphere quantity."""
 
 import iris
-import numpy as np
-
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
+
 from .temporalmap import Temporalmap
+
 
 class OifsYearMeanTemporalmap(Temporalmap):
     """OifsYearMeanTemporalmap Processing Task"""
@@ -27,7 +27,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
 
         self.check_file_extension(dst)
 
-        oifs_cube = helpers.load_input_cube(src, varname)
+        oifs_cube = helpers.cubes.load_input_cube(src, varname)
 
         temporalmap_cube = self.compute_time_mean(oifs_cube)
 
@@ -38,8 +38,12 @@ class OifsYearMeanTemporalmap(Temporalmap):
     def set_cell_methods(self, cube):
         """Set the correct cell methods."""
         cube.cell_methods = ()
-        cube.add_cell_method(iris.coords.CellMethod("mean", coords="time", intervals="1 year"))
-        cube.add_cell_method(iris.coords.CellMethod("point", coords=["latitude", "longitude"]))
+        cube.add_cell_method(
+            iris.coords.CellMethod("mean", coords="time", intervals="1 year")
+        )
+        cube.add_cell_method(
+            iris.coords.CellMethod("point", coords=["latitude", "longitude"])
+        )
         return cube
 
     def compute_time_mean(self, output_cube):
@@ -59,7 +63,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
 
     def adjust_metadata(self, temporalmap_cube, varname: str):
         """Do further adjustments to the cube metadata before saving."""
-        temporalmap_cube = helpers.set_metadata(
+        temporalmap_cube = helpers.cubes.set_metadata(
             temporalmap_cube,
             title=f"{temporalmap_cube.long_name.title()} (Annual Mean Map)",
             comment=f"Annual Mean of **{varname}**.",

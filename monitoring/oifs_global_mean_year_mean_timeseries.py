@@ -6,7 +6,7 @@ import iris
 import numpy as np
 from scriptengine.tasks.core import timed_runner
 
-import helpers.file_handling as helpers
+import helpers.cubes
 
 from .timeseries import Timeseries
 
@@ -32,7 +32,7 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
 
         self.check_file_extension(dst)
 
-        oifs_cube = helpers.load_input_cube(src, varname)
+        oifs_cube = helpers.cubes.load_input_cube(src, varname)
 
         time_mean_cube = self.compute_time_mean(oifs_cube)
 
@@ -119,10 +119,10 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
         # Add File Metadata
         comment = (
             f"Global average time series of **{varname}**. "
-            "Each data point represents the (spatial and temporal) "
-            "average over one year."
+            f"Each data point represents the (spatial and temporal) "
+            f"average over one year."
         )
-        timeseries_cube = helpers.set_metadata(
+        timeseries_cube = helpers.cubes.set_metadata(
             timeseries_cube,
             title=f"{timeseries_cube.long_name} (Annual Mean)",
             comment=comment,
