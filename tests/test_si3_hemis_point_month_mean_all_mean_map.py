@@ -10,15 +10,15 @@ from monitoring.si3_hemis_point_month_mean_all_mean_map import (
 
 
 def test_ice_map_once(tmpdir):
-    init = {
+    args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmpdir) + "/test.nc",
         "varname": "sivolu",
         "hemisphere": "north",
     }
-    ice_map = Si3HemisPointMonthMeanAllMeanMap(init)
-    ice_map.run(init)
-    cube = iris.load_cube(init["dst"])
+    ice_map = Si3HemisPointMonthMeanAllMeanMap(args)
+    ice_map.run({})
+    cube = iris.load_cube(args["dst"])
     assert cube.attributes["map_type"] == "polar ice sheet"
     assert cube.attributes["diagnostic_type"] == "map"
     assert cube.coord("time").climatological
@@ -26,23 +26,23 @@ def test_ice_map_once(tmpdir):
 
 
 def test_ice_map_twice(tmpdir):
-    init_a = {
+    args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmpdir) + "/test.nc",
         "varname": "sivolu",
         "hemisphere": "north",
     }
-    ice_map = Si3HemisPointMonthMeanAllMeanMap(init_a)
-    ice_map.run(init_a)
-    init_b = {
+    ice_map = Si3HemisPointMonthMeanAllMeanMap(args)
+    ice_map.run({})
+    args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199103.nc",
         "dst": str(tmpdir) + "/test.nc",
         "varname": "sivolu",
         "hemisphere": "north",
     }
-    ice_map = Si3HemisPointMonthMeanAllMeanMap(init_b)
-    ice_map.run(init_b)
-    cube = iris.load_cube(init_b["dst"])
+    ice_map = Si3HemisPointMonthMeanAllMeanMap(args)
+    ice_map.run({})
+    cube = iris.load_cube(args["dst"])
     assert cube.attributes["map_type"] == "polar ice sheet"
     assert cube.attributes["diagnostic_type"] == "map"
     assert cube.coord("time").climatological
@@ -50,26 +50,26 @@ def test_ice_map_twice(tmpdir):
 
 
 def test_ice_map_wrong_varname(tmpdir):
-    init = {
+    args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmpdir) + "/test.nc",
         "hemisphere": "north",
         "varname": "tos",
     }
-    ice_map = Si3HemisPointMonthMeanAllMeanMap(init)
+    ice_map = Si3HemisPointMonthMeanAllMeanMap(args)
     pytest.raises(
-        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError, ice_map.run, init
+        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError, ice_map.run, args
     )
 
 
 def test_ice_map_wrong_hemisphere(tmpdir):
-    init = {
+    args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmpdir) + "/test.nc",
         "varname": "sivolu",
         "hemisphere": "east",
     }
-    ice_map = Si3HemisPointMonthMeanAllMeanMap(init)
+    ice_map = Si3HemisPointMonthMeanAllMeanMap(args)
     pytest.raises(
-        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError, ice_map.run, init
+        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError, ice_map.run, args
     )

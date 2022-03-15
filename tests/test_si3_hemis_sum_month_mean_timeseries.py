@@ -8,7 +8,7 @@ from monitoring.si3_hemis_sum_month_mean_timeseries import (
 
 
 def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
-    init = {
+    args = {
         "src": [
             "./tests/testdata/NEMO_output_sivolu-199003.nc",
             "./tests/testdata/NEMO_output_sivolu-199009.nc",
@@ -19,8 +19,8 @@ def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
         "hemisphere": "north",
         "month": 3,
     }
-    ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
-    ice_time_series.run(init)
+    ice_time_series = Si3HemisSumMonthMeanTimeseries(args)
+    ice_time_series.run({})
     cube = iris.load_cube(str(tmpdir) + "/test.nc")
     assert cube.name() == "sea_ice_volume"
     assert cube.attributes["title"] is not None
@@ -33,7 +33,7 @@ def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
 
 
 def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmpdir, caplog):
-    init = {
+    args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmpdir) + "/test.nc",
         "domain": "./tests/testdata/domain_cfg_example.nc",
@@ -41,13 +41,13 @@ def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmpdir, caplog):
         "hemisphere": "south",
         "month": 3,
     }
-    ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
-    ice_time_series.run(init)
+    ice_time_series = Si3HemisSumMonthMeanTimeseries(args)
+    ice_time_series.run({})
     assert "Invalid varname argument" in caplog.text
 
 
 def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmpdir, caplog):
-    init = {
+    args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmpdir) + "/test.nc",
         "domain": "./tests/testdata/domain_cfg_example.nc",
@@ -55,6 +55,6 @@ def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmpdir, caplog):
         "hemisphere": "foo",
         "month": 3,
     }
-    ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
-    ice_time_series.run(init)
+    ice_time_series = Si3HemisSumMonthMeanTimeseries(args)
+    ice_time_series.run({})
     assert "Invalid hemisphere argument " in caplog.text
