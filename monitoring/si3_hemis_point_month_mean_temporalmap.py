@@ -1,10 +1,10 @@
 """Processing Task that creates a 2D time map of sea ice concentration."""
 
 import iris
-import numpy as np
 from scriptengine.tasks.core import timed_runner
 
 import helpers.cubes
+import helpers.dates
 
 from .temporalmap import Temporalmap
 
@@ -19,65 +19,6 @@ _meta_dict = {
 }
 
 
-def _remove_aux_time(cube):
-    try:
-        aux_time = cube.coord("time", dim_coords=False)
-    except iris.exceptions.CoordinateNotFoundError:
-        pass
-    else:
-        cube.remove_coord(aux_time)
-    return cube
-
-
-_month_names = (
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-)
-
-
-def _month_number(month):
-    "Returns number of month (1..12) for month (int or string)"
-    nums = dict()
-    # Allow all of "January", "january", "jan", 1
-    for num, name in enumerate(_month_names):
-        nums[name] = nums[num + 1] = nums[name[:3]] = nums[name.lower()] = num + 1
-    try:
-        return nums[month]
-    except KeyError:
-        raise ValueError(f"Invalid month: '{month}'")
-
-
-def _month_name(month):
-    return _month_names[_month_number(month) - 1]
-
-
-def _extract_month(cube, month):
-    return cube.extract(
-        iris.Constraint(time=lambda cell: cell.point.month == _month_number(month))
-    )
-
-
-def _mask_other_hemisphere(cube, hemisphere):
-    lats = np.broadcast_to(cube.coord("latitude").points, cube.shape)
-    if hemisphere.lower() in ("south", "s"):
-        cube.data = np.ma.masked_where(lats > 0, cube.data)
-    elif hemisphere.lower() in ("north", "n"):
-        cube.data = np.ma.masked_where(lats < 0, cube.data)
-    else:
-        raise ValueError("Invalid hemisphere, must be 'north' or 'south'")
-    return cube
-
-
 def _set_cell_methods(cube, hemisphere):
     cube.cell_methods = ()
     cube.add_cell_method(iris.coords.CellMethod("point", coords="time"))
@@ -90,30 +31,6 @@ def _set_cell_methods(cube, hemisphere):
     )
     cube.add_cell_method(iris.coords.CellMethod("point", coords="longitude"))
     return cube
-
-
-def _yearly_time_bounds(cube):
-
-    t_coord = cube.coord("time")
-    cube.remove_coord("time")
-
-    t_point = t_coord.units.num2date(t_coord.points[0])
-    t_first, t_last = (
-        t_coord.units.date2num(t_point.replace(month=1, day=1)),
-        t_coord.units.date2num(t_point.replace(year=t_point.year + 1, month=1, day=1)),
-    )
-    cube.add_aux_coord(
-        iris.coords.DimCoord(
-            t_coord.points,
-            bounds=np.array([[t_first, t_last]]),
-            standard_name=t_coord.standard_name,
-            long_name=t_coord.long_name,
-            units=t_coord.units,
-            var_name=t_coord.var_name,
-            attributes=t_coord.attributes,
-        )
-    )
-    return iris.util.new_axis(cube, "time")
 
 
 class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
@@ -162,11 +79,11 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
         self.check_file_extension(dst)
 
         this_leg = helpers.cubes.load_input_cube(src, varname)
-        this_leg = _remove_aux_time(this_leg)
-        this_leg = _mask_other_hemisphere(this_leg, hemisphere)
+        this_leg = helpers.cubes.remove_aux_time(this_leg)
+        this_leg = helpers.cubes.mask_other_hemisphere(this_leg, hemisphere)
         if month:
-            this_leg = _extract_month(this_leg, month)
-            this_leg = _yearly_time_bounds(this_leg)
+            this_leg = helpers.cubes.extract_month(this_leg, month)
+            this_leg = helpers.cubes.yearly_time_bounds(this_leg)
 
         if "convert_to" in _meta_dict[varname]:
             try:
@@ -180,11 +97,11 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
             _meta_dict[varname]["long_name"]
             + " "
             + hemisphere
-            + (f" {_month_name(month)}" if month else "")
+            + (f" {helpers.dates.month_name(month)}" if month else "")
         )
         comment = (
             f"{_meta_dict[varname]['long_name']} / **{varname}** in {hemisphere}ern hemisphere"
-            + (f" in {_month_name(month)}" if month else "")
+            + (f" in {helpers.dates.month_name(month)}" if month else "")
         )
         this_leg.long_name = long_name
         this_leg = helpers.cubes.set_metadata(
