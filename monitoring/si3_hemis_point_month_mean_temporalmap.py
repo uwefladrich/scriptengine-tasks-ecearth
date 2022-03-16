@@ -55,24 +55,22 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
         varname = self.getarg("varname", context)
         month = self.getarg("month", context, default=False)
 
-        self.log_info(
-            f"Temporal map for {varname} on {hemisphere}ern hemisphere at {dst}"
-        )
+        self.log_info(f"Temporalmap for {varname} ({hemisphere}ern hemisphere): {dst}")
         self.log_debug(f"Source file(s): {src}")
 
         if varname not in _meta_dict:
             self.log_warning(
                 (
-                    f"Invalid varname argument '{varname}', must be one of {_meta_dict.keys()}."
-                    " Diagnostic will not be included!"
+                    f"Invalid varname '{varname}', must be one of {_meta_dict.keys()}; "
+                    "diagnostic will not be ignored."
                 )
             )
             return
         if hemisphere not in ("north", "south"):
             self.log_warning(
                 (
-                    f"Invalid hemisphere argument '{hemisphere}', must be 'north' or 'south'."
-                    " Diagnostic will not be included!"
+                    f"Invalid hemisphere '{hemisphere}', must be 'north' or 'south'; "
+                    "diagnostic will not be ignored."
                 )
             )
             return

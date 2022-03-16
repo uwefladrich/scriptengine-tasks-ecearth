@@ -69,18 +69,16 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
         month = self.getarg("month", context)
         domain = self.getarg("domain", context)
 
-        self.log_info(
-            f"Create {varname} time series for {hemisphere}ern hemisphere at {dst}."
-        )
-        self.log_debug(f"Domain: {domain}, source file: {src}")
+        self.log_info(f"Timeseries for {varname} ({hemisphere}ern hemisphere): {dst}")
+        self.log_debug(f"Source file(s): {src}; domain file: {domain}")
 
         try:
             long_name = _meta_dict[varname]["long_name"]
         except KeyError:
             self.log_warning(
                 (
-                    f"Invalid varname argument: '{varname}', must be one of {_meta_dict.keys()}."
-                    " Diagnostic will not be included!"
+                    f"Invalid varname '{varname}', must be one of {_meta_dict.keys()}; "
+                    "diagnostic will not be ignored."
                 )
             )
             return
@@ -88,8 +86,8 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
         if hemisphere not in ("north", "south"):
             self.log_warning(
                 (
-                    f"Invalid hemisphere argument '{hemisphere}', must be 'north' or 'south'."
-                    " Diagnostic will not be included!"
+                    f"Invalid hemisphere '{hemisphere}', must be 'north' or 'south'; "
+                    "diagnostic will not be ignored."
                 )
             )
             return

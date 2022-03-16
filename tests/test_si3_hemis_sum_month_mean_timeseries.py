@@ -43,7 +43,7 @@ def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmpdir, caplog):
     }
     ice_time_series = Si3HemisSumMonthMeanTimeseries(args)
     ice_time_series.run({})
-    assert "Invalid varname argument" in caplog.text
+    assert "Invalid varname " in caplog.text
 
 
 def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmpdir, caplog):
@@ -57,4 +57,4 @@ def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmpdir, caplog):
     }
     ice_time_series = Si3HemisSumMonthMeanTimeseries(args)
     ice_time_series.run({})
-    assert "Invalid hemisphere argument " in caplog.text
+    assert "Invalid hemisphere " in caplog.text

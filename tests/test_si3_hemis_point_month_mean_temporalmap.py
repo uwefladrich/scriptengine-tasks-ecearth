@@ -52,7 +52,7 @@ def test_si3_hemis_point_month_mean_temporalmap_wrong_varname(tmpdir, caplog):
     }
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(args)
     ice_time_map.run({})
-    assert "Invalid varname argument" in caplog.text
+    assert "Invalid varname " in caplog.text
 
 
 def test_si3_hemis_point_month_mean_temporalmap_wrong_hemisphere(tmpdir, caplog):
@@ -64,7 +64,7 @@ def test_si3_hemis_point_month_mean_temporalmap_wrong_hemisphere(tmpdir, caplog)
     }
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(args)
     ice_time_map.run({})
-    assert "Invalid hemisphere argument " in caplog.text
+    assert "Invalid hemisphere " in caplog.text
 
 
 # missing: 'convert_to' test (requires a siconc input file) or multiple Mocks
