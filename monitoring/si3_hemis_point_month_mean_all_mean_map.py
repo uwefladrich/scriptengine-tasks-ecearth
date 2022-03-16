@@ -1,5 +1,6 @@
 """Processing Task that creates a 2D map of sea ice variables."""
 
+from calendar import month
 import datetime
 
 import cftime
@@ -61,25 +62,22 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
         self.check_file_extension(dst)
 
         month_cube = helpers.cubes.load_input_cube(src, varname)
+
         # Remove auxiliary time coordinate
         month_cube.remove_coord(month_cube.coord("time", dim_coords=False))
         month_cube = month_cube[0]
         time_coord = month_cube.coord("time")
         time_coord.bounds = self.get_time_bounds(time_coord)
-        latitudes = np.broadcast_to(
-            month_cube.coord("latitude").points, month_cube.shape
-        )
-        if hemisphere == "north":
-            month_cube.data = np.ma.masked_where(latitudes < 0, month_cube.data)
-        else:
-            month_cube.data = np.ma.masked_where(latitudes > 0, month_cube.data)
+
+        month_cube = helpers.cubes.mask_other_hemisphere(month_cube, hemisphere)
+
+        month_cube.data = np.ma.masked_equal(month_cube.data, 0)
+        month_cube.data = month_cube.data.astype("float64")
 
         month_cube.long_name = (
             f"{_meta_dict[varname]} {hemisphere} {self.get_month(time_coord)}"
         )
-        month_cube.data = np.ma.masked_equal(month_cube.data, 0)
 
-        month_cube.data = month_cube.data.astype("float64")
         comment = f"Simulation Average of {_meta_dict[varname]} / **{varname}** on {hemisphere}ern hemisphere."
         month_cube = helpers.cubes.set_metadata(
             month_cube,
