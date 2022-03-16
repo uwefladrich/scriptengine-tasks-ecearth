@@ -1,12 +1,10 @@
 """Processing Task that creates a 2D map of sea ice variables."""
 
 import datetime
-from calendar import month
 
 import cftime
 import iris
 import numpy as np
-from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.core import timed_runner
 
 import helpers.cubes
