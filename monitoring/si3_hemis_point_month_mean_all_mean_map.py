@@ -98,22 +98,20 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
         self.check_file_extension(dst)
 
         month_cube = helpers.cubes.load_input_cube(src, varname)
-
-        # Remove auxiliary time coordinate
-        month_cube.remove_coord(month_cube.coord("time", dim_coords=False))
+        month_cube = helpers.cubes.remove_aux_time(month_cube)
         month_cube = month_cube[0]
+
         time_coord = month_cube.coord("time")
         time_coord.bounds = _get_time_bounds(time_coord)
+        time_coord.climatological = True
 
         month_cube = helpers.cubes.mask_other_hemisphere(month_cube, hemisphere)
-
         month_cube.data = np.ma.masked_equal(month_cube.data, 0)
         month_cube.data = month_cube.data.astype("float64")
 
         month_cube.long_name = (
             f"{_meta_dict[varname]} {hemisphere} {_get_month(time_coord)}"
         )
-
         comment = f"Simulation Average of {_meta_dict[varname]} / **{varname}** on {hemisphere}ern hemisphere."
         month_cube = helpers.cubes.set_metadata(
             month_cube,
@@ -121,7 +119,7 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
             comment=comment,
             map_type="polar ice sheet",
         )
-        time_coord.climatological = True
+
         month_cube = _set_cell_methods(month_cube, hemisphere)
 
         self.save(month_cube, dst)
