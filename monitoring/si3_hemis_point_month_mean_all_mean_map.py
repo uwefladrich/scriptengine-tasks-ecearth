@@ -12,7 +12,7 @@ import helpers.cubes
 
 from .map import Map
 
-meta_dict = {
+_meta_dict = {
     "sivolu": "Sea-Ice Volume per Area",
     "siconc": "Sea-Ice Area Fraction",
 }
@@ -38,23 +38,26 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
         dst = self.getarg("dst", context)
         hemisphere = self.getarg("hemisphere", context)
         varname = self.getarg("varname", context)
-        self.log_info(f"Create {varname} map for {hemisphere}ern hemisphere at {dst}.")
+
+        self.log_info(f"Map for {varname} ({hemisphere}ern hemisphere): {dst}")
         self.log_debug(f"Source file(s): {src}")
 
-        if varname not in meta_dict:
-            msg = (
-                f"'varname' must be one of the following: {meta_dict.keys()} "
-                "Diagnostic will not be treated, returning now."
+        if varname not in _meta_dict:
+            self.log_warning(
+                (
+                    f"Invalid varname '{varname}', must be one of {_meta_dict.keys()}; "
+                    "diagnostic will not be ignored."
+                )
             )
-            self.log_error(msg)
-            raise ScriptEngineTaskArgumentInvalidError()
+            return
         if not hemisphere in ("north", "south"):
-            msg = (
-                f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
-                "Diagnostic will not be treated, returning now."
+            self.log_warning(
+                (
+                    f"Invalid hemisphere '{hemisphere}', must be 'north' or 'south'; "
+                    "diagnostic will not be ignored."
+                )
             )
-            self.log_error(msg)
-            raise ScriptEngineTaskArgumentInvalidError()
+            return
         self.check_file_extension(dst)
 
         month_cube = helpers.cubes.load_input_cube(src, varname)
@@ -72,12 +75,12 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
             month_cube.data = np.ma.masked_where(latitudes > 0, month_cube.data)
 
         month_cube.long_name = (
-            f"{meta_dict[varname]} {hemisphere} {self.get_month(time_coord)}"
+            f"{_meta_dict[varname]} {hemisphere} {self.get_month(time_coord)}"
         )
         month_cube.data = np.ma.masked_equal(month_cube.data, 0)
 
         month_cube.data = month_cube.data.astype("float64")
-        comment = f"Simulation Average of {meta_dict[varname]} / **{varname}** on {hemisphere}ern hemisphere."
+        comment = f"Simulation Average of {_meta_dict[varname]} / **{varname}** on {hemisphere}ern hemisphere."
         month_cube = helpers.cubes.set_metadata(
             month_cube,
             title=f"{month_cube.long_name} (Climatology)",
