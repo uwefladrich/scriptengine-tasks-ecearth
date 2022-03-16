@@ -44,14 +44,13 @@ def _get_month(time_coord):
 
 def _set_cell_methods(cube, hemisphere):
     """Set the correct cell methods."""
-    cube.cell_methods = ()
-    cube.add_cell_method(iris.coords.CellMethod("mean over years", coords="time"))
-    cube.add_cell_method(
+    cube.cell_methods = (
+        iris.coords.CellMethod("mean over years", coords="time"),
         iris.coords.CellMethod(
             "point", coords="latitude", intervals=f"{hemisphere}ern hemisphere"
-        )
+        ),
+        iris.coords.CellMethod("point", coords="longitude"),
     )
-    cube.add_cell_method(iris.coords.CellMethod("point", coords="longitude"))
     return cube
 
 

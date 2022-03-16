@@ -20,16 +20,15 @@ _meta_dict = {
 
 
 def _set_cell_methods(cube, hemisphere):
-    cube.cell_methods = ()
-    cube.add_cell_method(iris.coords.CellMethod("point", coords="time"))
-    cube.add_cell_method(
+    cube.cell_methods = (
+        iris.coords.CellMethod("point", coords="time"),
         iris.coords.CellMethod(
             "point",
             coords="latitude",
             comments=f"{hemisphere}ern hemisphere",
-        )
+        ),
+        iris.coords.CellMethod("point", coords="longitude"),
     )
-    cube.add_cell_method(iris.coords.CellMethod("point", coords="longitude"))
     return cube
 
 

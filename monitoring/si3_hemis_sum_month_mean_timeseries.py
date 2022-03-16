@@ -31,13 +31,11 @@ _meta_dict = {
 
 
 def _set_cell_methods(cube, hemisphere):
-    """Set the correct cell methods."""
-    cube.cell_methods = ()
-    cube.add_cell_method(iris.coords.CellMethod("point", coords="time"))
-    cube.add_cell_method(
+    cube.cell_methods = (
+        iris.coords.CellMethod("point", coords="time"),
         iris.coords.CellMethod(
             "sum", coords="area", intervals=f"{hemisphere}ern hemisphere"
-        )
+        ),
     )
     return cube
 
