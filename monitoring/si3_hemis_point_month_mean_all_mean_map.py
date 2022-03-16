@@ -1,7 +1,7 @@
 """Processing Task that creates a 2D map of sea ice variables."""
 
-from calendar import month
 import datetime
+from calendar import month
 
 import cftime
 import iris
@@ -17,6 +17,44 @@ _meta_dict = {
     "sivolu": "Sea-Ice Volume per Area",
     "siconc": "Sea-Ice Area Fraction",
 }
+
+
+def _get_time_bounds(time_coord):
+    """
+    Get contiguous time bounds for sea ice maps
+
+    Creates new time bounds [
+        [01-01-current year, 01-01-next year],
+    ]
+    """
+    dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
+    start = datetime.datetime(dt_object.year, 1, 1)
+    end = datetime.datetime(start.year + 1, 1, 1)
+    start_seconds = cftime.date2num(start, time_coord.units.name)
+    end_seconds = cftime.date2num(end, time_coord.units.name)
+    new_bounds = np.array([[start_seconds, end_seconds]])
+    return new_bounds
+
+
+def _get_month(time_coord):
+    """
+    Returns the month of [0] in time_coord.points as a string
+    """
+    dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
+    return dt_object.strftime("%B")
+
+
+def _set_cell_methods(cube, hemisphere):
+    """Set the correct cell methods."""
+    cube.cell_methods = ()
+    cube.add_cell_method(iris.coords.CellMethod("mean over years", coords="time"))
+    cube.add_cell_method(
+        iris.coords.CellMethod(
+            "point", coords="latitude", intervals=f"{hemisphere}ern hemisphere"
+        )
+    )
+    cube.add_cell_method(iris.coords.CellMethod("point", coords="longitude"))
+    return cube
 
 
 class Si3HemisPointMonthMeanAllMeanMap(Map):
@@ -67,7 +105,7 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
         month_cube.remove_coord(month_cube.coord("time", dim_coords=False))
         month_cube = month_cube[0]
         time_coord = month_cube.coord("time")
-        time_coord.bounds = self.get_time_bounds(time_coord)
+        time_coord.bounds = _get_time_bounds(time_coord)
 
         month_cube = helpers.cubes.mask_other_hemisphere(month_cube, hemisphere)
 
@@ -75,7 +113,7 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
         month_cube.data = month_cube.data.astype("float64")
 
         month_cube.long_name = (
-            f"{_meta_dict[varname]} {hemisphere} {self.get_month(time_coord)}"
+            f"{_meta_dict[varname]} {hemisphere} {_get_month(time_coord)}"
         )
 
         comment = f"Simulation Average of {_meta_dict[varname]} / **{varname}** on {hemisphere}ern hemisphere."
@@ -86,42 +124,6 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
             map_type="polar ice sheet",
         )
         time_coord.climatological = True
-        month_cube = self.set_cell_methods(month_cube, hemisphere)
+        month_cube = _set_cell_methods(month_cube, hemisphere)
 
         self.save(month_cube, dst)
-
-    def get_time_bounds(self, time_coord):
-        """
-        Get contiguous time bounds for sea ice maps
-
-        Creates new time bounds [
-            [01-01-current year, 01-01-next year],
-        ]
-        """
-        dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
-        start = datetime.datetime(dt_object.year, 1, 1)
-        end = datetime.datetime(start.year + 1, 1, 1)
-        start_seconds = cftime.date2num(start, time_coord.units.name)
-        end_seconds = cftime.date2num(end, time_coord.units.name)
-        new_bounds = np.array([[start_seconds, end_seconds]])
-        return new_bounds
-
-    def get_month(self, time_coord):
-        """
-        Returns the month of [0] in time_coord.points as a string
-        """
-        dt_object = cftime.num2pydate(time_coord.points[0], time_coord.units.name)
-        return dt_object.strftime("%B")
-
-    def set_cell_methods(self, cube, hemisphere):
-        """Set the correct cell methods."""
-        self.log_debug("Setting cell methods.")
-        cube.cell_methods = ()
-        cube.add_cell_method(iris.coords.CellMethod("mean over years", coords="time"))
-        cube.add_cell_method(
-            iris.coords.CellMethod(
-                "point", coords="latitude", intervals=f"{hemisphere}ern hemisphere"
-            )
-        )
-        cube.add_cell_method(iris.coords.CellMethod("point", coords="longitude"))
-        return cube
