@@ -70,6 +70,7 @@ setuptools.setup(
             "ece.mon.oifs_global_mean_year_mean_timeseries = monitoring.oifs_global_mean_year_mean_timeseries:OifsGlobalMeanYearMeanTimeseries",
             "ece.mon.presentation.markdown = monitoring.markdown:Markdown",
             "ece.mon.presentation.redmine = monitoring.redmine:Redmine",
+            "ece.mon.linear_combination = monitoring.linear_combination:LinearCombination",
         ]
     },
 )
