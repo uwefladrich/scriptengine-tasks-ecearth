@@ -199,41 +199,39 @@ class TemporalmapLoader(PresentationObjectLoader):
         if map_handler is None:
             raise InvalidMapTypeException(map_type)
 
-        png_dir = Path(self.path.stem + "_frames")
-        with ChangeDirectory(dst_folder):
-            png_dir.mkdir(exist_ok=True)
-            number_of_pngs = len(list(png_dir.iterdir()))
+        png_dir = dst_folder / Path(self.path.stem + "_frames")
+        png_dir.mkdir(exist_ok=True)
+        num_existing_pngs = len(list(png_dir.iterdir()))
 
-        unit_text = format_units(self.cube.units)
-        dst_file = f"./{self.path.stem}.gif"
-        number_of_time_steps = len(self.cube.coord("time").points)
-        with ChangeDirectory(f"{dst_folder}/{png_dir}"):
-            for time_step in range(number_of_pngs, number_of_time_steps):
-                time_coord = self.cube.coord("time")
-                time_bounds = time_coord.bounds[time_step]
-                dates = cftime.num2pydate(time_bounds, time_coord.units.name)
-                date_title = dates[0].strftime("%Y")
-                plot_title = format_title(self.cube.long_name)
-                fig = map_handler(
-                    self.cube[time_step],
-                    title=plot_title,
-                    dates=date_title,
-                    units=unit_text,
-                    **kwargs,
-                )
-                fig.savefig(
-                    f"./{self.path.stem}-{time_step:03}.png", bbox_inches="tight"
-                )
-                plt.close(fig)
-            images = []
-            for file_name in sorted(Path().iterdir()):
-                images.append(imageio.imread(file_name))
-            imageio.mimsave(f".{dst_file}", images, fps=2)
+        gif_file = self.path.with_suffix(".gif").name
+
+        time_coord = self.cube.coord("time")
+        num_time_steps = len(time_coord.points)
+
+        for time_step in range(num_existing_pngs, num_time_steps):
+
+            time_bounds = time_coord.bounds[time_step]
+            startdate, _ = cftime.num2pydate(time_bounds, time_coord.units.name)
+
+            fig = map_handler(
+                self.cube[time_step],
+                title=format_title(self.cube.long_name),
+                dates=startdate.strftime("%Y"),
+                units=format_units(self.cube.units),
+                **kwargs,
+            )
+            fig.savefig(
+                png_dir / f"{self.path.stem}-{time_step:03}.png", bbox_inches="tight"
+            )
+            plt.close(fig)
+
+        frames = [imageio.imread(png) for png in sorted(png_dir.iterdir())]
+        imageio.mimsave(dst_folder / gif_file, frames, fps=2)
 
         return {
             "title": self.cube.attributes["title"],
-            "path": dst_file,
             "comment": self.cube.attributes["comment"],
+            "path": "./" + gif_file,
         }
 
 
