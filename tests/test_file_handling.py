@@ -1,4 +1,4 @@
-"""Tests for files and cubes helpers"""
+"""Tests for file handling and nemo helpers"""
 
 import os
 

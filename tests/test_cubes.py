@@ -1,3 +1,5 @@
+"""Tests for Iris cubes helpers"""
+
 import pytest
 from iris.coords import AuxCoord, DimCoord
 from iris.cube import Cube
