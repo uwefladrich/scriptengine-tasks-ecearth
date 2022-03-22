@@ -21,7 +21,9 @@ def month_number(month):
     nums = dict()
     # Allow all of "January", "january", "jan", 1
     for num, name in enumerate(_month_names):
-        nums[name] = nums[num + 1] = nums[name[:3]] = nums[name.lower()] = num + 1
+        nums[name] = nums[num + 1] = nums[name.lower()[:3]] = nums[name.lower()] = (
+            num + 1
+        )
     try:
         return nums[month]
     except KeyError:
