@@ -12,6 +12,7 @@ def test_month_number():
     pytest.raises(ValueError, helpers.dates.month_number, 13)
     pytest.raises(ValueError, helpers.dates.month_number, 0)
 
+
 def test_month_name():
     assert helpers.dates.month_name(3) == "March"
     assert helpers.dates.month_name("March") == "March"
