@@ -29,10 +29,9 @@ class PresentationObject:
 
 
 def get_loader(path):
-    suffix = Path(path).suffix
-    if suffix in (".yml", ".yaml"):
+    if path.suffix in (".yml", ".yaml"):
         return ScalarLoader(path)
-    if suffix == ".nc":
+    if path.suffix == ".nc":
         try:
             # Iris before 3.3 can't handle pathlib's Path, needs string
             cube = iris.load_cube(str(path))
