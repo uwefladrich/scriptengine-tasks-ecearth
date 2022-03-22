@@ -1,5 +1,6 @@
 """Processing Task that creates a 2D map of a given extensive ocean quantity."""
 
+import pathlib
 import warnings
 
 import iris
@@ -25,7 +26,7 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
     @timed_runner
     def run(self, context):
         src = self.getarg("src", context)
-        dst = self.getarg("dst", context)
+        dst = pathlib.Path(self.getarg("dst", context))
         varname = self.getarg("varname", context)
         self.log_info(f"Create time series for atmosphere variable {varname} at {dst}.")
         self.log_debug(f"Source file(s): {src}")

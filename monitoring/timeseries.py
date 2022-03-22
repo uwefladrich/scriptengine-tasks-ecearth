@@ -2,6 +2,8 @@
 
 import datetime
 import os
+import pathlib
+import tempfile
 
 import iris
 import numpy as np
@@ -27,7 +29,7 @@ class Timeseries(Task):
     def run(self, context):
         # load input parameters
         title = self.getarg("title", context)
-        dst = self.getarg("dst", context)
+        dst = pathlib.Path(self.getarg("dst", context))
         self.log_info(f"Time series {title} at {dst}.")
 
         # Convert coordinate value to number and get unit
@@ -79,32 +81,32 @@ class Timeseries(Task):
         )
         self.save(data_cube, dst)
 
-    def save(self, new_cube, dst):
+    def save(self, new_cube, dst: pathlib.Path):
         """save time series cube in netCDF file"""
         self.log_debug(f"Saving time series cube to {dst}")
 
         new_cube.attributes["diagnostic_type"] = "time series"
         try:
-            current_cube = iris.load_cube(dst)
+            current_cube = iris.load_cube(str(dst))
         except OSError:  # file does not exist yet.
-            iris.save(new_cube, dst)
+            iris.save(new_cube, str(dst))
             return
 
         self.test_monotonic_increase(current_cube.coords()[0], new_cube.coords()[0])
 
         # Iris changes metadata when saving/loading cube
         # save & reload to prevent metadata mismatch
-        iris.save(new_cube, "temp.nc")
-        new_cube = iris.load_cube("temp.nc")
+        with tempfile.NamedTemporaryFile() as tf:
+            iris.save(new_cube, tf.name, saver="nc")
+            new_cube = iris.load_cube(tf.name)
 
         cube_list = iris.cube.CubeList([current_cube, new_cube])
         merged_cube = cube_list.concatenate_cube()
-        iris.save(merged_cube, f"{dst}-copy.nc")
 
-        os.remove(dst)
-        os.rename(f"{dst}-copy.nc", dst)
-        # remove temporary save
-        os.remove("temp.nc")
+        dst_copy = pathlib.Path(f"{dst}-copy.nc")
+        iris.save(merged_cube, str(dst_copy))
+        dst.unlink()
+        dst_copy.rename(dst)
 
     def test_monotonic_increase(self, old_coord, new_coord):
         """Test if coordinate is monotonically increasing."""
@@ -121,6 +123,6 @@ class Timeseries(Task):
 
     def check_file_extension(self, dst):
         """check if destination file has a valid netCDF extension"""
-        if not dst.endswith(".nc"):
+        if not dst.suffix == ".nc":
             self.log_error(f"Invalid netCDF extension in dst '{dst}'")
             raise ScriptEngineTaskArgumentInvalidError()

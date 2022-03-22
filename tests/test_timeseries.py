@@ -1,6 +1,7 @@
 """Tests for monitoring/timeseries.py"""
 
 import datetime
+import pathlib
 
 import iris
 import pytest
@@ -20,7 +21,7 @@ def test_timeseries_dst_error():
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
         time_series.check_file_extension,
-        init["dst"],
+        pathlib.Path(init["dst"]),
     )
 
 
