@@ -1,5 +1,6 @@
 """Tests for Iris cubes helpers"""
 
+import cf_units
 import pytest
 from iris.coords import AuxCoord, DimCoord
 from iris.cube import Cube
@@ -54,3 +55,16 @@ def test_remove_aux_time():
     cube = helpers.cubes.remove_aux_time(cube)
     assert len(cube.coords("time")) == 1
     pytest.raises(CoordinateNotFoundError, cube.coord, "time", dim_coords=False)
+
+
+def test_extract_month():
+    cube = Cube([0, 1, 2])
+    day0 = cf_units.encode_time(1990, 3, 4, 0, 0, 0)
+    day1 = cf_units.encode_time(1990, 3, 6, 0, 0, 0)
+    day2 = cf_units.encode_time(1990, 4, 4, 0, 0, 0)
+    time = DimCoord(
+        [day0, day1, day2], "time", units="seconds since 1970-01-01 00:00:00"
+    )
+    cube.add_dim_coord(time, 0)
+    cube = helpers.cubes.extract_month(cube, 3)
+    assert cube.shape == (2,)
