@@ -205,24 +205,19 @@ class TemporalmapLoader(PresentationObjectLoader):
 
         gif_file = self.path.with_suffix(".gif").name
 
-        time_coord = self.cube.coord("time")
-        num_time_steps = len(time_coord.points)
+        time = self.cube.coord("time")
+        dates = [cftime.num2pydate(t, time.units.name) for t in time.points]
+        num_months = len(set(d.month for d in dates))
 
-        for time_step in range(num_existing_pngs, num_time_steps):
-
-            time_bounds = time_coord.bounds[time_step]
-            startdate, _ = cftime.num2pydate(time_bounds, time_coord.units.name)
-
+        for ts in range(num_existing_pngs, len(dates)):
             fig = map_handler(
-                self.cube[time_step],
+                self.cube[ts],
                 title=format_title(self.cube.long_name),
-                dates=startdate.strftime("%Y"),
+                dates=dates[ts].strftime("%B %Y" if num_months > 1 else "%Y"),
                 units=format_units(self.cube.units),
                 **kwargs,
             )
-            fig.savefig(
-                png_dir / f"{self.path.stem}-{time_step:03}.png", bbox_inches="tight"
-            )
+            fig.savefig(png_dir / f"{self.path.stem}-{ts:03}.png", bbox_inches="tight")
             plt.close(fig)
 
         frames = [imageio.imread(png) for png in sorted(png_dir.iterdir())]
