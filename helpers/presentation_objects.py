@@ -116,8 +116,8 @@ class TimeseriesLoader(PresentationObjectLoader):
         ax.set_ylim(kwargs.get("value_range", [None, None]))
 
         ax.set_title(format_title(self.cube.long_name))
-        ax.set_xlabel(format_title(x_coord.name()))
-        ax.set_ylabel(format_title(self.cube.long_name, self.cube.units))
+        ax.set_xlabel(format_label(x_coord.name()))
+        ax.set_ylabel(format_label(self.cube.long_name, self.cube.units))
 
         plt.tight_layout()
         with ChangeDirectory(dst_folder):
@@ -241,20 +241,33 @@ class TemporalmapLoader(PresentationObjectLoader):
         }
 
 
-def format_title(name, units=None):
+def format_title(name):
     """
-    Create Plot/Axis Title from Iris cube/coordinate
+    String formatting for plot titles
 
     Slight variance on _title() in iris/quickplot.py.
     """
     title = name.replace("_", " ").title()
-    unit_text = format_units(units)
-    if unit_text and unit_text != "1":
-        title += " / {}".format(unit_text)
     # create multiline string if it becomes too long
     # cf. https://stackoverflow.com/a/10634897
     title = "\n".join(wrap(title, 40))
     return title
+
+
+def format_label(name, units=None):
+    """
+    String formatting for axis labels
+
+    Slight variance on _title() in iris/quickplot.py.
+    """
+    label = name.replace("_", " ").capitalize()
+    unit_text = format_units(units)
+    if unit_text and unit_text != "1":
+        label += " / {}".format(unit_text)
+    # create multiline string if it becomes too long
+    # cf. https://stackoverflow.com/a/10634897
+    label = "\n".join(wrap(label, 40))
+    return label
 
 
 def format_units(units):
