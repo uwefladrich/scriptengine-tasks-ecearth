@@ -1,5 +1,7 @@
 """Processing Task that creates a 2D time map of a given extensive atmosphere quantity."""
 
+from pathlib import Path
+
 import iris
 from scriptengine.tasks.core import timed_runner
 
@@ -20,7 +22,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
     @timed_runner
     def run(self, context):
         src = self.getarg("src", context)
-        dst = self.getarg("dst", context)
+        dst = Path(self.getarg("dst", context))
         varname = self.getarg("varname", context)
         self.log_info(f"Create time map for atmosphere variable {varname} at {dst}.")
         self.log_debug(f"Source file: {src}")
