@@ -1,12 +1,10 @@
 """Base class for map processing tasks."""
-
-import os
+from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 import iris
-from scriptengine.exceptions import (
-    ScriptEngineTaskArgumentInvalidError,
-    ScriptEngineTaskRunError,
-)
+from scriptengine.exceptions import (ScriptEngineTaskArgumentInvalidError,
+                                     ScriptEngineTaskRunError)
 from scriptengine.tasks.core import Task
 
 import helpers.cubes
@@ -18,14 +16,14 @@ class Map(Task):
     def run(self, context):
         raise NotImplementedError("Base class function Map.run() must not be called")
 
-    def save(self, new_cube, dst):
+    def save(self, new_cube: iris.cube.Cube, dst: Path):
         """save map cube in netCDF file"""
-        self.log_debug(f"Saving map cube to {dst}")
+        self.log_debug(f"Saving map cube to '{dst}'")
         new_cube.attributes["diagnostic_type"] = "map"
         try:
-            current_cube = iris.load_cube(dst)
+            current_cube = iris.load_cube(str(dst))
         except OSError:  # file does not exist yet.
-            iris.save(new_cube, dst)
+            iris.save(new_cube, str(dst))
             return
 
         current_bounds = current_cube.coord("time").bounds
@@ -37,27 +35,26 @@ class Map(Task):
 
         # Iris changes metadata when saving/loading cube
         # save & reload to prevent metadata mismatch
-        iris.save(new_cube, "temp.nc")
-        new_cube = iris.load_cube("temp.nc")
+        # keep tempfile until the merged cube is saved
+        with NamedTemporaryFile() as tf:
+            iris.save(new_cube, tf.name, saver="nc")
+            new_cube = iris.load_cube(tf.name)
 
-        current_cube.cell_methods = new_cube.cell_methods
-        cube_list = iris.cube.CubeList([current_cube, new_cube])
-        merged_cube = cube_list.merge_cube()
-        simulation_avg = self.compute_simulation_avg(merged_cube)
-        iris.save(simulation_avg, f"{dst}-copy.nc")
-        os.remove(dst)
-        os.rename(f"{dst}-copy.nc", dst)
-        # remove temporary save
-        os.remove("temp.nc")
+            current_cube.cell_methods = new_cube.cell_methods
+            cube_list = iris.cube.CubeList([current_cube, new_cube])
+            merged_cube = cube_list.merge_cube()
+            simulation_avg = self.compute_simulation_avg(merged_cube)
 
-    def check_file_extension(self, dst):
+            dst_copy = dst.with_stem(f"{dst.stem}_copy")
+            iris.save(simulation_avg, str(dst_copy))
+
+        dst.unlink()
+        dst_copy.rename(dst)
+
+    def check_file_extension(self, dst: Path):
         """check if destination file has a valid netCDF extension"""
-        if not dst.endswith(".nc"):
-            msg = (
-                f"{dst} does not end in valid netCDF file extension. "
-                "Diagnostic will not be treated, returning now."
-            )
-            self.log_error(msg)
+        if dst.suffix != ".nc":
+            self.log_error(f"Invalid netCDF extension in dst '{dst}'")
             raise ScriptEngineTaskArgumentInvalidError()
 
     def compute_simulation_avg(self, merged_cube):

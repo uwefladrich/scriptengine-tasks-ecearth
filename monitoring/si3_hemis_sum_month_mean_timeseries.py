@@ -1,7 +1,7 @@
 """Processing Task that calculates the seasonal cycle of sea ice variables in one leg."""
 
-import pathlib
 import warnings
+from pathlib import Path
 
 import cf_units
 import iris
@@ -50,7 +50,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
 
     @timed_runner
     def run(self, context):
-        dst = pathlib.Path(self.getarg("dst", context))
+        dst = Path(self.getarg("dst", context))
         varname = self.getarg("varname", context)
         hemisphere = self.getarg("hemisphere", context)
 

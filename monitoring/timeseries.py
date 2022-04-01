@@ -126,6 +126,6 @@ class Timeseries(Task):
 
     def check_file_extension(self, dst):
         """check if destination file has a valid netCDF extension"""
-        if not dst.suffix == ".nc":
+        if dst.suffix != ".nc":
             self.log_error(f"Invalid netCDF extension in dst '{dst}'")
             raise ScriptEngineTaskArgumentInvalidError()

@@ -1,4 +1,5 @@
 """Processing Task that creates a 2D map of a given extensive atmosphere quantity."""
+from pathlib import Path
 
 import iris
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
@@ -25,9 +26,9 @@ class OifsAllMeanMap(Map):
     @timed_runner
     def run(self, context):
         src = self.getarg("src", context)
-        dst = self.getarg("dst", context)
+        dst = Path(self.getarg("dst", context))
         varname = self.getarg("varname", context)
-        self.log_info(f"Create map for atmosphere variable {varname} at {dst}.")
+        self.log_info(f"Create map for atmosphere variable {varname} at '{dst}'.")
         self.log_debug(f"Source file: {src}")
 
         self.check_file_extension(dst)

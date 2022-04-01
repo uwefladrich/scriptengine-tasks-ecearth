@@ -1,6 +1,6 @@
 """Processing Task that creates a 2D map of sea ice variables."""
-
 import datetime
+from pathlib import Path
 
 import cftime
 import iris
@@ -35,7 +35,7 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
     @timed_runner
     def run(self, context):
         src = self.getarg("src", context)
-        dst = self.getarg("dst", context)
+        dst = Path(self.getarg("dst", context))
         hemisphere = self.getarg("hemisphere", context)
         varname = self.getarg("varname", context)
         self.log_info(f"Create {varname} map for {hemisphere}ern hemisphere at {dst}.")

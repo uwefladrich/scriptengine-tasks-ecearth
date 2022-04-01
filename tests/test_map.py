@@ -1,4 +1,5 @@
 """Tests for monitoring/map.py"""
+from pathlib import Path
 
 import iris
 import pytest
@@ -12,7 +13,7 @@ def test_map_dst_error():
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
         test_map.check_file_extension,
-        "test.yml",
+        Path("test.yml"),
     )
 
 
