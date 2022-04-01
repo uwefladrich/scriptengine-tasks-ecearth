@@ -10,11 +10,11 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
-                branch: 62-github-actions
+                ref: 62-github-actions
             - name: Setup Python
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v3
               with:
                 python-version: ${{matrix.python-version}}
             - name: Install from source
