@@ -1,9 +1,8 @@
 """Tests for monitoring/markdown.py"""
 
-import os
+from pathlib import Path
 from unittest.mock import patch
 
-import pytest
 import yaml
 
 from monitoring.markdown import Markdown
@@ -20,8 +19,7 @@ def test_markdown_output_full(tmpdir):
     markdown_output = Markdown(init)
 
     markdown_output.run(init)
-    assert os.path.isfile(init["dst"] + "/summary.md")
-
+    assert Path(init["dst"] + "/summary.md").is_file()
 
 def test_markdown_presentation_list(tmpdir):
     init = {
