@@ -18,7 +18,7 @@ jobs:
               with:
                 python-version: ${{matrix.python-version}}
             - name: Install from source
-              uses: ./.github/workwflows/install-from-source
+              uses: ./.github/workflows/install-from-source
               with:
                 branch: 62-github-actions
                 python-version: ${{matrix.python-version}}
