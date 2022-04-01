@@ -1,11 +1,12 @@
 """Processing Task that writes out a generalized time series diagnostic."""
 
 import datetime
-import os
-import pathlib
 import tempfile
+from pathlib import Path
 
 import iris
+import iris.coords
+import iris.cube
 import numpy as np
 from scriptengine.exceptions import (
     ScriptEngineTaskArgumentInvalidError,
@@ -29,7 +30,7 @@ class Timeseries(Task):
     def run(self, context):
         # load input parameters
         title = self.getarg("title", context)
-        dst = pathlib.Path(self.getarg("dst", context))
+        dst = Path(self.getarg("dst", context))
         self.log_info(f"Time series {title} at {dst}.")
 
         # Convert coordinate value to number and get unit
@@ -81,7 +82,7 @@ class Timeseries(Task):
         )
         self.save(data_cube, dst)
 
-    def save(self, new_cube, dst: pathlib.Path):
+    def save(self, new_cube: iris.cube.Cube, dst: Path):
         """save time series cube in netCDF file"""
         self.log_debug(f"Saving time series cube to {dst}")
 
@@ -96,15 +97,17 @@ class Timeseries(Task):
 
         # Iris changes metadata when saving/loading cube
         # save & reload to prevent metadata mismatch
+        # keep tempfile until the merged cube is saved
         with tempfile.NamedTemporaryFile() as tf:
             iris.save(new_cube, tf.name, saver="nc")
             new_cube = iris.load_cube(tf.name)
 
-        cube_list = iris.cube.CubeList([current_cube, new_cube])
-        merged_cube = cube_list.concatenate_cube()
+            cube_list = iris.cube.CubeList([current_cube, new_cube])
+            merged_cube = cube_list.concatenate_cube()
 
-        dst_copy = pathlib.Path(f"{dst}-copy.nc")
-        iris.save(merged_cube, str(dst_copy))
+            dst_copy = dst.with_stem(f"{dst.stem}_copy")
+            iris.save(merged_cube, str(dst_copy))
+
         dst.unlink()
         dst_copy.rename(dst)
 

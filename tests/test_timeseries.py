@@ -1,7 +1,7 @@
 """Tests for monitoring/timeseries.py"""
 
 import datetime
-import pathlib
+from pathlib import Path
 
 import iris
 import pytest
@@ -21,7 +21,7 @@ def test_timeseries_dst_error():
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
         time_series.check_file_extension,
-        pathlib.Path(init["dst"]),
+        Path(init["dst"]),
     )
 
 
@@ -84,20 +84,15 @@ def test_time_series_first_save(tmpdir):
 def test_time_series_append(tmpdir):
     init_a = {
         "title": "A Test Diagnostic",
-        "dst": str(tmpdir) + "/dst_file.nc",
+        "dst": str(tmpdir) + "/dst.nc",
         "data_value": 0,
         "coord_value": 0,
     }
     time_series = Timeseries(init_a)
     time_series.run(init_a)
 
-    init_b = {
-        "title": "A Test Diagnostic",
-        "dst": str(tmpdir) + "/dst_file.nc",
-        "data_value": 0,
-        "coord_value": 1,
-    }
-
+    init_b = init_a.copy()
+    init_b["coord_value"] = 1
     time_series = Timeseries(init_b)
     time_series.run(init_b)
 
@@ -122,12 +117,8 @@ def test_time_series_append_nonmonotonic(tmpdir):
     time_series = Timeseries(init_a)
     time_series.run(init_a)
 
-    init_b = {
-        "title": "A Test Diagnostic",
-        "dst": str(tmpdir) + "/dst_file.nc",
-        "data_value": 0,
-        "coord_value": 0,
-    }
+    init_b = init_a.copy()
+    init_b["coord_value"] = 0
 
     time_series = Timeseries(init_b)
     pytest.raises(
