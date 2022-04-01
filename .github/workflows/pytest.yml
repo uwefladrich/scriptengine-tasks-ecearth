@@ -9,9 +9,18 @@ jobs:
                 python-version: [ '3.6', '3.7', '3.8', '3.9' ]
 
         steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+              with:
+                ref: 62-github-actions
+            - name: Setup Python
+              uses: actions/setup-python@v3
+              with:
+                python-version: ${{matrix.python-version}}
             - name: Install from source
               uses: ./.github/workwflows/install-from-source
               with:
+                branch: 62-github-actions
                 python-version: ${{matrix.python-version}}
             
             - name: Download test data
