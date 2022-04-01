@@ -11,6 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: 62-github-actions
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{matrix.python-version}}
       - name: Download and install conda
         run: |
           wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
