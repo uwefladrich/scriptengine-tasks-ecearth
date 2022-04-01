@@ -37,9 +37,9 @@ jobs:
           run: |
             conda create -n test-environment python=${{matrix.python-version}}
             $CONDA/bin/activate test-environment
-            conda env update -n test-environment --quiet --file conda_environment.yml
+            conda env update -n test-environment --file conda_environment.yml
             conda install pip
-            conda install -c conda-forge "iris>=3.1,!=3.2.0,!=3.2.0.post0"
+            python -m pip install --upgrade pip
 
         - name: Install package + remaining PyPI dependencies
           run: pip install .
