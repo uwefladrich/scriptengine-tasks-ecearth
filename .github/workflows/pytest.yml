@@ -40,6 +40,7 @@ jobs:
             conda env update -n test-environment --file conda_environment.yml
             conda install pip
             python -m pip install --upgrade pip
+            conda list
 
         - name: Install package + remaining PyPI dependencies
           run: pip install .
