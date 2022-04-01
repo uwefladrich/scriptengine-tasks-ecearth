@@ -18,12 +18,12 @@ jobs:
               with:
                 python-version: ${{matrix.python-version}}
             - name: Install from source
-              uses: ./.github/workflows/install-from-source
+              uses: ./.github/workflows/install-from-source.yml
               with:
                 python-version: ${{matrix.python-version}}
             
             - name: Download test data
-              uses: ./.github/workwflows/download-test-data
+              uses: ./.github/workwflows/download-test-data.yml
 
             - name: Install Dependencies and ScriptEngine
               run: |
