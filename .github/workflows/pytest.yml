@@ -9,7 +9,12 @@ jobs:
                 python-version: [ '3.6', '3.7', '3.8', '3.9' ]
 
         steps:
-
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Setup Python
+              uses: actions/setup-python@v2
+              with:
+                python-version: ${{python-version}}
             - name: Install from source
               uses: ./.github/workwflows/install-from-source
               with:
