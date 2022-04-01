@@ -1,0 +1,40 @@
+name: PyTest
+on: push
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: [ '3.6', '3.7', '3.8', '3.9' ]
+
+        steps:
+
+            - name: Install from source
+              uses: ./.github/workwflows/install-from-source
+              with:
+                python-version: ${{matrix.python-version}}
+            
+            - name: Download test data
+              uses: ./.github/workwflows/download-test-data
+
+            - name: Install Dependencies and ScriptEngine
+              run: |
+                python -m pip install pytest
+                python -m pip install coverage
+                python -m pip install coveralls
+                python -m pip install flake8
+            - name: Lint with flake8
+              run: |
+                # Syntax errors or undefined names
+                flake8 --count --select=E9,F63,F7,F82 --show-source --statistics monitoring/
+                flake8 --count --select=E9,F63,F7,F82 --show-source --statistics helpers/
+                flake8 --count --select=E9,F63,F7,F82 --show-source --statistics tests/
+                # All other stuff
+                flake8 --exit-zero --count --statistics --exclude=__init__.py --max-line-length=88 monitoring/
+                flake8 --exit-zero --count --statistics --exclude=__init__.py --max-line-length=88 helpers/
+                flake8 --exit-zero --count --statistics --exclude=__init__.py --max-line-length=88 tests/
+            - name: Run PyTest
+              run: |
+                coverage run -m pytest
+                coveralls
