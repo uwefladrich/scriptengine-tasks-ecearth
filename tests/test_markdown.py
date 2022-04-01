@@ -21,6 +21,7 @@ def test_markdown_output_full(tmpdir):
     markdown_output.run(init)
     assert Path(init["dst"] + "/summary.md").is_file()
 
+
 def test_markdown_presentation_list(tmpdir):
     init = {
         "src": [str(tmpdir) + "/test.yml"],
