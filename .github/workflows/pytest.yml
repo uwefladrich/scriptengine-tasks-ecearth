@@ -3,7 +3,7 @@ on: push
 
 env:
   TEST_DATA_REF: "https://github.com/valentinaschueller/ece-4-monitoring-test-data/archive/refs/heads/main.zip"
-  TEST_DATA_DOWNLOAD: "${{env.HOME}}/test-data"
+  TEST_DATA_DOWNLOAD: "test-data"
 
 jobs:
     pytest:
