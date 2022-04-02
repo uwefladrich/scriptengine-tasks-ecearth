@@ -23,24 +23,12 @@ jobs:
           with:
             python-version: ${{matrix.python-version}}
 
-        - name: Download and install conda
-          run: |
-            wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-            bash miniconda.sh -b -p $HOME/miniconda
-            source "$HOME/miniconda/etc/profile.d/conda.sh"
-            hash -r
-            conda config --set always_yes yes --set changeps1 no
-            conda config --add channels conda-forge
-            conda update -q conda
-
         - name: Create environment and load dependencies that PyPI cannot find
           run: |
-            conda create -n test-environment python=${{matrix.python-version}}
-            $CONDA/bin/activate test-environment
-            conda env update -n test-environment --file conda_environment.yml
-            conda install pip
+            $CONDA/bin/conda env update --file conda_environment.yml --name base
+            $CONDA/bin/conda install pip
             python -m pip install --upgrade pip
-            conda list
+            $CONDA/bin/conda list
 
         - name: Install package + remaining PyPI dependencies
           run: pip install .
