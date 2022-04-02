@@ -22,15 +22,21 @@ jobs:
           uses: actions/setup-python@v3
           with:
             python-version: ${{matrix.python-version}}
+        
+        - name: Setup miniconda
+          uses: conda-incubator/setup-miniconda@v2
+          with:
+            miniconda-version: "latest"
+            activate-environment: test-environment
+            environment-file: conda_environment.yml
+            python-version: ${{matrix.python-version}}
 
-        - name: Create environment and load dependencies that PyPI cannot find
+        - name: Finish conda setup
           run: |
-            $CONDA/bin/conda env update --file conda_environment.yml --name base
-            $CONDA/bin/conda init bash
-            $CONDA/bin/conda activate base
-            $CONDA/bin/conda install pip
+            conda info
+            conda install pip
             python -m pip install --upgrade pip
-            $CONDA/bin/conda list
+            conda list
 
         - name: Install package + remaining PyPI dependencies
           run: pip install .
