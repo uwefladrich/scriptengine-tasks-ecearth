@@ -67,7 +67,9 @@ jobs:
             flake8 --exit-zero --count --statistics --exclude=__init__.py --max-line-length=88 monitoring/
             flake8 --exit-zero --count --statistics --exclude=__init__.py --max-line-length=88 helpers/
             flake8 --exit-zero --count --statistics --exclude=__init__.py --max-line-length=88 tests/
-        - name: Run PyTest
+        - name: Run PyTest and Coveralls
           run: |
             coverage run -m pytest
             coveralls
+          env: 
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
