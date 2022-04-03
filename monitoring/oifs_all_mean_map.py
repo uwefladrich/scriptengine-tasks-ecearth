@@ -2,7 +2,6 @@
 from pathlib import Path
 
 import iris
-from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.core import timed_runner
 
 import helpers.cubes
@@ -47,7 +46,7 @@ class OifsAllMeanMap(Map):
         # Remove auxiliary time coordinate before collapsing cube
         try:
             output_cube.coord("time")
-        except iris.exceptions.CoordinateNotFoundError as e:
+        except iris.exceptions.CoordinateNotFoundError:
             output_cube.remove_coord(output_cube.coord("time", dim_coords=False))
         time_mean_cube = output_cube.collapsed(
             "time",

@@ -81,7 +81,7 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
         # Remove auxiliary time coordinate before collapsing cube
         try:
             output_cube.coord("time")
-        except iris.exceptions.CoordinateNotFoundError as e:
+        except iris.exceptions.CoordinateNotFoundError:
             output_cube.remove_coord(output_cube.coord("time", dim_coords=False))
         time_mean_cube = output_cube.collapsed(
             "time",
