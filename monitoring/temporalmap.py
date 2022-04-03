@@ -15,11 +15,6 @@ from scriptengine.tasks.core import Task
 class Temporalmap(Task):
     """Temporalmap Processing Task"""
 
-    def run(self, _):
-        raise NotImplementedError(
-            "Base class function Temporalmap.run() must not be called"
-        )
-
     def save(self, new_cube: iris.cube.Cube, dst: Path):
         """save temporal map cube in netCDF file"""
         self.log_debug(f"Saving temporal map cube to {dst}")

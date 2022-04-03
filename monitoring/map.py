@@ -16,9 +16,6 @@ import helpers.cubes
 class Map(Task):
     """Map Processing Task"""
 
-    def run(self, _):
-        raise NotImplementedError("Base class function Map.run() must not be called")
-
     def save(self, new_cube: iris.cube.Cube, dst: Path):
         """save map cube in netCDF file"""
         self.log_debug(f"Saving map cube to '{dst}'")
