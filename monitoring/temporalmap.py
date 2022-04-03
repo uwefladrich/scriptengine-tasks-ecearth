@@ -15,8 +15,7 @@ from scriptengine.tasks.core import Task
 class Temporalmap(Task):
     """Temporalmap Processing Task"""
 
-    def run(self, context):
-        del context
+    def run(self, _):
         raise NotImplementedError(
             "Base class function Temporalmap.run() must not be called"
         )
