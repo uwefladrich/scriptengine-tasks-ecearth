@@ -1,6 +1,6 @@
 """Processing Task that calculates the yearly global average of a given extensive quantity."""
 
-import pathlib
+from pathlib import Path
 import warnings
 
 import iris
@@ -32,7 +32,7 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
     def run(self, context):
 
         src = self.getarg("src", context)
-        dst = pathlib.Path(self.getarg("dst", context))
+        dst = Path(self.getarg("dst", context))
         var_name = self.getarg("varname", context)
         domain = self.getarg("domain", context)
         grid = self.getarg("grid", context, default="T")
