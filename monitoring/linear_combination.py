@@ -27,7 +27,7 @@ class LinearCombination(Task):
             self.log_error("Invalid 'src' argument, must be a list")
             raise ScriptEngineTaskArgumentInvalidError
 
-        result = None
+        result = 0
         for src in sources:
             self.log_debug(f"Processing source {src}")
             try:
@@ -50,14 +50,18 @@ class LinearCombination(Task):
             summand = helpers.cubes.load_input_cube(path, varname)
             summand = helpers.cubes.remove_aux_time(summand)
 
-            if result:
-                try:
-                    result += factor * summand
-                except Exception as e:
-                    self.log_error(f"Error adding '{summand.name()}': {e}")
-                    raise ScriptEngineTaskRunError
-            else:
-                result = factor * summand
+            try:
+                scaled_summand = factor*summand
+            except Exception as e:
+                self.log_error(f"Error scaling '{summand.name()}': {e}")
+                raise ScriptEngineTaskRunError
+            scaled_summand.convert_units(summand.units)
+            try:
+                result += scaled_summand
+            except Exception as e:
+                self.log_error(f"Error adding '{summand.name()}': {e}")
+                raise ScriptEngineTaskRunError
+
         self.log_debug("All sources processed")
 
         dst = self.getarg("dst", context)
