@@ -4,8 +4,10 @@ from tempfile import NamedTemporaryFile
 
 import iris
 import iris.cube
-from scriptengine.exceptions import (ScriptEngineTaskArgumentInvalidError,
-                                     ScriptEngineTaskRunError)
+from scriptengine.exceptions import (
+    ScriptEngineTaskArgumentInvalidError,
+    ScriptEngineTaskRunError,
+)
 from scriptengine.tasks.core import Task
 
 import helpers.cubes
@@ -15,7 +17,7 @@ class Map(Task):
     """Map Processing Task"""
 
     def run(self, context):
-        del(context)
+        del context
         raise NotImplementedError("Base class function Map.run() must not be called")
 
     def save(self, new_cube: iris.cube.Cube, dst: Path):

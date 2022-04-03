@@ -5,8 +5,10 @@ from tempfile import NamedTemporaryFile
 
 import iris
 import iris.cube
-from scriptengine.exceptions import (ScriptEngineTaskArgumentInvalidError,
-                                     ScriptEngineTaskRunError)
+from scriptengine.exceptions import (
+    ScriptEngineTaskArgumentInvalidError,
+    ScriptEngineTaskRunError,
+)
 from scriptengine.tasks.core import Task
 
 
