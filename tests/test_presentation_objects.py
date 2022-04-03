@@ -1,6 +1,5 @@
 """Tests for helpers/presentation_objects.py"""
 
-from audioop import tomono
 import datetime
 from pathlib import Path
 

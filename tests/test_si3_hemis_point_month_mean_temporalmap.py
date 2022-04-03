@@ -32,7 +32,7 @@ def test_si3_hemis_point_month_mean_temporalmap_twice(tmp_path):
     }
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(init)
     ice_time_map.run(init)
-    init["src"] = "./tests/testdata/NEMO_output_sivolu-199103.nc",
+    init["src"] = ("./tests/testdata/NEMO_output_sivolu-199103.nc",)
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(init)
     ice_time_map.run(init)
     cube = iris.load_cube(init["dst"])

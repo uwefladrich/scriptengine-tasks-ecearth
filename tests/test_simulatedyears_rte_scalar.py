@@ -1,6 +1,5 @@
 """Tests for monitoring/simulatedyears_rte_scalar.py"""
 
-from pathlib import Path
 from unittest.mock import patch
 
 from monitoring.simulatedyears_rte_scalar import SimulatedyearsRteScalar
