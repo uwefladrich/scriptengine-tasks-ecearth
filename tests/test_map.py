@@ -17,7 +17,7 @@ def test_map_dst_error():
     )
 
 
-def test_map_nonmonotonic_increase(tmpdir):
+def test_map_nonmonotonic_increase(tmp_path):
     test_map = Map({})
 
     old_coord_with_bounds = iris.coords.DimCoord(
@@ -28,10 +28,11 @@ def test_map_nonmonotonic_increase(tmpdir):
     )
     old_cube = iris.cube.Cube([0], dim_coords_and_dims=[(old_coord_with_bounds, 0)])
     new_cube = iris.cube.Cube([0], dim_coords_and_dims=[(new_coord_with_bounds, 0)])
-    iris.save(new_cube, str(tmpdir) + "/new_cube.nc")
+    out_path = str(tmp_path / "new_cube.nc")
+    iris.save(new_cube, out_path)
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskRunError,
         test_map.save,
         old_cube,
-        str(tmpdir) + "/new_cube.nc",
+        out_path,
     )

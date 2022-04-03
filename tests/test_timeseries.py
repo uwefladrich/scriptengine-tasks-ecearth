@@ -60,10 +60,10 @@ def test_monotonic_increase():
     )
 
 
-def test_time_series_first_save(tmpdir):
+def test_time_series_first_save(tmp_path):
     init = {
         "title": "A Test Diagnostic",
-        "dst": str(tmpdir) + "/dst_file.nc",
+        "dst": str(tmp_path / "dst_file.nc"),
         "data_value": 0,
         "coord_value": 0,
     }
@@ -81,10 +81,10 @@ def test_time_series_first_save(tmpdir):
     assert cube.coord().units.name == "1"
 
 
-def test_time_series_append(tmpdir):
+def test_time_series_append(tmp_path):
     init_a = {
         "title": "A Test Diagnostic",
-        "dst": str(tmpdir) + "/dst.nc",
+        "dst": str(tmp_path / "dst.nc"),
         "data_value": 0,
         "coord_value": 0,
     }
@@ -107,34 +107,33 @@ def test_time_series_append(tmpdir):
     assert cube.coord().units.name == "1"
 
 
-def test_time_series_append_nonmonotonic(tmpdir):
-    init_a = {
+def test_time_series_append_nonmonotonic(tmp_path):
+    init = {
         "title": "A Test Diagnostic",
-        "dst": str(tmpdir) + "/dst_file.nc",
+        "dst": str(tmp_path / "dst_file.nc"),
         "data_value": 0,
         "coord_value": 1,
     }
-    time_series = Timeseries(init_a)
-    time_series.run(init_a)
+    time_series = Timeseries(init)
+    time_series.run(init)
 
-    init_b = init_a.copy()
-    init_b["coord_value"] = 0
+    init["coord_value"] = 0
 
-    time_series = Timeseries(init_b)
+    time_series = Timeseries(init)
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskRunError,
         time_series.run,
-        init_b,
+        init,
     )
 
 
-def test_time_series_date_time(tmpdir):
+def test_time_series_date_time(tmp_path):
     seconds_value = (
         datetime.datetime(1990, 1, 1) - datetime.datetime(1900, 1, 1)
     ).total_seconds()
     init_date = {
         "title": "A Date Diagnostic",
-        "dst": str(tmpdir) + "/date_file.nc",
+        "dst": str(tmp_path / "date_file.nc"),
         "data_value": 0,
         "coord_value": "1990-01-01",
     }
@@ -153,7 +152,7 @@ def test_time_series_date_time(tmpdir):
 
     init_date_time = {
         "title": "A Datetime Diagnostic",
-        "dst": str(tmpdir) + "/date_time_file.nc",
+        "dst": str(tmp_path / "date_time_file.nc"),
         "data_value": 0,
         "coord_value": "1990-01-01 00:00:00",
     }

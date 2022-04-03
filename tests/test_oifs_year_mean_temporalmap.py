@@ -7,15 +7,15 @@ import scriptengine.exceptions
 from monitoring.oifs_year_mean_temporalmap import OifsYearMeanTemporalmap
 
 
-def test_oifs_year_mean_temporalmap_working(tmpdir):
+def test_oifs_year_mean_temporalmap_working(tmp_path):
     init = {
         "src": ["./tests/testdata/TES1_atm_1m_1990_2t.nc"],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "2t",
     }
     atmos_time_map = OifsYearMeanTemporalmap(init)
     atmos_time_map.run(init)
-    cube = iris.load_cube(str(tmpdir) + "/test.nc")
+    cube = iris.load_cube(init["dst"])
     assert cube.name() == "2 metre temperature"
     assert cube.attributes["title"] is not None
     assert cube.attributes["comment"] is not None
@@ -23,10 +23,10 @@ def test_oifs_year_mean_temporalmap_working(tmpdir):
     assert cube.attributes["map_type"] == "global atmosphere"
 
 
-def test_oifs_year_mean_temporalmap_wrong_varname(tmpdir):
+def test_oifs_year_mean_temporalmap_wrong_varname(tmp_path):
     init = {
         "src": ["./tests/testdata/TES1_atm_1m_1990_2t.nc"],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
     }
     atmos_time_map = OifsYearMeanTemporalmap(init)
