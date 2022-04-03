@@ -1,11 +1,11 @@
 """Tests for monitoring/si3_hemis_point_month_mean_all_mean_map.py"""
 
 import iris
-import pytest
-import scriptengine.exceptions
+from iris.cube import Cube
 
 from monitoring.si3_hemis_point_month_mean_all_mean_map import (
     Si3HemisPointMonthMeanAllMeanMap,
+    _set_cell_methods,
 )
 
 
@@ -71,3 +71,10 @@ def test_ice_map_wrong_hemisphere(tmpdir, caplog):
     ice_map = Si3HemisPointMonthMeanAllMeanMap(args)
     ice_map.run({})
     assert "Invalid hemisphere " in caplog.text
+
+
+def test_set_cell_methods():
+    cube = Cube([])
+    assert cube.cell_methods == ()
+    cube = _set_cell_methods(cube, "north")
+    assert cube.cell_methods != ()

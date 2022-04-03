@@ -1,9 +1,11 @@
 """Tests for monitoring/si3_hemis_sum_month_mean_timeseries.py"""
 
 import iris
+from iris.cube import Cube
 
 from monitoring.si3_hemis_sum_month_mean_timeseries import (
     Si3HemisSumMonthMeanTimeseries,
+    _set_cell_methods,
 )
 
 
@@ -58,3 +60,10 @@ def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmpdir, caplog):
     ice_time_series = Si3HemisSumMonthMeanTimeseries(args)
     ice_time_series.run({})
     assert "Invalid hemisphere " in caplog.text
+
+
+def test_set_cell_methods():
+    cube = Cube([])
+    assert cube.cell_methods == ()
+    cube = _set_cell_methods(cube, "north")
+    assert cube.cell_methods != ()

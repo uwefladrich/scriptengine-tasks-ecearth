@@ -1,9 +1,11 @@
 """Tests for monitoring/si3_hemis_point_month_mean_temporalmap.py"""
 
 import iris
+from iris.cube import Cube
 
 from monitoring.si3_hemis_point_month_mean_temporalmap import (
     Si3HemisPointMonthMeanTemporalmap,
+    _set_cell_methods,
 )
 
 
@@ -65,6 +67,13 @@ def test_si3_hemis_point_month_mean_temporalmap_wrong_hemisphere(tmpdir, caplog)
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(args)
     ice_time_map.run({})
     assert "Invalid hemisphere " in caplog.text
+
+
+def test_set_cell_methods():
+    cube = Cube([])
+    assert cube.cell_methods == ()
+    cube = _set_cell_methods(cube, "north")
+    assert cube.cell_methods != ()
 
 
 # missing: 'convert_to' test (requires a siconc input file) or multiple Mocks
