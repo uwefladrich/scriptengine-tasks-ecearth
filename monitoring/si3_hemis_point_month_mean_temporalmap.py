@@ -1,5 +1,7 @@
 """Processing Task that creates a 2D time map of sea ice concentration."""
 
+from pathlib import Path
+
 import iris
 from scriptengine.tasks.core import timed_runner
 
@@ -49,7 +51,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
     @timed_runner
     def run(self, context):
         src = self.getarg("src", context)
-        dst = self.getarg("dst", context)
+        dst = Path(self.getarg("dst", context))
         hemisphere = self.getarg("hemisphere", context)
         varname = self.getarg("varname", context)
         month = self.getarg("month", context, default=False)

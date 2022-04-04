@@ -19,17 +19,17 @@ def test_load_collapse_save(tmp_path):
     iris.save(cube, str(dst))
 
 
-def test_nemo_global_mean_year_mean_timeseries_working(tmpdir):
+def test_nemo_global_mean_year_mean_timeseries_working(tmp_path):
     init = {
         "src": ["./tests/testdata/NEMO_output_sivolu-199003.nc"],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "domain": "./tests/testdata/domain_cfg_example.nc",
         "varname": "sivolu",
         "grid": "T",
     }
     global_avg = NemoGlobalMeanYearMeanTimeseries(init)
     global_avg.run(init)
-    cube = iris.load_cube(str(tmpdir) + "/test.nc")
+    cube = iris.load_cube(init["dst"])
     assert cube.name() == "sea_ice_thickness"
     assert cube.attributes["title"] is not None
     assert cube.attributes["comment"] is not None

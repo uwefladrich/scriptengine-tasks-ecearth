@@ -9,10 +9,10 @@ from monitoring.si3_hemis_point_month_mean_temporalmap import (
 )
 
 
-def test_si3_hemis_point_month_mean_temporalmap_once(tmpdir):
+def test_si3_hemis_point_month_mean_temporalmap_once(tmp_path):
     args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "hemisphere": "north",
         "varname": "sivolu",
     }
@@ -23,32 +23,27 @@ def test_si3_hemis_point_month_mean_temporalmap_once(tmpdir):
     assert cube.attributes["diagnostic_type"] == "temporal map"
 
 
-def test_si3_hemis_point_month_mean_temporalmap_twice(tmpdir):
+def test_si3_hemis_point_month_mean_temporalmap_twice(tmp_path):
     args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "hemisphere": "north",
         "varname": "sivolu",
     }
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(args)
-    ice_time_map.run({})
-    args = {
-        "src": "./tests/testdata/NEMO_output_sivolu-199103.nc",
-        "dst": str(tmpdir) + "/test.nc",
-        "hemisphere": "north",
-        "varname": "sivolu",
-    }
+    ice_time_map.run(args)
+    args["src"] = ("./tests/testdata/NEMO_output_sivolu-199103.nc",)
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(args)
-    ice_time_map.run({})
+    ice_time_map.run(args)
     cube = iris.load_cube(args["dst"])
     assert cube.attributes["map_type"] == "polar ice sheet"
     assert cube.attributes["diagnostic_type"] == "temporal map"
 
 
-def test_si3_hemis_point_month_mean_temporalmap_wrong_varname(tmpdir, caplog):
+def test_si3_hemis_point_month_mean_temporalmap_wrong_varname(tmp_path, caplog):
     args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "hemisphere": "north",
         "varname": "foo",
     }
@@ -57,11 +52,10 @@ def test_si3_hemis_point_month_mean_temporalmap_wrong_varname(tmpdir, caplog):
     assert "Invalid varname " in caplog.text
 
 
-def test_si3_hemis_point_month_mean_temporalmap_wrong_hemisphere(tmpdir, caplog):
+def test_si3_hemis_point_month_mean_temporalmap_wrong_hemisphere(tmp_path, caplog):
     args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
-        "dst": str(tmpdir) + "/test.nc",
-        "hemisphere": "foo",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
     }
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(args)

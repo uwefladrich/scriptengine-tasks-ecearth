@@ -18,6 +18,7 @@ from helpers.presentation_objects import (
     TemporalmapLoader,
     TimeseriesLoader,
     format_dates,
+    format_label,
     format_title,
     format_units,
     get_loader,
@@ -34,10 +35,14 @@ def test_presentation_object():
 
 def test_format_title():
     assert format_title("test_title") == "Test Title"
+
+
+def test_format_label():
+    assert format_label("test_title") == "Test title"
     test_unit = cf_units.Unit("1")
-    assert format_title("test_title", units=test_unit) == "Test Title"
+    assert format_label("test_title", units=test_unit) == "Test title"
     test_unit = cf_units.Unit("kilometers")
-    assert format_title("test_title", units=test_unit) == "Test Title / 1000 m"
+    assert format_label("test_title", units=test_unit) == "Test title / 1000 m"
 
 
 unit = [

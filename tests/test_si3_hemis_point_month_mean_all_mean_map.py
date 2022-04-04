@@ -9,10 +9,10 @@ from monitoring.si3_hemis_point_month_mean_all_mean_map import (
 )
 
 
-def test_ice_map_once(tmpdir):
+def test_ice_map_once(tmp_path):
     args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
         "hemisphere": "north",
     }
@@ -25,23 +25,18 @@ def test_ice_map_once(tmpdir):
     assert len(cube.coord("time").points) == 1
 
 
-def test_ice_map_twice(tmpdir):
+def test_ice_map_twice(tmp_path):
     args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
         "hemisphere": "north",
     }
     ice_map = Si3HemisPointMonthMeanAllMeanMap(args)
-    ice_map.run({})
-    args = {
-        "src": "./tests/testdata/NEMO_output_sivolu-199103.nc",
-        "dst": str(tmpdir) + "/test.nc",
-        "varname": "sivolu",
-        "hemisphere": "north",
-    }
+    ice_map.run(args)
+    args["src"] = "./tests/testdata/NEMO_output_sivolu-199103.nc"
     ice_map = Si3HemisPointMonthMeanAllMeanMap(args)
-    ice_map.run({})
+    ice_map.run(args)
     cube = iris.load_cube(args["dst"])
     assert cube.attributes["map_type"] == "polar ice sheet"
     assert cube.attributes["diagnostic_type"] == "map"
@@ -49,10 +44,10 @@ def test_ice_map_twice(tmpdir):
     assert len(cube.coord("time").points) == 1
 
 
-def test_ice_map_wrong_varname(tmpdir, caplog):
+def test_ice_map_wrong_varname(tmp_path, caplog):
     args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "hemisphere": "north",
         "varname": "tos",
     }
@@ -61,10 +56,10 @@ def test_ice_map_wrong_varname(tmpdir, caplog):
     assert "Invalid varname " in caplog.text
 
 
-def test_ice_map_wrong_hemisphere(tmpdir, caplog):
+def test_ice_map_wrong_hemisphere(tmp_path, caplog):
     args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
         "hemisphere": "east",
     }
