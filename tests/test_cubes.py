@@ -68,3 +68,26 @@ def test_extract_month():
     cube.add_dim_coord(time, 0)
     cube = helpers.cubes.extract_month(cube, 3)
     assert cube.shape == (2,)
+
+
+def test_mask_other_hemisphere():
+    cube = Cube([0])
+    cube.add_dim_coord(DimCoord([0], "latitude"), 0)
+    hemisphere = "foo"
+    pytest.raises(ValueError, helpers.cubes.mask_other_hemisphere, cube, hemisphere)
+
+    src = "./tests/testdata/NEMO_output_sivolu-199003.nc"
+    varname = "sivolu"
+    cube = helpers.cubes.load_input_cube(src, varname)
+
+    out_cube_ref = helpers.cubes.mask_other_hemisphere(cube, "north")
+    hemisphere_vals = ["North", "n", "N"]
+    for hemisphere in hemisphere_vals:
+        out_cube = helpers.cubes.mask_other_hemisphere(cube, hemisphere)
+        assert out_cube == out_cube_ref
+
+    hemisphere_vals = ["south", "South", "s", "S"]
+    out_cube_ref = helpers.cubes.mask_other_hemisphere(cube, "south")
+    for hemisphere in hemisphere_vals:
+        out_cube = helpers.cubes.mask_other_hemisphere(cube, hemisphere)
+        assert out_cube == out_cube_ref
