@@ -1,6 +1,7 @@
 """Tests for Iris cubes helpers"""
 
 import cf_units
+import numpy as np
 import pytest
 from iris.coords import AuxCoord, DimCoord
 from iris.cube import Cube
@@ -91,3 +92,31 @@ def test_mask_other_hemisphere():
     for hemisphere in hemisphere_vals:
         out_cube = helpers.cubes.mask_other_hemisphere(cube, hemisphere)
         assert out_cube == out_cube_ref
+
+
+def test_yearly_time_bounds():
+    cube = Cube([0])
+    points = np.array([cf_units.encode_time(1990, 3, 4, 0, 0, 0)])
+    bounds = np.array(
+        [
+            [
+                cf_units.encode_time(1990, 3, 1, 0, 0, 0),
+                cf_units.encode_time(1990, 4, 1, 0, 0, 0),
+            ],
+        ]
+    )
+    time = DimCoord(
+        points, "time", units="seconds since 1970-01-01 00:00:00", bounds=bounds
+    )
+    cube.add_dim_coord(time, 0)
+    cube = helpers.cubes.yearly_time_bounds(cube)
+    new_bounds = cube.coord("time").bounds
+    yearly_bounds = np.array(
+        [
+            [
+                cf_units.encode_time(1990, 1, 1, 0, 0, 0),
+                cf_units.encode_time(1991, 1, 1, 0, 0, 0),
+            ],
+        ]
+    )
+    assert (new_bounds == yearly_bounds).all()
