@@ -83,8 +83,8 @@ def test_get_loader_extension():
             get_loader(Path(src))
 
 
-def test_get_loader_invalid_diagnostic_type(tmpdir):
-    src = Path(tmpdir) / "test.nc"
+def test_get_loader_invalid_diagnostic_type(tmp_path):
+    src = tmp_path / "test.nc"
     cube = iris.cube.Cube([0], attributes={"diagnostic_type": "invalid"})
     # Iris before 3.3 can't handle pathlib's Path, needs string
     iris.save(cube, str(src))
@@ -93,13 +93,13 @@ def test_get_loader_invalid_diagnostic_type(tmpdir):
         get_loader(src)
 
 
-def test_map_object(tmpdir, monkeypatch):
+def test_map_object(tmp_path, monkeypatch):
     path = "./tests/testdata/tos_nemo_all_mean_map.nc"
 
     def mockreturn(*args, **kwargs):
         return plt.figure()
 
-    map = PresentationObject(tmpdir, path)
+    map = PresentationObject(tmp_path, path)
     assert isinstance(map.loader, MapLoader)
 
     monkeypatch.setattr("helpers.map_type_handling.global_ocean_plot", mockreturn)
@@ -114,13 +114,13 @@ def test_map_object(tmpdir, monkeypatch):
     assert result == expected_result
 
 
-def test_temporalmap_object(tmpdir, monkeypatch):
+def test_temporalmap_object(tmp_path, monkeypatch):
     path = "./tests/testdata/tos_nemo_year_mean_temporalmap.nc"
 
     def mockreturn(*args, **kwargs):
         return plt.figure()
 
-    temporalmap = PresentationObject(tmpdir, path)
+    temporalmap = PresentationObject(tmp_path, path)
     assert isinstance(temporalmap.loader, TemporalmapLoader)
 
     monkeypatch.setattr("helpers.map_type_handling.global_ocean_plot", mockreturn)
@@ -135,31 +135,31 @@ def test_temporalmap_object(tmpdir, monkeypatch):
     assert result == expected_result
 
 
-def test_temporalmap_map_handling_exception(tmpdir):
-    path = Path(tmpdir) / "test.nc"
+def test_temporalmap_map_handling_exception(tmp_path):
+    path = tmp_path / "test.nc"
     cube = iris.load_cube("./tests/testdata/tos_nemo_year_mean_temporalmap.nc")
     cube.attributes["map_type"] = "invalid type"
     # Iris before 3.3 can't handle pathlib's Path, needs string
     iris.save(cube, str(path))
-    temporalmap_object = PresentationObject(tmpdir, path)
+    temporalmap_object = PresentationObject(tmp_path, path)
     with pytest.raises(InvalidMapTypeException):
         temporalmap_object.create_dict()
 
 
-def test_map_map_handling_exception(tmpdir):
-    path = str(tmpdir) + "test.nc"
+def test_map_map_handling_exception(tmp_path):
+    path = tmp_path / "test.nc"
     cube = iris.load_cube("./tests/testdata/tos_nemo_all_mean_map.nc")
     cube.attributes["map_type"] = "invalid type"
     iris.save(cube, path)
-    map_object = PresentationObject(tmpdir, path)
+    map_object = PresentationObject(tmp_path, path)
     with pytest.raises(InvalidMapTypeException):
         map_object.create_dict()
 
 
-def test_timeseries_object(tmpdir):
+def test_timeseries_object(tmp_path):
     path = "./tests/testdata/tos_nemo_global_mean_year_mean_timeseries.nc"
     cube = iris.load_cube(path)
-    timeseries_object = PresentationObject(tmpdir, path)
+    timeseries_object = PresentationObject(tmp_path, path)
     assert isinstance(timeseries_object.loader, TimeseriesLoader)
     result = timeseries_object.create_dict()
     expected_result = {
@@ -179,8 +179,8 @@ def test_scalar_object_not_found():
             ScalarLoader(sdiag_file).load()
 
 
-def test_scalar_object_created(tmpdir):
-    sdiag_file = tmpdir / "test.yml"
+def test_scalar_object_created(tmp_path):
+    sdiag_file = tmp_path / "test.yml"
     sdiag = {"foo": "bar", "eggs": "ham"}
     with open(sdiag_file, "w") as file:
         yaml.dump(sdiag, file)

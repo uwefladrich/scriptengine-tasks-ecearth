@@ -1,5 +1,7 @@
 """Tests for monitoring/temporalmap.py"""
 
+from pathlib import Path
+
 import pytest
 import scriptengine.exceptions
 
@@ -11,7 +13,7 @@ def test_temporalmap_dst_error():
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
         temporalmap.check_file_extension,
-        "test.yml",
+        Path("test.yml"),
     )
 
 

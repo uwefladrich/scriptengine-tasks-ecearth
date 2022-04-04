@@ -10,20 +10,20 @@ from monitoring.si3_hemis_sum_month_mean_timeseries import (
 )
 
 
-def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
+def test_si3_hemis_sum_month_mean_timeseries_working(tmp_path):
     init = {
         "src": [
             "./tests/testdata/NEMO_output_sivolu-199003.nc",
             "./tests/testdata/NEMO_output_sivolu-199009.nc",
         ],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "domain": "./tests/testdata/domain_cfg_example.nc",
         "varname": "sivolu",
         "hemisphere": "north",
     }
     ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
     ice_time_series.run(init)
-    cube = iris.load_cube(str(tmpdir) + "/test.nc")
+    cube = iris.load_cube(init["dst"])
     assert cube.name() == "sea_ice_volume"
     assert cube.attributes["title"] is not None
     assert cube.attributes["comment"] is not None
@@ -34,10 +34,10 @@ def test_si3_hemis_sum_month_mean_timeseries_working(tmpdir):
     )
 
 
-def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmpdir):
+def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmp_path):
     init = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "domain": "./tests/testdata/domain_cfg_example.nc",
         "varname": "tos",
         "hemisphere": "south",
@@ -54,10 +54,10 @@ def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmpdir):
     )
 
 
-def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmpdir):
+def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmp_path):
     init = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "domain": "./tests/testdata/domain_cfg_example.nc",
         "varname": "sivolu",
         "hemisphere": "east",

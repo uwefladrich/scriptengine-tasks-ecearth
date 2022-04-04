@@ -1,6 +1,7 @@
 """Processing Task that creates a 2D time map of sea ice concentration."""
 
 import datetime
+from pathlib import Path
 
 import cftime
 import iris
@@ -41,7 +42,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
     @timed_runner
     def run(self, context):
         src = self.getarg("src", context)
-        dst = self.getarg("dst", context)
+        dst = Path(self.getarg("dst", context))
         hemisphere = self.getarg("hemisphere", context)
         varname = self.getarg("varname", context)
 

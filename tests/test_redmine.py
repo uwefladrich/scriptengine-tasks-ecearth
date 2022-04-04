@@ -11,27 +11,27 @@ import scriptengine.exceptions
 from monitoring.redmine import Redmine
 
 
-def test_redmine_presentation_list(tmpdir):
+def test_redmine_presentation_list(tmp_path):
     init = {
-        "src": str(tmpdir),
-        "local_dst": str(tmpdir),
-        "template": str(tmpdir) + "/redmine_template.txt.j2",
+        "src": str(tmp_path),
+        "local_dst": str(tmp_path),
+        "template": str(tmp_path / "redmine_template.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
     redmine_task = Redmine(init)
     test_sources = ["path.txt", {"path": "path.txt"}, "path.yml"]
     with patch.object(redmine_task, "log_warning") as mock:
-        result = redmine_task.get_presentation_list(test_sources, str(tmpdir))
+        result = redmine_task.get_presentation_list(test_sources, str(tmp_path))
     mock.assert_called_with("Can not present diagnostic: File not found: path.yml")
     assert result == []
 
 
-def test_redmine_connection_error(tmpdir):
+def test_redmine_connection_error(tmp_path):
     init = {
-        "src": str(tmpdir),
-        "local_dst": str(tmpdir),
-        "template": str(tmpdir) + "/redmine_template.txt.j2",
+        "src": str(tmp_path),
+        "local_dst": str(tmp_path),
+        "template": str(tmp_path / "redmine_template.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
@@ -45,11 +45,11 @@ def test_redmine_connection_error(tmpdir):
     )
 
 
-def test_redmine_auth_error(tmpdir):
+def test_redmine_auth_error(tmp_path):
     init = {
-        "src": str(tmpdir),
-        "local_dst": str(tmpdir),
-        "template": str(tmpdir) + "/redmine_template.txt.j2",
+        "src": str(tmp_path),
+        "local_dst": str(tmp_path),
+        "template": str(tmp_path / "redmine_template.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
@@ -63,11 +63,11 @@ def test_redmine_auth_error(tmpdir):
     )
 
 
-def test_redmine_get_template(tmpdir):
+def test_redmine_get_template(tmp_path):
     init = {
-        "src": str(tmpdir),
-        "local_dst": str(tmpdir),
-        "template": str(tmpdir) + "/template.txt.j2",
+        "src": str(tmp_path),
+        "local_dst": str(tmp_path),
+        "template": str(tmp_path / "template.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
@@ -87,11 +87,11 @@ class MockTemplateOrIssue:
         return None
 
 
-def test_redmine_run(tmpdir):
+def test_redmine_run(tmp_path):
     init = {
-        "src": str(tmpdir),
-        "local_dst": str(tmpdir),
-        "template": str(tmpdir) + "/template.txt.j2",
+        "src": str(tmp_path),
+        "local_dst": str(tmp_path),
+        "template": str(tmp_path / "template.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }

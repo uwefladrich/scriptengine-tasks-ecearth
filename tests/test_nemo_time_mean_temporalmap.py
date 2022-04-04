@@ -10,13 +10,13 @@ from monitoring.nemo_time_mean_temporalmap import (
 )
 
 
-def test_nemo_time_mean_temporalmap_base(tmpdir):
+def test_nemo_time_mean_temporalmap_base(tmp_path):
     init = {
         "src": [
             "./tests/testdata/NEMO_output_sivolu-199003.nc",
             "./tests/testdata/NEMO_output_sivolu-199009.nc",
         ],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
     }
     ocean_time_map = NemoTimeMeanTemporalmap(init)
@@ -24,13 +24,13 @@ def test_nemo_time_mean_temporalmap_base(tmpdir):
         ocean_time_map.run(init)
 
 
-def test_nemo_year_mean_temporalmap_once(tmpdir):
+def test_nemo_year_mean_temporalmap_once(tmp_path):
     init = {
         "src": [
             "./tests/testdata/NEMO_output_sivolu-199003.nc",
             "./tests/testdata/NEMO_output_sivolu-199009.nc",
         ],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
     }
     ocean_time_map = NemoYearMeanTemporalmap(init)
@@ -41,34 +41,30 @@ def test_nemo_year_mean_temporalmap_once(tmpdir):
     assert cube.data.shape[0] == 1
 
 
-def test_nemo_year_mean_temporalmap_twice(tmpdir):
-    init_a = {
+def test_nemo_year_mean_temporalmap_twice(tmp_path):
+    init = {
         "src": ["./tests/testdata/NEMO_output_sivolu-199003.nc"],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
     }
-    ocean_time_map = NemoYearMeanTemporalmap(init_a)
-    ocean_time_map.run(init_a)
-    init_b = {
-        "src": ["./tests/testdata/NEMO_output_sivolu-199009.nc"],
-        "dst": str(tmpdir) + "/test.nc",
-        "varname": "sivolu",
-    }
-    ocean_time_map = NemoYearMeanTemporalmap(init_b)
-    ocean_time_map.run(init_b)
-    cube = iris.load_cube(init_b["dst"])
+    ocean_time_map = NemoYearMeanTemporalmap(init)
+    ocean_time_map.run(init)
+    init["src"] = ["./tests/testdata/NEMO_output_sivolu-199009.nc"]
+    ocean_time_map = NemoYearMeanTemporalmap(init)
+    ocean_time_map.run(init)
+    cube = iris.load_cube(init["dst"])
     assert cube.attributes["map_type"] == "global ocean"
     assert cube.attributes["diagnostic_type"] == "temporal map"
     assert cube.data.shape[0] == 2
 
 
-def test_nemo_month_mean_temporalmap_once(tmpdir):
+def test_nemo_month_mean_temporalmap_once(tmp_path):
     init = {
         "src": [
             "./tests/testdata/NEMO_output_sivolu-199003.nc",
             "./tests/testdata/NEMO_output_sivolu-199009.nc",
         ],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
     }
     ocean_time_map = NemoMonthMeanTemporalmap(init)
@@ -79,22 +75,18 @@ def test_nemo_month_mean_temporalmap_once(tmpdir):
     assert cube.data.shape[0] == len(init["src"])
 
 
-def test_nemo_month_mean_temporalmap_twice(tmpdir):
-    init_a = {
+def test_nemo_month_mean_temporalmap_twice(tmp_path):
+    init = {
         "src": ["./tests/testdata/NEMO_output_sivolu-199003.nc"],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
     }
-    ocean_time_map = NemoMonthMeanTemporalmap(init_a)
-    ocean_time_map.run(init_a)
-    init_b = {
-        "src": ["./tests/testdata/NEMO_output_sivolu-199009.nc"],
-        "dst": str(tmpdir) + "/test.nc",
-        "varname": "sivolu",
-    }
-    ocean_time_map = NemoMonthMeanTemporalmap(init_b)
-    ocean_time_map.run(init_b)
-    cube = iris.load_cube(init_b["dst"])
+    ocean_time_map = NemoMonthMeanTemporalmap(init)
+    ocean_time_map.run(init)
+    init["src"] = ["./tests/testdata/NEMO_output_sivolu-199009.nc"]
+    ocean_time_map = NemoMonthMeanTemporalmap(init)
+    ocean_time_map.run(init)
+    cube = iris.load_cube(init["dst"])
     assert cube.attributes["map_type"] == "global ocean"
     assert cube.attributes["diagnostic_type"] == "temporal map"
-    assert cube.data.shape[0] == len(init_a["src"]) + len(init_b["src"])
+    assert cube.data.shape[0] == 2
