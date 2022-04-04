@@ -121,7 +121,8 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
 
         metadata = {
             "comment": (
-                f"Area weighted sum of {long_name} / **{varname}** on the {hemisphere}ern hemisphere."
+                f"Product of {long_name} / **{varname}** and grid-cell area, "
+                f"summed over all grid cells of the {hemisphere}ern hemisphere."
             ),
             "title": f"{long_name} ({helpers.dates.month_name(month)} mean on the {hemisphere}ern hemisphere)",
         }
