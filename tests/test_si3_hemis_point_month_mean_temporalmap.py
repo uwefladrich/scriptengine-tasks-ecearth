@@ -57,6 +57,7 @@ def test_si3_hemis_point_month_mean_temporalmap_wrong_hemisphere(tmp_path, caplo
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
+        "hemisphere": "foo",
     }
     ice_time_map = Si3HemisPointMonthMeanTemporalmap(args)
     ice_time_map.run({})
