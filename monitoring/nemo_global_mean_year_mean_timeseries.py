@@ -1,7 +1,7 @@
 """Processing Task that calculates the yearly global average of a given extensive quantity."""
 
-from pathlib import Path
 import warnings
+from pathlib import Path
 
 import iris
 from scriptengine.tasks.core import timed_runner

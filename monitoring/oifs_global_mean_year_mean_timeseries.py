@@ -1,7 +1,7 @@
 """Processing Task that creates a 2D map of a given extensive ocean quantity."""
 
-from pathlib import Path
 import warnings
+from pathlib import Path
 
 import iris
 import numpy as np

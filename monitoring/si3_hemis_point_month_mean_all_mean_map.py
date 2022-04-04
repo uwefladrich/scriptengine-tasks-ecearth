@@ -86,7 +86,7 @@ class Si3HemisPointMonthMeanAllMeanMap(Map):
                 )
             )
             return
-        if not hemisphere in ("north", "south"):
+        if hemisphere not in ("north", "south"):
             self.log_warning(
                 (
                     f"Invalid hemisphere '{hemisphere}', must be 'north' or 'south'; "
