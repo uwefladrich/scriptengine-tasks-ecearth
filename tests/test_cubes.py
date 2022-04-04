@@ -86,7 +86,7 @@ def test_mask_other_hemisphere():
         out_cube = helpers.cubes.mask_other_hemisphere(cube, hemisphere)
         assert out_cube == out_cube_ref
 
-    hemisphere_vals = ["south", "South", "s", "S"]
+    hemisphere_vals = ["South", "s", "S"]
     out_cube_ref = helpers.cubes.mask_other_hemisphere(cube, "south")
     for hemisphere in hemisphere_vals:
         out_cube = helpers.cubes.mask_other_hemisphere(cube, hemisphere)
