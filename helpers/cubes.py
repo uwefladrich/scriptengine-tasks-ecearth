@@ -7,6 +7,7 @@ import numpy as np
 from iris.util import equalise_attributes
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 
+from helpers.dates import month_number
 from helpers.nemo import remove_unique_attributes
 
 
@@ -63,3 +64,54 @@ def compute_time_weights(monthly_data_cube, cube_shape=None):
             [time_weight * weight_shape for time_weight in month_weights]
         )
     return month_weights
+
+
+def extract_month(cube, month):
+    return cube.extract(
+        iris.Constraint(time=lambda cell: cell.point.month == month_number(month))
+    )
+
+
+def remove_aux_time(cube):
+    try:
+        aux_time = cube.coord("time", dim_coords=False)
+    except iris.exceptions.CoordinateNotFoundError:
+        pass
+    else:
+        cube.remove_coord(aux_time)
+    return cube
+
+
+def yearly_time_bounds(cube):
+
+    t_coord = cube.coord("time")
+    cube.remove_coord("time")
+
+    t_point = t_coord.units.num2date(t_coord.points[0])
+    t_first, t_last = (
+        t_coord.units.date2num(t_point.replace(month=1, day=1)),
+        t_coord.units.date2num(t_point.replace(year=t_point.year + 1, month=1, day=1)),
+    )
+    cube.add_aux_coord(
+        iris.coords.DimCoord(
+            t_coord.points,
+            bounds=np.array([[t_first, t_last]]),
+            standard_name=t_coord.standard_name,
+            long_name=t_coord.long_name,
+            units=t_coord.units,
+            var_name=t_coord.var_name,
+            attributes=t_coord.attributes,
+        )
+    )
+    return iris.util.new_axis(cube, "time")
+
+
+def mask_other_hemisphere(cube, hemisphere):
+    lats = np.broadcast_to(cube.coord("latitude").points, cube.shape)
+    if hemisphere.lower() in ("south", "s"):
+        cube.data = np.ma.masked_where(lats > 0, cube.data)
+    elif hemisphere.lower() in ("north", "n"):
+        cube.data = np.ma.masked_where(lats < 0, cube.data)
+    else:
+        raise ValueError("Invalid hemisphere, must be 'north' or 'south'")
+    return cube

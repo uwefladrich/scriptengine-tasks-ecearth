@@ -1,17 +1,16 @@
 """Tests for monitoring/si3_hemis_sum_month_mean_timeseries.py"""
 
-from unittest.mock import patch
-
 import iris
+from iris.cube import Cube
 
 from monitoring.si3_hemis_sum_month_mean_timeseries import (
     Si3HemisSumMonthMeanTimeseries,
-    meta_dict,
+    _set_cell_methods,
 )
 
 
 def test_si3_hemis_sum_month_mean_timeseries_working(tmp_path):
-    init = {
+    args = {
         "src": [
             "./tests/testdata/NEMO_output_sivolu-199003.nc",
             "./tests/testdata/NEMO_output_sivolu-199009.nc",
@@ -20,10 +19,11 @@ def test_si3_hemis_sum_month_mean_timeseries_working(tmp_path):
         "domain": "./tests/testdata/domain_cfg_example.nc",
         "varname": "sivolu",
         "hemisphere": "north",
+        "month": 3,
     }
-    ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
-    ice_time_series.run(init)
-    cube = iris.load_cube(init["dst"])
+    ice_time_series = Si3HemisSumMonthMeanTimeseries(args)
+    ice_time_series.run(args)
+    cube = iris.load_cube(args["dst"])
     assert cube.name() == "sea_ice_volume"
     assert cube.attributes["title"] is not None
     assert cube.attributes["comment"] is not None
@@ -34,41 +34,36 @@ def test_si3_hemis_sum_month_mean_timeseries_working(tmp_path):
     )
 
 
-def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmp_path):
-    init = {
+def test_si3_hemis_sum_month_mean_timeseries_wrong_varname(tmp_path, caplog):
+    args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmp_path / "test.nc"),
         "domain": "./tests/testdata/domain_cfg_example.nc",
-        "varname": "tos",
+        "varname": "foo",
         "hemisphere": "south",
+        "month": 3,
     }
-    ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
-    ice_time_series.run(init)
-    with patch.object(ice_time_series, "log_warning") as mock:
-        ice_time_series.run(init)
-    mock.assert_called_with(
-        (
-            f"'varname' must be one of the following: {meta_dict.keys()} "
-            f"Diagnostic will not be treated, returning now."
-        )
-    )
+    ice_time_series = Si3HemisSumMonthMeanTimeseries(args)
+    ice_time_series.run({})
+    assert "Invalid varname " in caplog.text
 
 
-def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmp_path):
-    init = {
+def test_si3_hemis_sum_month_mean_timeseries_wrong_hemisphere(tmp_path, caplog):
+    args = {
         "src": "./tests/testdata/NEMO_output_sivolu-199003.nc",
         "dst": str(tmp_path / "test.nc"),
         "domain": "./tests/testdata/domain_cfg_example.nc",
         "varname": "sivolu",
-        "hemisphere": "east",
+        "hemisphere": "foo",
+        "month": 3,
     }
-    ice_time_series = Si3HemisSumMonthMeanTimeseries(init)
-    ice_time_series.run(init)
-    with patch.object(ice_time_series, "log_warning") as mock:
-        ice_time_series.run(init)
-    mock.assert_called_with(
-        (
-            f"'hemisphere' must be 'north' or 'south' but is '{init['hemisphere']}'."
-            f"Diagnostic will not be treated, returning now."
-        )
-    )
+    ice_time_series = Si3HemisSumMonthMeanTimeseries(args)
+    ice_time_series.run({})
+    assert "Invalid hemisphere " in caplog.text
+
+
+def test_set_cell_methods():
+    cube = Cube([])
+    assert cube.cell_methods == ()
+    cube = _set_cell_methods(cube, "north")
+    assert cube.cell_methods != ()

@@ -157,7 +157,7 @@ def test_map_map_handling_exception(tmp_path):
 
 
 def test_timeseries_object(tmp_path):
-    path = "./tests/testdata/tos_nemo_global_mean_year_mean_timeseries.nc"
+    path = "tests/testdata/tos_nemo_global_mean_year_mean_timeseries.nc"
     cube = iris.load_cube(path)
     timeseries_object = PresentationObject(tmp_path, path)
     assert isinstance(timeseries_object.loader, TimeseriesLoader)
