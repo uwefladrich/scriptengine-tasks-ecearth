@@ -42,7 +42,7 @@ setuptools.setup(
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=[
         "scriptengine>=0.8.1",
         "pyYAML>=5.1",
@@ -50,7 +50,7 @@ setuptools.setup(
         "numpy>=1.18",
         "imageio>=2.0",
         "scitools-iris>=3.1,!=3.2.0,!=3.2.0.post0",
-        "cartopy>=0.18",
+        "cartopy>=0.20",
         "python-redmine",
     ],
     entry_points={
