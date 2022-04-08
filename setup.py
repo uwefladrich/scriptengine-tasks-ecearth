@@ -50,7 +50,7 @@ setuptools.setup(
         "numpy>=1.18",
         "imageio>=2.0",
         "scitools-iris>=3.1,!=3.2.0,!=3.2.0.post0",
-        "cartopy>=0.20",
+        "cartopy>=0.18",
         "python-redmine",
     ],
     entry_points={
