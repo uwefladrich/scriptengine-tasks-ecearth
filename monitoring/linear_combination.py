@@ -18,6 +18,10 @@ class LinearCombination(Task):
         "dst",
     )
 
+    def __init__(self, arguments):
+        LinearCombination.check_arguments(arguments)
+        super().__init__(arguments)
+
     @timed_runner
     def run(self, context):
         self.log_info("Create new netCDF file from linear combination of inputs")
