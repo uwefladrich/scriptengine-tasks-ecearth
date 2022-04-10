@@ -55,7 +55,7 @@ class LinearCombination(Task):
             summand = helpers.cubes.remove_aux_time(summand)
 
             try:
-                scaled_summand = factor*summand
+                scaled_summand = factor * summand
             except Exception as e:
                 self.log_error(f"Error scaling '{summand.name()}': {e}")
                 raise ScriptEngineTaskRunError
