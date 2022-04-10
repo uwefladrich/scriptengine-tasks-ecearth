@@ -7,15 +7,15 @@ import scriptengine.exceptions
 from monitoring.oifs_all_mean_map import OifsAllMeanMap
 
 
-def test_oifs_all_mean_map_working(tmpdir):
+def test_oifs_all_mean_map_working(tmp_path):
     init = {
         "src": ["./tests/testdata/TES1_atm_1m_1990_2t.nc"],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "2t",
     }
     atmo_map = OifsAllMeanMap(init)
     atmo_map.run(init)
-    cube = iris.load_cube(str(tmpdir) + "/test.nc")
+    cube = iris.load_cube(init["dst"])
     assert cube.name() == "2 metre temperature"
     assert cube.attributes["title"] is not None
     assert cube.attributes["comment"] is not None
@@ -25,10 +25,10 @@ def test_oifs_all_mean_map_working(tmpdir):
     assert len(cube.coord("time").points) == 1
 
 
-def test_oifs_all_mean_map_wrong_code(tmpdir):
+def test_oifs_all_mean_map_wrong_code(tmp_path):
     init = {
         "src": ["./tests/testdata/TES1_atm_1m_1990_2t.nc"],
-        "dst": str(tmpdir) + "/test.nc",
+        "dst": str(tmp_path / "test.nc"),
         "varname": "sivolu",
     }
     atmo_map = OifsAllMeanMap(init)

@@ -62,23 +62,23 @@ expected_result = [
 @pytest.mark.parametrize(
     "init, context, expected_result", zip(init, context, expected_result)
 )
-def test_scalar_working(tmpdir, init, context, expected_result):
-    path = str(tmpdir + "/test.yml")
-    init["dst"] = path
+def test_scalar_working(tmp_path, init, context, expected_result):
+    path = tmp_path / "test.yml"
+    init["dst"] = str(path)
     context["dst"] = path
     scalar = Scalar(init)
     scalar.run(context)
-    with open(path) as file:
+    with path.open() as file:
         result = yaml.load(file, Loader=yaml.FullLoader)
     assert expected_result == result
 
 
-def test_scalar_runtime_error(tmpdir):
-    path = str(tmpdir + "/test.yml")
+def test_scalar_runtime_error(tmp_path):
+    path = tmp_path / "test.yml"
     init = {
         "title": "Title",
         "comment": "Comment",
-        "dst": path,
+        "dst": str(path),
     }
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskArgumentMissingError,
@@ -87,13 +87,13 @@ def test_scalar_runtime_error(tmpdir):
     )
 
 
-def test_scalar_extension_error(tmpdir):
-    path = str(tmpdir + "/test.nc")
+def test_scalar_extension_error(tmp_path):
+    path = tmp_path / "test.nc"
     init = {
         "title": "Title",
         "comment": "Comment",
         "value": "Value",
-        "dst": path,
+        "dst": str(path),
     }
     context = init
     scalar = Scalar(init)

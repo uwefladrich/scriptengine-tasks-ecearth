@@ -1,6 +1,7 @@
 """Processing Task that calculates the yearly global average of a given extensive quantity."""
 
 import warnings
+from pathlib import Path
 
 import iris
 from scriptengine.tasks.core import timed_runner
@@ -31,7 +32,7 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
     def run(self, context):
 
         src = self.getarg("src", context)
-        dst = self.getarg("dst", context)
+        dst = Path(self.getarg("dst", context))
         var_name = self.getarg("varname", context)
         domain = self.getarg("domain", context)
         grid = self.getarg("grid", context, default="T")

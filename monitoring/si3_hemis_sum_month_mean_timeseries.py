@@ -1,18 +1,19 @@
 """Processing Task that calculates the seasonal cycle of sea ice variables in one leg."""
 
 import warnings
+from pathlib import Path
 
 import cf_units
 import iris
-import numpy as np
 from scriptengine.tasks.core import timed_runner
 
 import helpers.cubes
+import helpers.dates
 import helpers.nemo
 
 from .timeseries import Timeseries
 
-meta_dict = {
+_meta_dict = {
     "sivolu": {
         "long_name": "Sea-Ice Volume",
         "standard_name": "sea_ice_volume",
@@ -30,15 +31,26 @@ meta_dict = {
 }
 
 
+def _set_cell_methods(cube, hemisphere):
+    cube.cell_methods = (
+        iris.coords.CellMethod("point", coords="time"),
+        iris.coords.CellMethod(
+            "sum", coords="area", intervals=f"{hemisphere}ern hemisphere"
+        ),
+    )
+    return cube
+
+
 class Si3HemisSumMonthMeanTimeseries(Timeseries):
     """Si3HemisSumMonthMeanTimeseries Processing Task"""
 
     _required_arguments = (
         "src",
+        "dst",
         "domain",
         "hemisphere",
         "varname",
-        "dst",
+        "month",
     )
 
     def __init__(self, arguments):
@@ -49,46 +61,43 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
 
     @timed_runner
     def run(self, context):
-        dst = self.getarg("dst", context)
+        src = self.getarg("src", context)
+        dst = Path(self.getarg("dst", context))
         varname = self.getarg("varname", context)
         hemisphere = self.getarg("hemisphere", context)
+        month = self.getarg("month", context)
+        domain = self.getarg("domain", context)
 
-        self.log_info(
-            f"Create {varname} time series for {hemisphere}ern hemisphere at {dst}."
-        )
+        self.log_info(f"Timeseries for {varname} ({hemisphere}ern hemisphere): {dst}")
+        self.log_debug(f"Source file(s): {src}; domain file: {domain}")
 
-        if varname not in meta_dict:
+        try:
+            long_name = _meta_dict[varname]["long_name"]
+        except KeyError:
             self.log_warning(
                 (
-                    f"'varname' must be one of the following: {meta_dict.keys()} "
-                    "Diagnostic will not be treated, returning now."
+                    f"Invalid varname '{varname}', must be one of {_meta_dict.keys()}; "
+                    "diagnostic will not be ignored."
                 )
             )
             return
-        long_name = meta_dict[varname]["long_name"]
 
-        src = self.getarg("src", context)
-        domain = self.getarg("domain", context)
-
-        self.log_debug(f"Domain: {domain}, Source file(s): {src}")
-
-        if not hemisphere in ("north", "south"):
+        if hemisphere not in ("north", "south"):
             self.log_warning(
                 (
-                    f"'hemisphere' must be 'north' or 'south' but is '{hemisphere}'."
-                    "Diagnostic will not be treated, returning now."
+                    f"Invalid hemisphere '{hemisphere}', must be 'north' or 'south'; "
+                    "diagnostic will not be ignored."
                 )
             )
             return
         self.check_file_extension(dst)
 
-        leg_cube = helpers.cubes.load_input_cube(src, varname)
-        cell_weights = helpers.nemo.spatial_weights(leg_cube, domain, "t")
-        latitudes = np.broadcast_to(leg_cube.coord("latitude").points, leg_cube.shape)
-        if hemisphere == "north":
-            leg_cube.data = np.ma.masked_where(latitudes < 0, leg_cube.data)
-        else:
-            leg_cube.data = np.ma.masked_where(latitudes > 0, leg_cube.data)
+        this_leg = helpers.cubes.load_input_cube(src, varname)
+        this_leg = helpers.cubes.remove_aux_time(this_leg)
+        this_leg = helpers.cubes.extract_month(this_leg, month)
+        this_leg = helpers.cubes.mask_other_hemisphere(this_leg, hemisphere)
+        this_leg = helpers.cubes.yearly_time_bounds(this_leg)
+
         with warnings.catch_warnings():
             # Suppress warning about insufficient metadata.
             warnings.filterwarnings(
@@ -96,37 +105,27 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
                 "Collapsing a multi-dimensional coordinate.",
                 UserWarning,
             )
-            hemispheric_sum = leg_cube.collapsed(
+            this_leg_summed = this_leg.collapsed(
                 ["latitude", "longitude"],
                 iris.analysis.SUM,
-                weights=cell_weights,
+                weights=helpers.nemo.spatial_weights(this_leg, domain, "T"),
             )
 
-        # Remove auxiliary time coordinate
-        hemispheric_sum.remove_coord(hemispheric_sum.coord("time", dim_coords=False))
-        hemispheric_sum.standard_name = meta_dict[varname]["standard_name"]
-        hemispheric_sum.units = cf_units.Unit(meta_dict[varname]["old_unit"])
-        hemispheric_sum.convert_units(meta_dict[varname]["new_unit"])
-        hemispheric_sum.long_name = f"{long_name} {hemisphere.capitalize()}"
-        hemispheric_sum.var_name = meta_dict[varname]["var_name"] + hemisphere[0]
+        this_leg_summed.standard_name = _meta_dict[varname]["standard_name"]
+        this_leg_summed.units = cf_units.Unit(_meta_dict[varname]["old_unit"])
+        this_leg_summed.convert_units(_meta_dict[varname]["new_unit"])
+        this_leg_summed.long_name = (
+            f"{long_name} {helpers.dates.month_name(month)} {hemisphere.capitalize()}"
+        )
+        this_leg_summed.var_name = _meta_dict[varname]["var_name"] + hemisphere[0]
 
         metadata = {
             "comment": (
-                f"Sum of {long_name} / **{varname}** on {hemisphere}ern hemisphere."
+                f"Product of {long_name} / **{varname}** and grid-cell area, "
+                f"summed over all grid cells of the {hemisphere}ern hemisphere."
             ),
-            "title": f"{long_name} (Seasonal Cycle)",
+            "title": f"{long_name} ({helpers.dates.month_name(month)} mean on the {hemisphere}ern hemisphere)",
         }
-        hemispheric_sum = helpers.cubes.set_metadata(hemispheric_sum, **metadata)
-        hemispheric_sum = self.set_cell_methods(hemispheric_sum, hemisphere)
-        self.save(hemispheric_sum, dst)
-
-    def set_cell_methods(self, cube, hemisphere):
-        """Set the correct cell methods."""
-        cube.cell_methods = ()
-        cube.add_cell_method(iris.coords.CellMethod("point", coords="time"))
-        cube.add_cell_method(
-            iris.coords.CellMethod(
-                "sum", coords="area", intervals=f"{hemisphere}ern hemisphere"
-            )
-        )
-        return cube
+        this_leg_summed = helpers.cubes.set_metadata(this_leg_summed, **metadata)
+        this_leg_summed = _set_cell_methods(this_leg_summed, hemisphere)
+        self.save(this_leg_summed, dst)

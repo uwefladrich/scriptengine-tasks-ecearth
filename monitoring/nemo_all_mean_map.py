@@ -1,4 +1,5 @@
 """Processing Task that creates a 2D map of a given extensive ocean quantity."""
+from pathlib import Path
 
 import iris
 from scriptengine.tasks.core import timed_runner
@@ -24,7 +25,7 @@ class NemoAllMeanMap(Map):
     @timed_runner
     def run(self, context):
         src = self.getarg("src", context)
-        dst = self.getarg("dst", context)
+        dst = Path(self.getarg("dst", context))
         varname = self.getarg("varname", context)
         self.log_info(f"Create map for ocean variable {varname} at {dst}.")
         self.log_debug(f"Source file(s): {src}")

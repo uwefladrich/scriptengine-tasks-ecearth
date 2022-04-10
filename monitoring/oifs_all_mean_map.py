@@ -1,7 +1,7 @@
 """Processing Task that creates a 2D map of a given extensive atmosphere quantity."""
+from pathlib import Path
 
 import iris
-from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.core import timed_runner
 
 import helpers.cubes
@@ -25,9 +25,9 @@ class OifsAllMeanMap(Map):
     @timed_runner
     def run(self, context):
         src = self.getarg("src", context)
-        dst = self.getarg("dst", context)
+        dst = Path(self.getarg("dst", context))
         varname = self.getarg("varname", context)
-        self.log_info(f"Create map for atmosphere variable {varname} at {dst}.")
+        self.log_info(f"Create map for atmosphere variable {varname} at '{dst}'.")
         self.log_debug(f"Source file: {src}")
 
         self.check_file_extension(dst)
@@ -46,7 +46,7 @@ class OifsAllMeanMap(Map):
         # Remove auxiliary time coordinate before collapsing cube
         try:
             output_cube.coord("time")
-        except iris.exceptions.CoordinateNotFoundError as e:
+        except iris.exceptions.CoordinateNotFoundError:
             output_cube.remove_coord(output_cube.coord("time", dim_coords=False))
         time_mean_cube = output_cube.collapsed(
             "time",

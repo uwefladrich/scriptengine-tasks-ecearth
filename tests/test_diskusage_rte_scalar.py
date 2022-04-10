@@ -52,11 +52,11 @@ def test_not_a_directory(tmpdir):
     assert expected_result["value"] == result["value"]
 
 
-def test_non_existent_directory(tmpdir):
+def test_non_existent_directory(tmp_path):
     """test with erroneous input: directory does not exist"""
     init = {
-        "src": str(tmpdir) + "/non-existent",
-        "dst": str(tmpdir) + ".yml",
+        "src": str(tmp_path / "non-existent"),
+        "dst": str(tmp_path / "out.yml"),
     }
     context = init
     disk_usage = DiskusageRteScalar(init)
@@ -76,9 +76,9 @@ def test_non_existent_directory(tmpdir):
     assert expected_result["value"] == result["value"]
 
 
-def test_permission_error(tmpdir):
+def test_permission_error(tmp_path):
     """test with erroneous input: permission error"""
-    path = str(tmpdir) + "/test.yml"
+    path = tmp_path / "test.yml"
     forbidden = "/root"
     init = {
         "src": forbidden,

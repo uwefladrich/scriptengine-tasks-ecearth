@@ -1,4 +1,5 @@
-[![Coverage Status](https://coveralls.io/repos/github/valentinaschueller/scriptengine-tasks-ecearth/badge.svg?branch=master)](https://coveralls.io/github/valentinaschueller/scriptengine-tasks-ecearth?branch=master)
+![Tests](https://github.com/uwefladrich/scriptengine-tasks-ecearth/actions/workflows/pytest.yml/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/uwefladrich/scriptengine-tasks-ecearth/badge.svg)](https://coveralls.io/github/uwefladrich/scriptengine-tasks-ecearth)
 
 # ScriptEngine Tasks for EC-Earth
 

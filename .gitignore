@@ -115,3 +115,4 @@ dmypy.json
 # Custom Additions
 tests/testdata
 *.nc
+.vscode/
