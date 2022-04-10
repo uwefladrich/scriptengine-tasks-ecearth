@@ -59,7 +59,10 @@ class LinearCombination(Task):
             except Exception as e:
                 self.log_error(f"Error scaling '{summand.name()}': {e}")
                 raise ScriptEngineTaskRunError
-            scaled_summand.convert_units(summand.units)
+            try:
+                scaled_summand.convert_units(summand.units)
+            except iris.exceptions.UnitConversionError as e:
+                self.log_warning(f"Unit conversion issue: {e}")
             try:
                 result += scaled_summand
             except Exception as e:
