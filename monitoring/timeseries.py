@@ -105,7 +105,7 @@ class Timeseries(Task):
             cube_list = iris.cube.CubeList([current_cube, new_cube])
             merged_cube = cube_list.concatenate_cube()
 
-            dst_copy = dst.with_stem(f"{dst.stem}_copy")
+            dst_copy = dst.with_name(f"{dst.stem}_copy{dst.suffix}")
             iris.save(merged_cube, str(dst_copy))
 
         dst.unlink()
