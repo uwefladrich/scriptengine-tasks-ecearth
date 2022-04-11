@@ -45,7 +45,7 @@ class Map(Task):
             merged_cube = cube_list.merge_cube()
             simulation_avg = self.compute_simulation_avg(merged_cube)
 
-            dst_copy = dst.with_stem(f"{dst.stem}_copy")
+            dst_copy = dst.with_name(f"{dst.stem}_copy{dst.suffix}")
             iris.save(simulation_avg, str(dst_copy))
 
         dst.unlink()
