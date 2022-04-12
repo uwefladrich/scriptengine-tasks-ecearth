@@ -1,6 +1,7 @@
 name: PyTest
 on: 
-  schedule: '0 8 * * *'
+  schedule: 
+    - cron: '0 8 * * *'
   push:
 
 env:
