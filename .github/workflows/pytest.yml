@@ -1,5 +1,7 @@
 name: PyTest
-on: push
+on: 
+  schedule: '0 8 * * *'
+  push:
 
 env:
   TEST_DATA_REF: "https://github.com/valentinaschueller/ece-4-monitoring-test-data/archive/refs/heads/main.zip"
