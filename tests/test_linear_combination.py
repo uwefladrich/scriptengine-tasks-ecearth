@@ -220,3 +220,25 @@ def test_convert_invalid_unit(create_test_cube, tmp_path, caplog):
     with pytest.raises(ScriptEngineTaskArgumentInvalidError):
         t.run({})
     assert "Unit conversion error: " in caplog.text
+
+
+def test_convert_incompatible_unit(create_test_cube, tmp_path, caplog):
+    c1 = create_test_cube("C1", 1000.0, "m")
+    c2 = tmp_path / "c2.nc"
+
+    t = _from_yaml(
+        f"""
+        ece.mon.linear_combination:
+          src:
+            -
+              varname: C1
+              path: {c1}
+          dst:
+            varname: C2
+            path: {c2}
+            unit: kg
+        """
+    )
+    with pytest.raises(ScriptEngineTaskArgumentInvalidError):
+        t.run({})
+    assert "Unit conversion error: " in caplog.text
