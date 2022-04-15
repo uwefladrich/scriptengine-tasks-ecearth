@@ -89,6 +89,12 @@ class LinearCombination(Task):
                 result.standard_name = dst["standardname"]
             except ValueError as e:
                 self.log_warning(f"Standard name could not be set: {e}")
+        if dst.get("unit", False):
+            try:
+                result.convert_units(dst["unit"])
+            except ValueError as e:
+                self.log_error(f"Unit conversion error: {e}")
+                raise ScriptEngineTaskArgumentInvalidError
 
         self.log_debug(f"Saving result to {path}")
         iris.save(result, path, saver="nc")

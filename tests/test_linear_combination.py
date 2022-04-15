@@ -175,3 +175,48 @@ def test_incompatible_units(tmp_path, caplog, create_test_cube):
     with pytest.raises(ScriptEngineTaskRunError):
         t.run({})
     assert "Error adding " in caplog.text
+
+
+def test_convert_unit(create_test_cube, tmp_path):
+    c1 = create_test_cube("C1", 1000.0, "m")
+    c2 = tmp_path / "c2.nc"
+
+    t = _from_yaml(
+        f"""
+        ece.mon.linear_combination:
+          src:
+            -
+              varname: C1
+              path: {c1}
+          dst:
+            varname: C2
+            path: {c2}
+            unit: km
+        """
+    )
+    t.run({})
+    result = iris.load_cube(str(c2))
+    assert result.units == "km"
+    assert result.data == [1.0]
+
+
+def test_convert_invalid_unit(create_test_cube, tmp_path, caplog):
+    c1 = create_test_cube("C1", 1000.0, "m")
+    c2 = tmp_path / "c2.nc"
+
+    t = _from_yaml(
+        f"""
+        ece.mon.linear_combination:
+          src:
+            -
+              varname: C1
+              path: {c1}
+          dst:
+            varname: C2
+            path: {c2}
+            unit: foo
+        """
+    )
+    with pytest.raises(ScriptEngineTaskArgumentInvalidError):
+        t.run({})
+    assert "Unit conversion error: " in caplog.text
