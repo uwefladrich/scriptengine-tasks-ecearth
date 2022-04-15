@@ -31,7 +31,7 @@ class LinearCombination(Task):
             self.log_error("Invalid 'src' argument, must be a list")
             raise ScriptEngineTaskArgumentInvalidError
 
-        result = 0
+        result = 0  # Initialize sum of scaled cubes
         for src in sources:
             self.log_debug(f"Processing source {src}")
             try:
