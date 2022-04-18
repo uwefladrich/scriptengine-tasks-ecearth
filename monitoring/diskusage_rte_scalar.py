@@ -7,6 +7,9 @@ from .scalar import Scalar
 
 
 def _dir_size(dir):
+    """Counts (recursively) the size of all files stored in a directory and
+    returns the sum (size in bytes). Note that all files and (sub)directories
+    that are not readable (i.e. due to missing permissions) are ignored."""
     if not dir.exists():
         raise FileNotFoundError
     if not dir.is_dir():
