@@ -1,10 +1,17 @@
 """Processing Task that writes out the disk usage of a given folder."""
-import os
 from pathlib import Path
 
 from scriptengine.tasks.core import timed_runner
 
 from .scalar import Scalar
+
+
+def _dir_size(dir):
+    if not dir.exists():
+        raise FileNotFoundError
+    if not dir.is_dir():
+        raise NotADirectoryError
+    return sum(f.stat().st_size for f in dir.glob("**/*") if f.is_file())
 
 
 class DiskusageRteScalar(Scalar):
@@ -25,32 +32,20 @@ class DiskusageRteScalar(Scalar):
         dst = Path(self.getarg("dst", context))
         self.log_info(f"Write disk usage of {src} to {dst}")
 
-        self.value = round(self.get_directory_size(src) * 1e-9, 1)
-        self.title = "Disk Usage in GB"
-        self.log_debug(f"Size of Directory: {self.value}")
+        try:
+            value = _dir_size(src)
+        except FileNotFoundError:
+            self.log_warning(f"'{src}' does not exist")
+            value = 0
+        except NotADirectoryError:
+            self.log_warning(f"'{src}' is not a directory")
+            value = 0
+        else:
+            self.log_debug(f"Directory size: {value}")
 
         self.save(
             dst,
-            title=self.title,
+            title="Disk usage in GiB",
             comment=f"Current size of {src}",
-            value=self.value,
+            value=round(value / 2**30, 1),
         )
-
-    def get_directory_size(self, path):
-        """Returns the size of `path` in Bytes."""
-        self.log_debug("Getting directory size.")
-        total = 0
-        try:
-            for entry in os.scandir(path):
-                if entry.is_file():
-                    total += entry.stat().st_size
-                elif entry.is_dir():
-                    total += self.get_directory_size(entry.path)
-        except (NotADirectoryError, FileNotFoundError):
-            self.log_warning(f"{path} is not a directory. Returning -1.")
-            return -1e9  # gets multiplied with 1e-9 again
-        except PermissionError:
-            self.log_warning(f"No permission to open {path}. Returning -1.")
-            return -1e9  # gets multiplied with 1e-9 again
-
-        return total
