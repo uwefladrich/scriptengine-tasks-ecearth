@@ -3,7 +3,7 @@
 import pytest
 import yaml
 
-from monitoring.diskusage_rte_scalar import DiskusageRteScalar
+from monitoring.diskusage_rte_scalar import DiskusageRteScalar, _dir_size
 
 _FILE_SIZE = 10000
 
@@ -15,6 +15,10 @@ def tmp_dir_with_size(tmp_path):
     f = d / "file_with_size"
     f.write_text(_FILE_SIZE * " ")
     return d
+
+
+def test_dir_size(tmp_dir_with_size):
+    assert _dir_size(tmp_dir_with_size) == _FILE_SIZE
 
 
 def test_diskusage(tmp_dir_with_size, tmp_path):
