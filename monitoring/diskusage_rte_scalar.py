@@ -35,14 +35,13 @@ class DiskusageRteScalar(Scalar):
         dst = Path(self.getarg("dst", context))
         self.log_info(f"Write disk usage of {src} to {dst}")
 
+        value = 0
         try:
             value = _dir_size(src)
         except FileNotFoundError:
             self.log_warning(f"'{src}' does not exist")
-            value = 0
         except NotADirectoryError:
             self.log_warning(f"'{src}' is not a directory")
-            value = 0
         else:
             self.log_debug(f"Directory size: {value}")
 
@@ -50,5 +49,5 @@ class DiskusageRteScalar(Scalar):
             dst,
             title="Disk usage in GiB",
             comment=f"Current size of {src}",
-            value=round(value / 2**30, 1),
+            value=round(float(value) / 2**30, 1),
         )
