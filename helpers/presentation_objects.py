@@ -6,7 +6,7 @@ from pathlib import Path
 from textwrap import wrap
 
 import cftime
-import imageio
+import imageio.v2 as imageio
 import iris
 import iris.quickplot as qplt
 import matplotlib.pyplot as plt
@@ -224,7 +224,7 @@ class TemporalmapLoader(PresentationObjectLoader):
             plt.close(fig)
 
         frames = [imageio.imread(png) for png in sorted(png_dir.iterdir())]
-        imageio.mimsave(dst_folder / gif_file, frames, fps=2)
+        imageio.mimwrite(dst_folder / gif_file, frames, fps=2)
 
         return {
             "title": self.cube.attributes["title"],
