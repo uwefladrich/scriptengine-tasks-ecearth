@@ -54,15 +54,11 @@ class LinearCombination(Task):
             summand = helpers.cubes.load_input_cube(path, varname)
             summand = helpers.cubes.remove_aux_time(summand)
 
-            try:
-                scaled_summand = factor * summand
-            except Exception as e:
-                self.log_error(f"Error scaling '{summand.name()}': {e}")
-                raise ScriptEngineTaskRunError
-            try:
-                scaled_summand.convert_units(summand.units)
-            except iris.exceptions.UnitConversionError as e:
-                self.log_warning(f"Unit conversion issue: {e}")
+            scaled_summand = factor * summand
+            # Multiplying an Iris cube with a scalar will sometimes "simplify"
+            # units, whereas we want to retain the original units of the summand
+            scaled_summand.convert_units(summand.units)
+
             try:
                 result += scaled_summand
             except Exception as e:
