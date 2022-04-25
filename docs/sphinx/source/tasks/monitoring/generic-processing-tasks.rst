@@ -98,7 +98,7 @@ Elaborate Example
 LinearCombination
 =================
 
-| Diagnostic Type: Timeseries/Map/Temporalmap (does not work with YAML files)
+| Diagnostic Type: None (generates a general NetCDF files for further processing tasks)
 | Mapped to: ``ece.mon.linear_combination``
 
 This processing task computes a linear combination :math:`\sum \alpha_i v_i` of
