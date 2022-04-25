@@ -98,64 +98,85 @@ Elaborate Example
 LinearCombination
 =================
 
-.. TODO: go over this part, especially the examples!
-
 | Diagnostic Type: Timeseries/Map/Temporalmap (does not work with YAML files)
 | Mapped to: ``ece.mon.linear_combination``
 
-This processing task creates a linear combination of different, compatible NetCDF variables :math:`v_i`, i.e., :math:`\sum_i \alpha_i v_i`.
-It can be used for custom diagnostics, e.g., computing the difference of precipitation and evaporation.
-It can make sense to create the linear combination before or after calling one of the other processing tasks.
+This processing task computes a linear combination :math:`\sum \alpha_i v_i` of
+scalar factors :math:`\alpha_i` and compatible NetCDF variables :math:`v_i`, and
+writes the result into a new NetCDF file. This can be used to create custom
+diagnostics, for example the difference or (weighted) sum of variables. The
+resulting NetCDF files and variables can be used in subsequent processing tasks.
+Note that the ``LinearCombination`` task does not perform any spatial or
+temporal averaging.
+
+Example use cases for ``LinearCombination`` include the computation of
+precipitation minus evaporation (mass balance :math:`P-E`) and energy balances
+by summing up individual radiation contributions.
+
+The input variables for the ``LinearCombination`` task must be compatible in
+terms of dimensions and units, according to the rules of `Iris cube maths`_. If
+Iris cannot compute the linear combination, the execution of the task is aborted
+with an error explaining the type of incompatibility.
 
 **Required arguments**
 
-* ``src``: A list of dictionaries containing the ``path``, ``varname``, and optional ``factor`` :math:`\alpha_i` (default is 1.0).
-* ``dst``: Dictionary containing information about the destination file. Must contain the ``path`` (ending in *.nc*) where the target can be stored.
+* ``src``: A list of dictionaries, each containing the ``path``, ``varname``,
+  for each variable, and an optional scalar ``factor`` :math:`\alpha_i`. The
+  default ``factor`` is 1.0.
+* ``dst``: A dictionary describing the NetCDF file used to store the custom
+  diagnostic. Must at least contain the ``path`` and ``varname`` for the result.
 
-**Optional arguments of ``dst``**
+**Optional ``dst`` arguments**
 
-If these arguments are not provided, the task will use the defaults determined by Iris.
+* ``longname``: The `long name` of the target variable. If not provided, the
+  resulting diagnostic will not have a longname.
+* ``standardname``: A `valid standard name` for the target variable as defined
+  by the `CF conventions`. If not provided, the resulting diagnostic will not
+  have a standardname.
+* ``unit``: Custom target unit for the destination file. Can be one of the
+  UDUNITS_ strings (see the :ref:`above note on checking valid units
+  <check-valid-units>`).
+  If not provided, Iris will try to determine the unit of the linear
+  combination.
 
-* ``varname``: The name of the target variable which can be used to access it later on.
-* ``longname``: The `long name` of the target variable.
-* ``standardname``: A `valid standard name` for the target variable as defined by the `CF conventions`.
-* ``unit``: Custom target unit for the destination file. Can be one of the UDUNITS_ strings (see the :ref:`above note on checking valid units <check-valid-units>`).
+Examples
+########
 
-Minimal Example
-###############
-
-::
-
-    - ece.mon.linear_combination:
-        src:
-            - path: "oifs_output_file.nc"
-              varname: "rsnt"
-            - path: "oifs_output_file.nc"
-              varname: "rlnt"
-        dst:
-            - path: "rsnt+rlnt.nc"
-
-Elaborate Example
-#################
-
-::
+The first example adds short and long wave radiation contributions to provide an
+energy budget at the top of atmosphere (TOA)::
 
     - ece.mon.linear_combination:
         src:
-            - path: "oifs_output_file.nc"
-              varname: p
-              factor: 1.0
-            - path: "oifs_output_file.nc"
-              varname: e
-              factor: -1.0
+          - varname: rsnt
+            path: oifs_output_file.nc
+          - varname: rlnt
+            path: oifs_output_file.nc
         dst:
-            path: "p-e.nc"
-            varname: "p-e" # TODO does +/- work inside a varname?
-            longname: "Precipitation minus evaporation"
-            standardname: precipitation_amount
-            unit: "kg m-2"
+          varname: net_toa
+          longname: Net TOA
+          path: net_toa.nc
+
+The second example computes the difference between precipitation :math:`P` and
+evaporation :math:`E` to provide the mass balance :math:`P-E` as custom
+diagnostic in ``pme.nc``. Note that the standardname and unit are explicitely
+set for the output NetCDF file::
+
+    - ece.mon.linear_combination:
+        src:
+          - varname: pr
+            path: oifs_output_file.nc
+          - varname: evspsbl
+            path: oifs_output_file.nc
+            factor: -1.0
+        dst:
+          varname: pme
+          longname: "Precipitation - Evaporation"
+          standardname: precipitation_amount
+          unit: "kg m-2"
+          path: pme.nc
 
 .. _UDUNITS: https://www.unidata.ucar.edu/software/udunits/
 .. _valid standard name: http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
 .. _CF conventions: http://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#standard-name
 .. _long name: http://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#long-name
+.. _Iris cube maths: https://scitools-iris.readthedocs.io/en/stable/userguide/cube_maths.html
