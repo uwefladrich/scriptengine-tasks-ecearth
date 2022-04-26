@@ -44,10 +44,6 @@ class Redmine(Task):
         presentation_list = self.get_presentation_list(sources, dst_folder)
         redmine_template = self.get_template(context, template_path)
         redmine_template.globals["urlencode"] = urllib.parse.quote
-        issue_description = redmine_template.render(presentation_list=presentation_list)
-        with ChangeDirectory(dst_folder):
-            with open("./issue_description.txt", "w") as outfile:
-                outfile.write(issue_description)
 
         url = "https://dev.ec-earth.org"
         redmine = redminelib.Redmine(url, key=key)
@@ -56,6 +52,13 @@ class Redmine(Task):
         issue = self.get_issue(redmine, issue_subject)
 
         self.log_debug("Updating the issue description.")
+        # render the template and save locally
+        issue_url = f"{url}/issues/{issue.id}"
+        issue_description = redmine_template.render(presentation_list=presentation_list, base_url=issue_url)
+        with ChangeDirectory(dst_folder):
+            with open("./issue_description.txt", "w") as outfile:
+                outfile.write(issue_description)
+        # update the description of the actual issue
         issue.description = ""
         for line in issue_description:
             issue.description += line
@@ -138,6 +141,7 @@ class Redmine(Task):
                 issue.priority_id = priority_identifier
                 issue.assigned_to_id = redmine.auth().id
                 issue.is_private = False
+                issue.save() # save issue once to get a valid issue ID (it's 0 otherwise)
             return issue
         except (
             redminelib.exceptions.AuthError,

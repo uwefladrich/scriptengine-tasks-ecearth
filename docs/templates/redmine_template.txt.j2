@@ -1,5 +1,16 @@
 h1. EC-Earth 4: Monitoring
 
+h2. Contained Plots
+
+{% for item in presentation_list %}
+
+{%- if item["presentation_type"] == "image" %}
+* "{{item["title"].title()}}":{{base_url}}#{{"-".join(item["title"].title().replace("(","").replace(")","").split())}}
+{%- endif -%}
+
+{% endfor %}
+
+
 {% for item in presentation_list %}
 
 {%- if item["presentation_type"] == "text" %}
