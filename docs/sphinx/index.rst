@@ -15,6 +15,7 @@ This package contains ScriptEngine tasks for the EC-Earth 4 climate model, speci
    :caption: The Monitoring Tool
 
    source/tasks/monitoring/general-structure
+   source/tasks/monitoring/generic-processing-tasks
    source/tasks/monitoring/computational-diagnostics
    source/tasks/monitoring/nemo-diagnostics
    source/tasks/monitoring/si3-diagnostics
