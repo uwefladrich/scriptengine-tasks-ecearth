@@ -223,7 +223,7 @@ class TemporalmapLoader(PresentationObjectLoader):
             fig.savefig(png_dir / f"{self.path.stem}-{ts:03}.png", bbox_inches="tight")
             plt.close(fig)
 
-        frames = [imageio.imread(file) for file in sorted(png_dir.iterdir())]
+        frames = [imageio.imread(png) for png in sorted(png_dir.iterdir())]
         imageio.imwrite(dst_folder / gif_file, frames, fps=2)
 
         return {
