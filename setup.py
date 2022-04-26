@@ -48,7 +48,7 @@ setuptools.setup(
         "pyYAML>=5.1",
         "matplotlib>=3.1",
         "numpy>=1.18",
-        "imageio>=2.0",
+        "imageio>=2.18",
         "scitools-iris>=3.1,!=3.2.0,!=3.2.0.post0",
         "cartopy>=0.20",
         "python-redmine",
