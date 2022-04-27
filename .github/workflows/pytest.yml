@@ -1,4 +1,4 @@
-name: PyTest
+name: Run pytest and coverage
 on:
   schedule:
     - cron: "0 8 * * *"
