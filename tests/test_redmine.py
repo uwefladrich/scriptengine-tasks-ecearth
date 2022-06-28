@@ -7,7 +7,6 @@ import pytest
 import redminelib
 import redminelib.exceptions
 import scriptengine.exceptions
-
 from monitoring.redmine import Redmine
 
 
@@ -79,6 +78,7 @@ def test_redmine_get_template(tmp_path):
 class MockTemplateOrIssue:
     def __init__(self):
         self.globals = {}
+        self.id = 0
 
     def render(self, **kwargs):
         return str(kwargs)
