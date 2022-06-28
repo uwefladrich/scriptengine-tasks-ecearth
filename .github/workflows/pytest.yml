@@ -1,7 +1,5 @@
 name: Run pytest and coverage
 on:
-  schedule:
-    - cron: "0 8 * * *"
   push:
 
 env:
