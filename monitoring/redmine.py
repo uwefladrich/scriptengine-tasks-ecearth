@@ -7,13 +7,12 @@ import jinja2
 import redminelib
 import redminelib.exceptions
 import requests
-from scriptengine.exceptions import ScriptEngineTaskRunError
-from scriptengine.jinja import filters as j2filters
-from scriptengine.tasks.core import Task, timed_runner
-
 from helpers.exceptions import PresentationException
 from helpers.files import ChangeDirectory
 from helpers.presentation_objects import PresentationObject
+from scriptengine.exceptions import ScriptEngineTaskRunError
+from scriptengine.jinja import filters as j2filters
+from scriptengine.tasks.core import Task, timed_runner
 
 
 class Redmine(Task):
@@ -52,16 +51,11 @@ class Redmine(Task):
         issue = self.get_issue(redmine, issue_subject)
 
         self.log_debug("Updating the issue description.")
-        # render the template and save locally
+        # render the template and add as description
         issue_url = f"{url}/issues/{issue.id}"
-        issue_description = redmine_template.render(presentation_list=presentation_list, base_url=issue_url)
-        with ChangeDirectory(dst_folder):
-            with open("./issue_description.txt", "w") as outfile:
-                outfile.write(issue_description)
-        # update the description of the actual issue
-        issue.description = ""
-        for line in issue_description:
-            issue.description += line
+        issue.description = redmine_template.render(
+            presentation_list=presentation_list, base_url=issue_url
+        )
 
         self.log_debug("Uploading attachments.")
         issue.uploads = []
@@ -141,7 +135,7 @@ class Redmine(Task):
                 issue.priority_id = priority_identifier
                 issue.assigned_to_id = redmine.auth().id
                 issue.is_private = False
-                issue.save() # save issue once to get a valid issue ID (it's 0 otherwise)
+                issue.save()  # save issue once to get a valid issue ID (it's 0 otherwise)
             return issue
         except (
             redminelib.exceptions.AuthError,
