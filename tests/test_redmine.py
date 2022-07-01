@@ -15,7 +15,7 @@ def test_redmine_presentation_list(tmp_path):
     init = {
         "src": str(tmp_path),
         "local_dst": str(tmp_path),
-        "template": str(tmp_path / "redmine_template.txt.j2"),
+        "template": str(tmp_path / "redmine.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
