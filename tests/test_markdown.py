@@ -12,7 +12,7 @@ def test_markdown_output_full(tmp_path):
     init = {
         "src": [str(tmp_path / "test.yml")],
         "dst": str(tmp_path),
-        "template": "./docs/templates/markdown_template.md.j2",
+        "template": "./docs/templates/markdown.md.j2",
     }
     with open(init["src"][0], "w") as file:
         yaml.dump(init, file)
@@ -27,7 +27,7 @@ def test_markdown_presentation_list(tmp_path):
     init = {
         "src": [str(tmp_path / "test.yml")],
         "dst": str(tmp_path),
-        "template": "./docs/templates/markdown_template.md.j2",
+        "template": "./docs/templates/markdown.md.j2",
     }
     markdown = Markdown(init)
     test_sources = ["path.txt", {"path": "path.txt"}, "path.yml"]
