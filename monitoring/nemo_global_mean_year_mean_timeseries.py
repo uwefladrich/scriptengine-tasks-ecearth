@@ -1,4 +1,4 @@
-"""Processing Task that calculates the yearly global average of a given extensive quantity."""
+"""Processing Task that calculates the annual global average of a given extensive quantity."""
 
 import warnings
 from pathlib import Path
@@ -62,28 +62,28 @@ class NemoGlobalMeanYearMeanTimeseries(Timeseries):
             )
         # Remove auxiliary time coordinate before collapsing cube
         global_avg.remove_coord(global_avg.coord("time", dim_coords=False))
-        global_yearly_avg = global_avg.collapsed(
+        global_annual_avg = global_avg.collapsed(
             "time",
             iris.analysis.MEAN,
             weights=helpers.cubes.compute_time_weights(global_avg),
         )
         # Promote time from scalar to dimension coordinate
-        global_yearly_avg = iris.util.new_axis(global_yearly_avg, "time")
+        global_annual_avg = iris.util.new_axis(global_annual_avg, "time")
 
-        global_yearly_avg = helpers.cubes.set_metadata(
-            global_yearly_avg,
-            title=f"{global_yearly_avg.long_name} (yearly Mean)",
+        global_annual_avg = helpers.cubes.set_metadata(
+            global_annual_avg,
+            title=f"{global_annual_avg.long_name} (annual mean)",
             comment=comment,
         )
 
-        global_yearly_avg.cell_methods = (
+        global_annual_avg.cell_methods = (
             iris.coords.CellMethod("mean", coords="time", intervals="1 month"),
             iris.coords.CellMethod(
                 "mean",
-                coords=("area", helpers.nemo.depth_coord(global_yearly_avg).name())
-                if helpers.nemo.has_depth(global_yearly_avg)
+                coords=("area", helpers.nemo.depth_coord(global_annual_avg).name())
+                if helpers.nemo.has_depth(global_annual_avg)
                 else "area",
             ),
         )
 
-        self.save(global_yearly_avg, dst)
+        self.save(global_annual_avg, dst)
