@@ -125,7 +125,7 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
         )
         timeseries_cube = helpers.cubes.set_metadata(
             timeseries_cube,
-            title=f"{timeseries_cube.long_name} (Annual Mean)",
+            title=f"{timeseries_cube.long_name} (annual mean)",
             comment=comment,
         )
         # Convert unit to °C if varname is given in K
