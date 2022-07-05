@@ -78,8 +78,8 @@ class OifsAllMeanMap(Map):
         # Add File Metadata
         map_cube = helpers.cubes.set_metadata(
             map_cube,
-            title=f"{map_cube.long_name.title()} (Annual Mean Climatology)",
-            comment=f"Simulation Average of **{varname}**.",
+            title=f"{map_cube.long_name} (annual mean climatology)",
+            comment=f"Simulation average of **{varname}**.",
             map_type="global atmosphere",
         )
         # Convert unit to °C if varname is given in K

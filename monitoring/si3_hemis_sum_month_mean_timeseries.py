@@ -115,7 +115,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
         this_leg_summed.units = cf_units.Unit(_meta_dict[varname]["old_unit"])
         this_leg_summed.convert_units(_meta_dict[varname]["new_unit"])
         this_leg_summed.long_name = (
-            f"{long_name} {helpers.dates.month_name(month)} {hemisphere.capitalize()}"
+            f"{long_name} {helpers.dates.month_name(month)} {hemisphere}"
         )
         this_leg_summed.var_name = _meta_dict[varname]["var_name"] + hemisphere[0]
 
