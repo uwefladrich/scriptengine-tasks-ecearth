@@ -239,7 +239,7 @@ def format_title(name):
 
     Slight variance on _title() in iris/quickplot.py.
     """
-    title = name.replace("_", " ").title()
+    title = name.replace("_", " ")
     # create multiline string if it becomes too long
     # cf. https://stackoverflow.com/a/10634897
     title = "\n".join(wrap(title, 40))
@@ -252,7 +252,7 @@ def format_label(name, units=None):
 
     Slight variance on _title() in iris/quickplot.py.
     """
-    label = name.replace("_", " ").capitalize()
+    label = name.replace("_", " ")
     unit_text = format_units(units)
     if unit_text and unit_text != "1":
         label += " / {}".format(unit_text)
