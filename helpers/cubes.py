@@ -82,7 +82,7 @@ def remove_aux_time(cube):
     return cube
 
 
-def yearly_time_bounds(cube):
+def annual_time_bounds(cube):
 
     t_coord = cube.coord("time")
     cube.remove_coord("time")

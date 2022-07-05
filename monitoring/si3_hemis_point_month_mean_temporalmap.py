@@ -82,7 +82,7 @@ class Si3HemisPointMonthMeanTemporalmap(Temporalmap):
         this_leg = helpers.cubes.mask_other_hemisphere(this_leg, hemisphere)
         if month:
             this_leg = helpers.cubes.extract_month(this_leg, month)
-            this_leg = helpers.cubes.yearly_time_bounds(this_leg)
+            this_leg = helpers.cubes.annual_time_bounds(this_leg)
 
         if "convert_to" in _meta_dict[varname]:
             try:
