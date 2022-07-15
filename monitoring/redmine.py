@@ -44,17 +44,17 @@ class Redmine(Task):
         redmine_template = self.get_template(context, template_path)
         redmine_template.globals["urlencode"] = urllib.parse.quote
 
-        url = "https://dev.ec-earth.org"
-        redmine = redminelib.Redmine(url, key=key)
+        server_url = "https://dev.ec-earth.org"
+        redmine = redminelib.Redmine(server_url, key=key)
 
         self.log_debug("Connecting to Redmine.")
         issue = self.get_issue(redmine, issue_subject)
 
         self.log_debug("Updating the issue description.")
         # render the template and add as description
-        issue_url = f"{url}/issues/{issue.id}"
+        issue_url = f"{server_url}/issues/{issue.id}"
         issue.description = redmine_template.render(
-            presentation_list=presentation_list, base_url=issue_url
+            presentation_list=presentation_list, issue_url=issue_url
         )
 
         self.log_debug("Uploading attachments.")
