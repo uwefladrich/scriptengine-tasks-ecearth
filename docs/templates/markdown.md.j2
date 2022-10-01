@@ -5,7 +5,7 @@
 {% for item in presentation_list %}
 
 {%- if item["presentation_type"] == "image" %}
-* [{{item["title"].title()}}](#{{"-".join(item["title"].lower().replace("(","").replace(")","").split())}})
+* [{{item["title"]}}](#{{"-".join(item["title"].lower().replace("(","").replace(")","").split())}})
 {%- endif -%}
 
 {% endfor %}
