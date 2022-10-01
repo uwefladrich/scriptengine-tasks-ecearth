@@ -1,5 +1,15 @@
 # EC-Earth 4: Monitoring
 
+## Table of Contents
+
+{% for item in presentation_list %}
+
+{%- if item["presentation_type"] == "image" %}
+* [{{item["title"].title()}}](#{{"-".join(item["title"].lower().replace("(","").replace(")","").split())}})
+{%- endif -%}
+
+{% endfor %}
+
 {% for item in presentation_list %}
 
 {%- if item["presentation_type"] == "text" %}
@@ -16,7 +26,6 @@
 
 {{item["comment"]}}
 
-{% endif %}
-
-{% endfor %}
+{%- endif %}
+{%- endfor %}
 

@@ -7,13 +7,12 @@ import jinja2
 import redminelib
 import redminelib.exceptions
 import requests
-from scriptengine.exceptions import ScriptEngineTaskRunError
-from scriptengine.jinja import filters as j2filters
-from scriptengine.tasks.core import Task, timed_runner
-
 from helpers.exceptions import PresentationException
 from helpers.files import ChangeDirectory
 from helpers.presentation_objects import PresentationObject
+from scriptengine.exceptions import ScriptEngineTaskRunError
+from scriptengine.jinja import filters as j2filters
+from scriptengine.tasks.core import Task, timed_runner
 
 
 class Redmine(Task):
@@ -44,21 +43,19 @@ class Redmine(Task):
         presentation_list = self.get_presentation_list(sources, dst_folder)
         redmine_template = self.get_template(context, template_path)
         redmine_template.globals["urlencode"] = urllib.parse.quote
-        issue_description = redmine_template.render(presentation_list=presentation_list)
-        with ChangeDirectory(dst_folder):
-            with open("./issue_description.txt", "w") as outfile:
-                outfile.write(issue_description)
 
-        url = "https://dev.ec-earth.org"
-        redmine = redminelib.Redmine(url, key=key)
+        server_url = "https://dev.ec-earth.org"
+        redmine = redminelib.Redmine(server_url, key=key)
 
         self.log_debug("Connecting to Redmine.")
         issue = self.get_issue(redmine, issue_subject)
 
         self.log_debug("Updating the issue description.")
-        issue.description = ""
-        for line in issue_description:
-            issue.description += line
+        # render the template and add as description
+        issue_url = f"{server_url}/issues/{issue.id}"
+        issue.description = redmine_template.render(
+            presentation_list=presentation_list, issue_url=issue_url
+        )
 
         self.log_debug("Uploading attachments.")
         issue.uploads = []
@@ -138,6 +135,7 @@ class Redmine(Task):
                 issue.priority_id = priority_identifier
                 issue.assigned_to_id = redmine.auth().id
                 issue.is_private = False
+                issue.save()  # save issue once to get a valid issue ID (it's 0 otherwise)
             return issue
         except (
             redminelib.exceptions.AuthError,

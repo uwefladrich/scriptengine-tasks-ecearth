@@ -7,7 +7,6 @@ import pytest
 import redminelib
 import redminelib.exceptions
 import scriptengine.exceptions
-
 from monitoring.redmine import Redmine
 
 
@@ -15,7 +14,7 @@ def test_redmine_presentation_list(tmp_path):
     init = {
         "src": str(tmp_path),
         "local_dst": str(tmp_path),
-        "template": str(tmp_path / "redmine_template.txt.j2"),
+        "template": str(tmp_path / "redmine.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
@@ -31,7 +30,7 @@ def test_redmine_connection_error(tmp_path):
     init = {
         "src": str(tmp_path),
         "local_dst": str(tmp_path),
-        "template": str(tmp_path / "redmine_template.txt.j2"),
+        "template": str(tmp_path / "redmine.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
@@ -49,7 +48,7 @@ def test_redmine_auth_error(tmp_path):
     init = {
         "src": str(tmp_path),
         "local_dst": str(tmp_path),
-        "template": str(tmp_path / "redmine_template.txt.j2"),
+        "template": str(tmp_path / "redmine.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
@@ -67,7 +66,7 @@ def test_redmine_get_template(tmp_path):
     init = {
         "src": str(tmp_path),
         "local_dst": str(tmp_path),
-        "template": str(tmp_path / "template.txt.j2"),
+        "template": str(tmp_path / "redmine.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
@@ -79,6 +78,7 @@ def test_redmine_get_template(tmp_path):
 class MockTemplateOrIssue:
     def __init__(self):
         self.globals = {}
+        self.id = 0
 
     def render(self, **kwargs):
         return str(kwargs)
@@ -91,7 +91,7 @@ def test_redmine_run(tmp_path):
     init = {
         "src": str(tmp_path),
         "local_dst": str(tmp_path),
-        "template": str(tmp_path / "template.txt.j2"),
+        "template": str(tmp_path / "redmine.txt.j2"),
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
