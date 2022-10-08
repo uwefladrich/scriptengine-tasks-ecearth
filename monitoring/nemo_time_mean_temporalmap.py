@@ -61,7 +61,7 @@ class NemoYearMeanTemporalmap(NemoTimeMeanTemporalmap):
         leg_average = helpers.cubes.set_metadata(
             leg_average,
             title=f"{leg_average.long_name} (annual mean map)",
-            comment=f"Leg mean of **{varname}**.",
+            comment=f"Annual mean of **{varname}**.",
             map_type="global ocean",
         )
         leg_average.cell_methods = ()
