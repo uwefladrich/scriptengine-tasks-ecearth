@@ -224,7 +224,7 @@ class TemporalmapLoader(PresentationObjectLoader):
             plt.close(fig)
 
         frames = [imageio.imread(png) for png in sorted(png_dir.iterdir())]
-        imageio.imwrite(dst_folder / gif_file, frames, duration=5e2, loop=0)
+        imageio.imwrite(dst_folder / gif_file, frames, duration=500, loop=0)
 
         return {
             "title": self.cube.attributes["title"],
