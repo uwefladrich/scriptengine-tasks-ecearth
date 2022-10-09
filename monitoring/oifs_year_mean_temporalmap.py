@@ -67,8 +67,8 @@ class OifsYearMeanTemporalmap(Temporalmap):
         """Do further adjustments to the cube metadata before saving."""
         temporalmap_cube = helpers.cubes.set_metadata(
             temporalmap_cube,
-            title=f"{temporalmap_cube.long_name.title()} (Annual Mean Map)",
-            comment=f"Annual Mean of **{varname}**.",
+            title=f"{temporalmap_cube.long_name} (annual mean map)",
+            comment=f"Annual mean of **{varname}**.",
             map_type="global atmosphere",
         )
         # Convert unit to °C if varname is given in K

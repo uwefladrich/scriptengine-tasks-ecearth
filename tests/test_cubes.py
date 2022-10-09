@@ -94,7 +94,7 @@ def test_mask_other_hemisphere():
         assert out_cube == out_cube_ref
 
 
-def test_yearly_time_bounds():
+def test_annual_time_bounds():
     cube = Cube([0])
     points = np.array([cf_units.encode_time(1990, 3, 4, 0, 0, 0)])
     bounds = np.array(
@@ -109,9 +109,9 @@ def test_yearly_time_bounds():
         points, "time", units="seconds since 1970-01-01 00:00:00", bounds=bounds
     )
     cube.add_dim_coord(time, 0)
-    cube = helpers.cubes.yearly_time_bounds(cube)
+    cube = helpers.cubes.annual_time_bounds(cube)
     new_bounds = cube.coord("time").bounds
-    yearly_bounds = np.array(
+    annual_bounds = np.array(
         [
             [
                 cf_units.encode_time(1990, 1, 1, 0, 0, 0),
@@ -119,4 +119,4 @@ def test_yearly_time_bounds():
             ],
         ]
     )
-    assert (new_bounds == yearly_bounds).all()
+    assert (new_bounds == annual_bounds).all()

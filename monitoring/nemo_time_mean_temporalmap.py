@@ -60,8 +60,8 @@ class NemoYearMeanTemporalmap(NemoTimeMeanTemporalmap):
         leg_average = iris.util.new_axis(leg_average, "time")
         leg_average = helpers.cubes.set_metadata(
             leg_average,
-            title=f"{leg_average.long_name.title()} (Annual Mean Map)",
-            comment=f"Leg Mean of **{varname}**.",
+            title=f"{leg_average.long_name} (annual mean map)",
+            comment=f"Annual mean of **{varname}**.",
             map_type="global ocean",
         )
         leg_average.cell_methods = ()
@@ -81,8 +81,8 @@ class NemoMonthMeanTemporalmap(NemoTimeMeanTemporalmap):
         self.log_debug("Creating monthly means.")
         leg_cube = helpers.cubes.set_metadata(
             leg_cube,
-            title=f"{leg_cube.long_name.title()} (Monthly Mean Map)",
-            comment=f"Monthly Mean of **{varname}**.",
+            title=f"{leg_cube.long_name} (monthly mean map)",
+            comment=f"Monthly mean of **{varname}**.",
             map_type="global ocean",
         )
         leg_cube.add_cell_method(

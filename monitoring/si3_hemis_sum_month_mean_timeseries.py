@@ -96,7 +96,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
         this_leg = helpers.cubes.remove_aux_time(this_leg)
         this_leg = helpers.cubes.extract_month(this_leg, month)
         this_leg = helpers.cubes.mask_other_hemisphere(this_leg, hemisphere)
-        this_leg = helpers.cubes.yearly_time_bounds(this_leg)
+        this_leg = helpers.cubes.annual_time_bounds(this_leg)
 
         with warnings.catch_warnings():
             # Suppress warning about insufficient metadata.
@@ -115,7 +115,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
         this_leg_summed.units = cf_units.Unit(_meta_dict[varname]["old_unit"])
         this_leg_summed.convert_units(_meta_dict[varname]["new_unit"])
         this_leg_summed.long_name = (
-            f"{long_name} {helpers.dates.month_name(month)} {hemisphere.capitalize()}"
+            f"{long_name} {helpers.dates.month_name(month)} {hemisphere}"
         )
         this_leg_summed.var_name = _meta_dict[varname]["var_name"] + hemisphere[0]
 

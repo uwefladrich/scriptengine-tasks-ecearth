@@ -47,8 +47,8 @@ class NemoAllMeanMap(Map):
 
         leg_average = helpers.cubes.set_metadata(
             leg_average,
-            title=f"{leg_average.long_name.title()} (Annual Mean Climatology)",
-            comment=f"Simulation Average of **{varname}**.",
+            title=f"{leg_average.long_name} (annual mean climatology)",
+            comment=f"Simulation average of **{varname}**.",
             map_type="global ocean",
         )
 

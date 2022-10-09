@@ -34,15 +34,15 @@ def test_presentation_object():
 
 
 def test_format_title():
-    assert format_title("test_title") == "Test Title"
+    assert format_title("test_title") == "test title"
 
 
 def test_format_label():
-    assert format_label("test_title") == "Test title"
+    assert format_label("test_title") == "test title"
     test_unit = cf_units.Unit("1")
-    assert format_label("test_title", units=test_unit) == "Test title"
+    assert format_label("test_title", units=test_unit) == "test title"
     test_unit = cf_units.Unit("kilometers")
-    assert format_label("test_title", units=test_unit) == "Test title / 1000 m"
+    assert format_label("test_title", units=test_unit) == "test title / 1000 m"
 
 
 unit = [
