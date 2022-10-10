@@ -1,3 +1,33 @@
+ScriptEngine Tasks for EC-Earth 0.6.0
+======================================
+
+Features
+--------
+- Streamline use of title() and capitalize() (#78)
+- TOC Support in Markdown/Redmine templates (#71)
+- Linear combination of variables (#64)
+
+Fixes
+-----
+- Fix duration to restore 2 FPS (#85 and #82)
+- Fix segfault problem with HDF5/Python3.7 in tests  (#84)
+- Fix: GIFs now loop again (#77)
+- Replace Path.with_stem for Python<3.9 (#66)
+
+Internal changes
+----------------
+- Rename url->server_url and base_url->issue_url (#79)
+- Fix #72: Release pipeline (#73)
+- Refactor: ImageIO dependency (#70)
+- Refactor diskusage task and tests (#69)
+
+
+ScriptEngine Tasks for EC-Earth 0.5.0
+======================================
+
+...
+
+
 ScriptEngine Tasks for EC-Earth 0.2.0 (45ef712, Fri 11 Sep 11:33:11 CEST 2020)
 ======================================
 
