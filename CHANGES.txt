@@ -1,3 +1,11 @@
+ScriptEngine Tasks for EC-Earth 0.6.1
+======================================
+
+Fixes
+-----
+- Create the correct anchors for Redmine TOC (#80/PR#87)
+
+
 ScriptEngine Tasks for EC-Earth 0.6.0
 ======================================
 
