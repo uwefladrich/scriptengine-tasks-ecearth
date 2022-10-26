@@ -1,5 +1,6 @@
 """Presentation Task that uploads Data and Plots to the EC-Earth dev portal."""
 
+import re
 import urllib.parse
 from pathlib import Path
 
@@ -7,12 +8,12 @@ import jinja2
 import redminelib
 import redminelib.exceptions
 import requests
-from helpers.exceptions import PresentationException
-from helpers.files import ChangeDirectory
-from helpers.presentation_objects import PresentationObject
 from scriptengine.exceptions import ScriptEngineTaskRunError
 from scriptengine.jinja import filters as j2filters
 from scriptengine.tasks.core import Task, timed_runner
+
+from helpers.exceptions import PresentationException
+from helpers.presentation_objects import PresentationObject
 
 
 class Redmine(Task):
@@ -54,7 +55,9 @@ class Redmine(Task):
         # render the template and add as description
         issue_url = f"{server_url}/issues/{issue.id}"
         issue.description = redmine_template.render(
-            presentation_list=presentation_list, issue_url=issue_url
+            presentation_list=presentation_list,
+            issue_url=issue_url,
+            create_anchor=sanitize_anchor_name,
         )
 
         self.log_debug("Uploading attachments.")
@@ -144,3 +147,18 @@ class Redmine(Task):
             msg = f"Could not log in to Redmine server ({e})"
             self.log_error(msg)
             raise ScriptEngineTaskRunError()
+
+
+def sanitize_anchor_name(anchor: str) -> str:
+    """
+    create correct anchors for Redmine issue URLs
+
+    This function is a Python-equivalent of the Ruby function sanitize_anchor_name()
+    in the Redmine source code (app/helpers/application_helper.rb). It makes sure that
+    1. non-word, non-whitespace characters are removed from the string
+    2. whitespace characters are replaced with dashes, but existing dashes do not get duplicated.
+    The logic is as close to the original as possible but is not Unicode aware (not natively supported by re package).
+    """
+    anchor = re.sub(r"[^a-zA-Z\s-]", "", anchor)
+    anchor = re.sub(r"\s+(\-+\s*)?", "-", anchor)
+    return anchor

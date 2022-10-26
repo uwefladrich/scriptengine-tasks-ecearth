@@ -7,7 +7,8 @@ import pytest
 import redminelib
 import redminelib.exceptions
 import scriptengine.exceptions
-from monitoring.redmine import Redmine
+
+from monitoring.redmine import Redmine, sanitize_anchor_name
 
 
 def test_redmine_presentation_list(tmp_path):
@@ -103,3 +104,9 @@ def test_redmine_run(tmp_path):
     with patch.object(redmine_output, "log_debug") as mock:
         redmine_output.run(init)
     mock.assert_called_with("Saving issue.")
+
+
+def test_sanitize_anchor_name():
+    test_string = "Precipitation - Evaporation (Annual Mean Climatology)"
+    redmine_anchor = "Precipitation-Evaporation-Annual-Mean-Climatology"
+    assert sanitize_anchor_name(test_string) == redmine_anchor
