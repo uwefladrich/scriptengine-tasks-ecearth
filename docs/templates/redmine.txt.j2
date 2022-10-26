@@ -12,7 +12,7 @@ h2. Short-links to diagnostic plots below
 
 {% for item in presentation_list -%}
 {% if item["presentation_type"] == "image" -%}
-* "{{item["title"]}}":{{issue_url}}#{{"-".join(item["title"].replace("(","").replace(")","").split())}}
+* "{{item["title"]}}":{{issue_url}}#{{create_anchor(item["title"])}}
 {% endif -%}
 {% endfor %}
 
