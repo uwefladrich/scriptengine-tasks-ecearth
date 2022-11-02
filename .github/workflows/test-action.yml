@@ -35,6 +35,10 @@ jobs:
           mamba list
           pip --version
       -
+        name: Install cartopy apt deps
+        run: |
+          sudo apt install libgeos++-dev -y
+      -
         name: Install se-t-ece from source
         run: |
           pip install -e .
