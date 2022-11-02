@@ -92,3 +92,56 @@ jobs:
         name: Run pytest
         run: |
           pytest
+
+  coverage:
+
+    needs: pytest
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+      -
+        name: Install miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          environment-file: conda_environment.yml
+          python-version: ${{matrix.python-version}}
+      -
+        name: Install testing dependencies
+        run: |
+          pip install pytest
+          pip install coverage
+          pip install coverall
+      -
+        name: Install se-t-ece from source
+        run: |
+          pip install -e .
+      -
+        name: Download test data
+        run: |
+          mkdir ${TEST_DATA_DOWNLOAD};
+          wget -O ${TEST_DATA_DOWNLOAD}/test-data.zip ${TEST_DATA_REF};
+          unzip -q ${TEST_DATA_DOWNLOAD}/test-data.zip -d ${TEST_DATA_DOWNLOAD};
+          mv ${TEST_DATA_DOWNLOAD}/ece-4-monitoring-test-data-main/ tests/testdata;
+      -
+        name: Run pytest
+        run: |
+          coverage run -m pytest
+          coverage lcov
+      -
+        name: Publish to coveralls.io
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage.lcov
