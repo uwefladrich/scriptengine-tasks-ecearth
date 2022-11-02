@@ -38,6 +38,7 @@ jobs:
         name: Install cartopy apt deps
         run: |
           sudo apt install libgeos++-dev -y
+          sudo apt install libproj-dev -y
       -
         name: Install se-t-ece from source
         run: |
