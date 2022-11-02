@@ -122,7 +122,7 @@ jobs:
         run: |
           pip install pytest
           pip install coverage
-          pip install coverall
+          pip install coveralls
       -
         name: Install se-t-ece from source
         run: |
