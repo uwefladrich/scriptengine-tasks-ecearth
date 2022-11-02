@@ -24,28 +24,15 @@ jobs:
         name: Install miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          miniforge-variant: Mambaforge
-          miniforge-version: latest
           environment-file: conda_environment.yml
           python-version: ${{matrix.python-version}}
       -
         name: Print info (1)
         run: |
-          mamba info
-          mamba list
+          conda info
+          conda list
           pip --version
       -
-        name: Install cartopy apt deps
+        name: Show conda_environment.yml
         run: |
-          sudo apt install libgeos++-dev -y
-          sudo apt install libproj-dev -y
-      -
-        name: Install se-t-ece from source
-        run: |
-          pip install -e .
-      -
-        name: Print info (2)
-        run: |
-          mamba info
-          mamba list
-          pip --version
+          cat conda_environment.yml
