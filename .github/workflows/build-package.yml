@@ -1,6 +1,7 @@
 name: Test building PyPI package
 on:
   push:
+    branches: [foo]
 
 jobs:
   pytest:

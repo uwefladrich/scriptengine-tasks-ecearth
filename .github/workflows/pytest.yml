@@ -1,6 +1,7 @@
 name: Run pytest and coverage
 on:
   push:
+    branches: [foo]
 
 env:
   TEST_DATA_REF: "https://github.com/valentinaschueller/ece-4-monitoring-test-data/archive/refs/heads/main.zip"
