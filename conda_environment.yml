@@ -1,4 +1,3 @@
-name: foo
 channels:
     - conda-forge
     - nodefaults

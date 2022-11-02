@@ -28,10 +28,8 @@ jobs:
         name: Install miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          activate-environment: foo
           environment-file: conda_environment.yml
           python-version: ${{matrix.python-version}}
-          auto-activate-base: false
       -
         name: Print info (1)
         run: |
