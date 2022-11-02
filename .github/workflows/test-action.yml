@@ -7,6 +7,35 @@ env:
 
 jobs:
 
+  lint:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+      -
+        name: Install linter
+        run: |
+          pip install flake8
+      -
+        name: Lint with flake8
+        run: |
+          # Syntax errors or undefined names
+          flake8 --count --select=E9,F63,F7,F82 --show-source --statistics monitoring/
+          flake8 --count --select=E9,F63,F7,F82 --show-source --statistics helpers/
+          flake8 --count --select=E9,F63,F7,F82 --show-source --statistics tests/
+          # All other stuff
+          flake8 --exit-zero --count --statistics --exclude=__init__.py --max-line-length=88 monitoring/
+          flake8 --exit-zero --count --statistics --exclude=__init__.py --max-line-length=88 helpers/
+          flake8 --exit-zero --count --statistics --exclude=__init__.py --max-line-length=88 tests/
+
   pytest:
 
     runs-on: ubuntu-latest
