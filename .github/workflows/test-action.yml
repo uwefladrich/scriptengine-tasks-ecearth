@@ -35,8 +35,7 @@ jobs:
         run: |
           conda info
           conda list
-          pip --version
       -
-        name: Show conda_environment.yml
+        name: Install se-t-ece from source
         run: |
-          cat conda_environment.yml
+          pip install -e .
