@@ -1,6 +1,10 @@
 name: Test action
 on: push
 
+env:
+  TEST_DATA_REF: "https://github.com/valentinaschueller/ece-4-monitoring-test-data/archive/refs/heads/main.zip"
+  TEST_DATA_DOWNLOAD: "test-data"
+
 jobs:
 
   pytest:
@@ -35,7 +39,7 @@ jobs:
         run: |
           pip install pytest
       -
-        name: Print info (1)
+        name: Print environment info (1)
         run: |
           conda info
           conda list
@@ -43,6 +47,18 @@ jobs:
         name: Install se-t-ece from source
         run: |
           pip install -e .
+      -
+        name: Print environment info (2)
+        run: |
+          conda info
+          conda list
+      -
+        name: Download test data
+        run: |
+          mkdir ${TEST_DATA_DOWNLOAD};
+          wget -O ${TEST_DATA_DOWNLOAD}/test-data.zip ${TEST_DATA_REF};
+          unzip -q ${TEST_DATA_DOWNLOAD}/test-data.zip -d ${TEST_DATA_DOWNLOAD};
+          mv ${TEST_DATA_DOWNLOAD}/ece-4-monitoring-test-data-main/ tests/testdata;
       -
         name: Run pytest
         run: |
