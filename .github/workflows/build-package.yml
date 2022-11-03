@@ -3,8 +3,11 @@ on:
   push:
 
 jobs:
-  pytest:
+
+  test-build-package:
+
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         python-version: [ "3.7", "3.8", "3.9", "3.10" ]
@@ -24,5 +27,5 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install build
       -
-        name: Build binary wheel and source tarbal
+        name: Build binary wheel and source tarball
         run: python -m build --sdist --wheel --outdir dist/ .

@@ -3,8 +3,11 @@ on:
   push:
 
 jobs:
+
   pytest:
+
     runs-on: ubuntu-latest
+
     defaults:
       run:
         shell: bash -l {0}
@@ -29,13 +32,7 @@ jobs:
           environment-file: conda_environment.yml
           python-version: ${{matrix.python-version}}
       -
-        name: Finish conda setup
-        run: |
-          conda info
-          conda install pip
-          python -m pip install --upgrade pip
-      -
-        name: Install package + remaining PyPI dependencies
+        name: Install se-t-ece from source
         run: pip install .
       -
         name: Test run ScriptEngine
