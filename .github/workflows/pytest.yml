@@ -71,7 +71,7 @@ jobs:
       -
         name: Install se-t-ece from source
         run: |
-          pip install -e .
+          pip install .
       -
         name: Print environment info
         run: |
@@ -115,7 +115,7 @@ jobs:
           python-version: "3.9"
       -
         name: Install se-t-ece from source
-        run: pip install -e .
+        run: pip install .
       -
         name: Install pytest, coverage, coveralls
         run: |
