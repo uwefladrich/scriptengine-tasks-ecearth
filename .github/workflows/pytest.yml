@@ -3,8 +3,8 @@ on:
   push:
 
 env:
-  TEST_DATA_REF: "https://github.com/valentinaschueller/ece-4-monitoring-test-data/archive/refs/heads/main.zip"
-  TEST_DATA_DOWNLOAD: "test-data"
+  TEST_DATA_REF: https://github.com/valentinaschueller/ece-4-monitoring-test-data/archive/refs/heads/main.zip
+  TEST_DATA_DOWNLOAD: test-data
 
 jobs:
 
@@ -61,7 +61,7 @@ jobs:
         name: Install miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          miniconda-version: "latest"
+          miniconda-version: latest
           environment-file: conda_environment.yml
           python-version: ${{matrix.python-version}}
       -
@@ -110,7 +110,7 @@ jobs:
         name: Install miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          miniconda-version: "latest"
+          miniconda-version: latest
           environment-file: conda_environment.yml
           python-version: "3.9"
       -

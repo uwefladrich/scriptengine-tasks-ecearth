@@ -56,7 +56,7 @@ jobs:
         name: Setup miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          miniconda-version: "latest"
+          miniconda-version: latest
           environment-file: conda_environment.yml
           python-version: ${{matrix.python-version}}
       -
