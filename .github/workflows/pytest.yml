@@ -67,11 +67,11 @@ jobs:
       -
         name: Install pytest
         run: |
-          pip install pytest
+          python -m pip install pytest
       -
         name: Install se-t-ece from source
         run: |
-          pip install .
+          python -m pip install .
       -
         name: Print environment info
         run: |
@@ -115,7 +115,8 @@ jobs:
           python-version: "3.9"
       -
         name: Install se-t-ece from source
-        run: pip install .
+        run: |
+          python -m pip install .
       -
         name: Install pytest, coverage, coveralls
         run: |
