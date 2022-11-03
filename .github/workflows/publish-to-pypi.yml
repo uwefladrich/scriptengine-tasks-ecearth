@@ -25,7 +25,8 @@ jobs:
           python -m pip install build
       -
         name: Build binary wheel and source tarball
-        run: python -m build --sdist --wheel --outdir dist/ .
+        run: |
+          python -m build --sdist --wheel --outdir dist/ .
       -
         name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

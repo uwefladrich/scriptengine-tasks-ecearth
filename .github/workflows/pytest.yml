@@ -86,7 +86,8 @@ jobs:
           mv ${TEST_DATA_DOWNLOAD}/ece-4-monitoring-test-data-main/ tests/testdata;
       -
         name: Run pytest
-        run: pytest
+        run: |
+          pytest
 
   coverage:
 
