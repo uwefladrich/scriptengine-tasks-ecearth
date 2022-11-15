@@ -1,3 +1,11 @@
+ScriptEngine Tasks for EC-Earth 0.6.2
+======================================
+
+Fixes
+-----
+- Add minimal pyproject.toml to allow for conda packaging
+
+
 ScriptEngine Tasks for EC-Earth 0.6.1
 ======================================
 
