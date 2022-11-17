@@ -1,3 +1,11 @@
+Next release
+============
+
+Internal changes
+----------------
+- Base package build on pyproject.toml (#93)
+
+
 ScriptEngine Tasks for EC-Earth 0.6.2
 ======================================
 
