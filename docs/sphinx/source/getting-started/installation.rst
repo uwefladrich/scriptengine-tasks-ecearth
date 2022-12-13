@@ -3,14 +3,14 @@ Installation
 ************
 
 The ScriptEngine tasks for EC-Earth require a Unix(-like) operating system and
-Python3.
+Python 3.
 
 The package supports two different installation methods:
 
-    * Installation using conda;
-    * Installation from source.
+    * installation using conda;
+    * installation from source.
 
-The next sections below will detail the procedure to install the package for
+The sections below will detail the procedure to install the package for
 both of the above recommended methods.
 
 Packages for the ScriptEngine tasks are also provided at PyPI and can be
@@ -23,10 +23,11 @@ Once the installation is done, you can check if everything worked out by calling
 tasks, and the tasks in this package start with the prefix ``ece.``.
 
 
-Installation using conda
+Installation Using Conda
 ========================
 
-This is the recommended way to install this package.
+.. note::
+    This is the recommended way to install this package for users.
 
 Get the conda package manager following the `instructions`_ for your operating
 system. Create an environment and activate it with::
