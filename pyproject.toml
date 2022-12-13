@@ -29,6 +29,7 @@
         "scitools-iris>=3.1,!=3.2.0,!=3.2.0.post0",
         "cartopy>=0.20",
         "python-redmine",
+        "python-gitlab",
     ]
 
     [project.urls]
@@ -52,4 +53,5 @@
         "ece.mon.oifs_global_mean_year_mean_timeseries" = "monitoring.oifs_global_mean_year_mean_timeseries:OifsGlobalMeanYearMeanTimeseries"
         "ece.mon.presentation.markdown" = "monitoring.markdown:Markdown"
         "ece.mon.presentation.redmine" = "monitoring.redmine:Redmine"
+        "ece.mon.presentation.gitlab" = "monitoring.gitlab:Gitlab"
         "ece.mon.linear_combination" = "monitoring.linear_combination:LinearCombination"
