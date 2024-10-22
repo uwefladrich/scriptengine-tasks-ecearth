@@ -120,3 +120,17 @@ def test_annual_time_bounds():
         ]
     )
     assert (new_bounds == annual_bounds).all()
+
+
+@pytest.mark.parametrize(
+    ("unit", "converted_unit"),
+    (
+        ("m", "m"),
+        ("m-s^-1", "m-s^-1"),
+        ("kelvin", "degC"),
+        ("meter^-2-kilogram-second^-1", "meter^-2-kilogram-day^-1"),
+    ),
+)
+def test_unit_conversions(unit, converted_unit):
+    cube = Cube(np.array([1]), units=unit)
+    assert helpers.cubes.convert_units(cube).units == cf_units.Unit(converted_unit)
