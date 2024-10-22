@@ -85,4 +85,7 @@ class OifsAllMeanMap(Map):
         # Convert unit to °C if varname is given in K
         if map_cube.units.name == "kelvin":
             map_cube.convert_units("degC")
+        # Convert unit to mm/day if varname is given in kg m-2 s-1
+        if timeseries_cube.units.name == "meter^-2-kilogram-second^-1":
+            timeseries_cube.convert_units("meter^-2-kilogram-day^-1")
         return map_cube

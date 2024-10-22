@@ -74,4 +74,7 @@ class OifsYearMeanTemporalmap(Temporalmap):
         # Convert unit to °C if varname is given in K
         if temporalmap_cube.units.name == "kelvin":
             temporalmap_cube.convert_units("degC")
+        # Convert unit to mm/day if varname is given in kg m-2 s-1
+        if timeseries_cube.units.name == "meter^-2-kilogram-second^-1":
+            timeseries_cube.convert_units("meter^-2-kilogram-day^-1")
         return temporalmap_cube
