@@ -98,6 +98,15 @@ class TimeseriesLoader(PresentationObjectLoader):
 
         fig = plt.figure(figsize=(6, 4), dpi=150)
         ax = fig.add_subplot(1, 1, 1)
+
+        # show a (constant) reference value if it is defined
+        reference = kwargs.get("reference", None)
+        if reference:
+            ref_value = reference['value']
+            ref_label = reference['label']
+            ax.plot([coord_points[0],coord_points[-1]],[ref_value,ref_value],
+                    color="r",linestyle="dotted", label=ref_label)
+
         ax.plot(coord_points, self.cube.data, color="k")
         plt.setp(ax.spines.values(), color="grey")
         ax.grid()
@@ -119,6 +128,10 @@ class TimeseriesLoader(PresentationObjectLoader):
         ax.set_ylabel(format_label(self.cube.long_name, self.cube.units))
 
         plt.tight_layout()
+
+        if reference:
+            plt.legend()
+
         with ChangeDirectory(dst_folder):
             fig.savefig(dst_file, bbox_inches="tight")
             plt.close(fig)
