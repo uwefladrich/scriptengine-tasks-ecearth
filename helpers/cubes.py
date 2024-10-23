@@ -35,6 +35,34 @@ def load_input_cube(src, varname):
     return leg_cube
 
 
+DEFAULT_UNIT_CONVERSIONS = {
+    "kelvin": "degC",
+    "meter^-2-kilogram-second^-1": "meter^-2-kilogram-day^-1",
+}
+
+
+def convert_units(cube: iris.cube.Cube, conversions=None) -> iris.cube.Cube:
+    """Converts units of an Iris cube
+
+    Converts units if the current unit is present in the 'conversions' dict.
+    Does nothing otherwise.
+
+    Args:
+        cube: An Iris cube
+        conversions: A mapping (dict) with 'unit': 'converted_unit' strings.
+          If None (default), then DEFAULT_UNIT_CONVERSIONS (defined above) is used.
+    Returns:
+        An Iris cube with modified units.
+    """
+    if conversions is None:
+        conversions = DEFAULT_UNIT_CONVERSIONS
+    try:
+        cube.convert_units(conversions[cube.units.name])
+    except KeyError:
+        pass
+    return cube
+
+
 def set_metadata(cube, **kwargs):
     """Set metadata for diagnostic."""
     defaults = {
