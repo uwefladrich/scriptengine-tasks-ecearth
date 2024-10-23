@@ -101,7 +101,7 @@ class TimeseriesLoader(PresentationObjectLoader):
 
         # plot (constant) reference value if defined
         ref = kwargs.get("reference", None)
-        if ref:
+        if isinstance(ref,dict):
             ref_value = ref.get("value", None)
             if ref_value:
                 ref_label = ref.get("label", "Reference value")
