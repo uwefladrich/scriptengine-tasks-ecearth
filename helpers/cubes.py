@@ -3,6 +3,7 @@
 import warnings
 
 import iris
+import iris.cube
 import numpy as np
 from iris.util import equalise_attributes
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
