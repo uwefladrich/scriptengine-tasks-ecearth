@@ -32,7 +32,7 @@ Installation Using Conda
 Get the conda package manager following the `instructions`_ for your operating
 system. Create an environment and activate it with::
 
-    conda create --name <ENVIRONMENT_NAME> python>=3.7
+    conda create --name <ENVIRONMENT_NAME> python>=3.8
     conda activate <ENVIRONMENT_NAME>
 
 Alternatively, activate an existing conda environment you want to use for this
