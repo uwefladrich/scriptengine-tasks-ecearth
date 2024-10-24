@@ -1,6 +1,10 @@
 Next Release
 ============
 
+Fixes
+-----
+- Add missing iris.cube import in helpers/cubes (PR #102)
+
 Features
 --------
 - Convert cubes with unit kg m-2 s-1 to kg m-2 day-1 (PR #99)
