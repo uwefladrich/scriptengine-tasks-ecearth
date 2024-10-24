@@ -20,7 +20,7 @@ jobs:
         name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: "3.12"
       -
         name: Install flake8
         run: |
@@ -106,14 +106,14 @@ jobs:
         name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: "3.12"
       -
         name: Install miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: latest
           environment-file: conda_environment.yml
-          python-version: "3.9"
+          python-version: "3.12"
       -
         name: Install se-t-ece from source
         run: |
