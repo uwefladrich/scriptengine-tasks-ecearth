@@ -8,6 +8,7 @@ Fixes
 Features
 --------
 - Convert cubes with unit kg m-2 s-1 to kg m-2 day-1 (PR #99)
+- Show optional reference value in timeseries plots (PR #100)
 
 Internal changes
 ----------------

@@ -38,6 +38,7 @@ Currently, the following customization features are implemented:
 
 * ``value_range``: set the minimum and maximum value of a time series or (temporal) map. Particularly useful for temporal maps. Default: ``[None, None]``
 * ``colormap``: set a custom colormap for maps and temporal maps. Default: ``RdBu_r``. The list of possible colormaps is in the `Matplotlib documentation`_.
+* ``reference``: provide a dict with keys ``value`` and optionally ``label`` for a reference value to be shown in the time series. Default: ``None``. 
 
 Example::
 
@@ -51,6 +52,12 @@ Example::
             - path: "{{mondir}}/tos_nemo_year_mean_temporalmap.nc"
               value_range: [-2, 30]
               colormap: 'viridis'
+            - path: "{{mondir}}/tas_nemo_global_mean_year_mean_timeseries.nc"
+              reference:
+                value: 14.4
+                label: "ERA5 (1991-2020)"
+            - path: "{{mondir}}/pr_nemo_global_mean_year_mean_timeseries.nc"
+              reference: {"value":2.93, "label":"ERA5 (1991-2020)"}
         dst: "{{mondir}}/report"
         template: "scriptengine-tasks-ecearth/docs/templates/markdown_template.md.j2"
 
