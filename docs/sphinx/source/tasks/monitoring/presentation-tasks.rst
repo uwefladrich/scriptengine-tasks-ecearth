@@ -58,7 +58,7 @@ Example::
                 label: "ERA5 (1991-2020)"
             - path: "{{mondir}}/pr_nemo_global_mean_year_mean_timeseries.nc"
               reference: {"value":2.93, "label":"ERA5 (1991-2020)"}
-            dst: "{{mondir}}/report"
+        dst: "{{mondir}}/report"
         template: "scriptengine-tasks-ecearth/docs/templates/markdown_template.md.j2"
 
 
