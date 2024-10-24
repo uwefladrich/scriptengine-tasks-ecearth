@@ -101,12 +101,18 @@ class TimeseriesLoader(PresentationObjectLoader):
 
         # plot (constant) reference value if defined
         ref = kwargs.get("reference", None)
-        if isinstance(ref,dict):
+        if isinstance(ref, dict):
             ref_value = ref.get("value", None)
             if ref_value:
                 ref_label = ref.get("label", "Reference value")
-                ax.axhline(y=ref_value,xmin=.05,xmax=.95,
-                        color="r",linestyle=":", label=ref_label)
+                ax.axhline(
+                    y=ref_value,
+                    xmin=0.05,
+                    xmax=0.95,
+                    color="r",
+                    linestyle=":",
+                    label=ref_label,
+                )
                 ax.legend()
 
         ax.plot(coord_points, self.cube.data, color="k")
