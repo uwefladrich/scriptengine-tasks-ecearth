@@ -19,7 +19,7 @@
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
     ]
-    requires-python = ">=3.7"
+    requires-python = ">=3.8"
     dependencies = [
         "scriptengine>=0.8.1",
         "pyYAML>=5.1",
