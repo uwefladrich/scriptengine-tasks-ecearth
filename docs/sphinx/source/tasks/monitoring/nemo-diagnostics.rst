@@ -19,7 +19,7 @@ NemoGlobalMeanYearMeanTimeseries
 | Diagnostic Type: Time Series
 | Mapped to: ``ece.mon.nemo_global_mean_year_mean_timeseries``
 
-This processing task computes the global and temporal average of a 2D oceanic quantity, resulting in a time series diagnostic.
+This processing task computes the global and temporal average of an oceanic quantity, resulting in a time series diagnostic.
 
 To compute an annual mean, the leg has to be one year long.
 If it is, e.g., six months long, the task will compute the six month global mean of the input variable.
@@ -49,7 +49,8 @@ NemoGlobalSumYearMeanTimeseries
 | Diagnostic Type: Time Series
 | Mapped to: ``ece.mon.nemo_global_sum_year_mean_timeseries``
 
-This processing task computes the global area-weighted sum and temporal average of a 2D oceanic quantity, resulting in a time series diagnostic.
+This processing task computes the global area/volume integral and temporal average of an oceanic quantity, resulting in a time series diagnostic.
+Units are automatically converted.
 
 To compute an annual mean, the leg has to be one year long.
 If it is, e.g., six months long, the task will compute the six month global mean of the input variable.
@@ -69,9 +70,9 @@ If it is, e.g., six months long, the task will compute the six month global mean
 
     - ece.mon.nemo_global_sum_year_mean_timeseries:
         src: "{{t_files}}"
-        dst: "{{mondir}}/tos_nemo_global_sum_year_mean_timeseries.nc"
+        dst: "{{mondir}}/qt_oce_nemo_global_sum_year_mean_timeseries.nc"
         domain: "{{rundir}}/domain.nc"
-        varname: tos
+        varname: qt_oce
 
 
 NemoAllMeanMap
