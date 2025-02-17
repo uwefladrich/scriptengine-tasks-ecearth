@@ -1,4 +1,4 @@
-"""Processing Task that calculates the area-weighted sum and annual mean of a given intensive quantity."""
+"""Processing Tasks for computing Timeseries from NEMO output."""
 
 from pathlib import Path
 
@@ -27,7 +27,7 @@ class NemoTimeseries(Timeseries):
             {**arguments, "title": None, "coord_value": None, "data_value": None}
         )
 
-    def _load_files(self, context):
+    def _load_input(self, context):
         self.src = self.getarg("src", context)
         self.dst = Path(self.getarg("dst", context))
         self.domain = self.getarg("domain", context)
@@ -46,7 +46,7 @@ class NemoTimeseries(Timeseries):
 class NemoGlobalSumYearMeanTimeseries(NemoTimeseries):
     @timed_runner
     def run(self, context):
-        var_data = self._load_files(context)
+        var_data = self._load_input(context)
 
         global_sum = helpers.nemo.compute_global_aggregate(
             var_data, self.domain, self.grid, iris.analysis.SUM
@@ -81,7 +81,7 @@ class NemoGlobalSumYearMeanTimeseries(NemoTimeseries):
 class NemoGlobalMeanYearMeanTimeseries(NemoTimeseries):
     @timed_runner
     def run(self, context):
-        var_data = self._load_files(context)
+        var_data = self._load_input(context)
 
         global_mean = helpers.nemo.compute_global_aggregate(
             var_data, self.domain, self.grid, iris.analysis.MEAN
