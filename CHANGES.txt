@@ -10,10 +10,13 @@ Features
 - Convert cubes with unit kg m-2 s-1 to kg m-2 day-1 (PR #99)
 - Show optional reference value in timeseries plots (PR #100)
 - Update supported Python versions (PR #103)
+- Add a new processing task NemoGlobalSumYearMeanTimeseries (PR #105)
 
 Internal changes
 ----------------
 - Streamline unit conversions for cubes (PR #99)
+- Add a new NemoTimeseries parent class (PR #105)
+- Improve global aggregation in NEMO timeseries tasks: Iris now changes units automatically when necessary (PR #105)
 
 
 ScriptEngine Tasks for EC-Earth 0.6.3
