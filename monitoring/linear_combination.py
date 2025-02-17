@@ -12,7 +12,6 @@ import helpers.cubes
 
 
 class LinearCombination(Task):
-
     _required_arguments = (
         "src",
         "dst",
