@@ -18,14 +18,12 @@ _meta_dict = {
         "long_name": "Sea-Ice Volume",
         "standard_name": "sea_ice_volume",
         "var_name": "sivol",
-        "old_unit": "m3",
         "new_unit": "1e3 km3",
     },
     "siconc": {
         "long_name": "Sea-Ice Area",
         "standard_name": "sea_ice_area",
         "var_name": "siarea",
-        "old_unit": "m2",
         "new_unit": "1e6 km2",
     },
 }
@@ -98,21 +96,11 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
         this_leg = helpers.cubes.mask_other_hemisphere(this_leg, hemisphere)
         this_leg = helpers.cubes.annual_time_bounds(this_leg)
 
-        with warnings.catch_warnings():
-            # Suppress warning about insufficient metadata.
-            warnings.filterwarnings(
-                "ignore",
-                "Collapsing a multi-dimensional coordinate.",
-                UserWarning,
-            )
-            this_leg_summed = this_leg.collapsed(
-                ["latitude", "longitude"],
-                iris.analysis.SUM,
-                weights=helpers.nemo.spatial_weights(this_leg, domain, "T"),
-            )
+        this_leg_summed = helpers.nemo.compute_global_aggregate(
+            this_leg, domain, "T", iris.analysis.SUM
+        )
 
         this_leg_summed.standard_name = _meta_dict[varname]["standard_name"]
-        this_leg_summed.units = cf_units.Unit(_meta_dict[varname]["old_unit"])
         this_leg_summed.convert_units(_meta_dict[varname]["new_unit"])
         this_leg_summed.long_name = (
             f"{long_name} {helpers.dates.month_name(month)} {hemisphere}"

@@ -95,6 +95,20 @@ def compute_time_weights(monthly_data_cube, cube_shape=None):
     return month_weights
 
 
+def compute_annual_mean(cube):
+    # Remove auxiliary time coordinate before collapsing cube
+    cube.remove_coord(cube.coord("time", dim_coords=False))
+
+    annual_mean = cube.collapsed(
+        "time",
+        iris.analysis.MEAN,
+        weights=compute_time_weights(cube),
+    )
+    # Promote time from scalar to dimension coordinate
+    annual_mean = iris.util.new_axis(annual_mean, "time")
+    return annual_mean
+
+
 def extract_month(cube, month):
     return cube.extract(
         iris.Constraint(time=lambda cell: cell.point.month == month_number(month))
@@ -112,7 +126,6 @@ def remove_aux_time(cube):
 
 
 def annual_time_bounds(cube):
-
     t_coord = cube.coord("time")
     cube.remove_coord("time")
 
