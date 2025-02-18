@@ -38,7 +38,8 @@ def test_2d_spatial_weights(tmp_path):
     domain_file = str(tmp_path / "domain.nc")
     iris.save(domain, domain_file)
     expected_weights = np.array([6.0])
-    assert helpers.nemo.spatial_weights(data, domain_file, "t") == expected_weights
+    helpers.nemo._add_cell_size(data, domain_file, "t")
+    assert data.cell_measure("cell_size").data == expected_weights
 
 
 def test_3d_spatial_weights(tmp_path):
@@ -66,4 +67,5 @@ def test_3d_spatial_weights(tmp_path):
     domain_file = str(tmp_path / "domain.nc")
     iris.save(domain, domain_file)
     expected_weights = np.array([24.0])
-    assert helpers.nemo.spatial_weights(data, domain_file, "t") == expected_weights
+    helpers.nemo._add_cell_size(data, domain_file, "t")
+    assert data.cell_measure("cell_size").data == expected_weights

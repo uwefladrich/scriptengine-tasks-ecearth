@@ -19,7 +19,7 @@ NemoGlobalMeanYearMeanTimeseries
 | Diagnostic Type: Time Series
 | Mapped to: ``ece.mon.nemo_global_mean_year_mean_timeseries``
 
-This processing task computes the global and temporal average of a 2D oceanic quantity, resulting in a time series diagnostic.
+This processing task computes the global and temporal average of an oceanic quantity, resulting in a time series diagnostic.
 
 To compute an annual mean, the leg has to be one year long.
 If it is, e.g., six months long, the task will compute the six month global mean of the input variable.
@@ -42,6 +42,37 @@ If it is, e.g., six months long, the task will compute the six month global mean
         dst: "{{mondir}}/tos_nemo_global_mean_year_mean_timeseries.nc"
         domain: "{{rundir}}/domain.nc"
         varname: tos
+
+NemoGlobalSumYearMeanTimeseries
+================================
+
+| Diagnostic Type: Time Series
+| Mapped to: ``ece.mon.nemo_global_sum_year_mean_timeseries``
+
+This processing task computes the global area/volume integral and temporal average of an oceanic quantity, resulting in a time series diagnostic.
+Units are automatically converted.
+
+To compute an annual mean, the leg has to be one year long.
+If it is, e.g., six months long, the task will compute the six month global mean of the input variable.
+
+**Required arguments**
+
+* ``src``: A list of strings containing paths to the desired NEMO output files. This list can be manually entered or (often better) created by the ``find`` task.
+* ``dst``: A string ending in ``.nc``. This is where the diagnostic will be saved.
+* ``domain``: A string containing the path to the ``domain.nc`` file. Used for area-weighting in the sum.
+* ``varname``: The name of the oceanic variable as it is saved in the NEMO output file.
+
+**Optional arguments**
+
+* ``grid``: The grid type of the desired variable. Can be T, U, V, W. Default: T.
+
+::
+
+    - ece.mon.nemo_global_sum_year_mean_timeseries:
+        src: "{{t_files}}"
+        dst: "{{mondir}}/qt_oce_nemo_global_sum_year_mean_timeseries.nc"
+        domain: "{{rundir}}/domain.nc"
+        varname: qt_oce
 
 
 NemoAllMeanMap

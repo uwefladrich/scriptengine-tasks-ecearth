@@ -26,7 +26,7 @@
         "matplotlib>=3.1",
         "numpy>=1.18",
         "imageio>=2.18",
-        "scitools-iris>=3.1,!=3.2.0,!=3.2.0.post0",
+        "scitools-iris>=3.5",
         "cartopy>=0.20",
         "python-redmine",
     ]
@@ -40,7 +40,8 @@
         "ece.mon.timeseries" = "monitoring.timeseries:Timeseries"
         "ece.mon.diskusage_rte_scalar" = "monitoring.diskusage_rte_scalar:DiskusageRteScalar"
         "ece.mon.simulatedyears_rte_scalar" = "monitoring.simulatedyears_rte_scalar:SimulatedyearsRteScalar"
-        "ece.mon.nemo_global_mean_year_mean_timeseries" = "monitoring.nemo_global_mean_year_mean_timeseries:NemoGlobalMeanYearMeanTimeseries"
+        "ece.mon.nemo_global_mean_year_mean_timeseries" = "monitoring.nemo_timeseries:NemoGlobalMeanYearMeanTimeseries"
+        "ece.mon.nemo_global_sum_year_mean_timeseries" = "monitoring.nemo_timeseries:NemoGlobalSumYearMeanTimeseries"
         "ece.mon.nemo_all_mean_map" = "monitoring.nemo_all_mean_map:NemoAllMeanMap"
         "ece.mon.nemo_month_mean_temporalmap" = "monitoring.nemo_time_mean_temporalmap:NemoMonthMeanTemporalmap"
         "ece.mon.nemo_year_mean_temporalmap" = "monitoring.nemo_time_mean_temporalmap:NemoYearMeanTemporalmap"
