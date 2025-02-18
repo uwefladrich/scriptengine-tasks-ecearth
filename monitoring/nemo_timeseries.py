@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import iris
+from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
 from scriptengine.tasks.core import timed_runner
 
 import helpers.cubes
@@ -16,7 +17,6 @@ class NemoTimeseries(Timeseries):
 
     _required_arguments = (
         "src",
-        "domain",
         "varname",
         "dst",
     )
@@ -28,28 +28,29 @@ class NemoTimeseries(Timeseries):
         )
 
     def _load_input(self, context):
-        self.src = self.getarg("src", context)
-        self.dst = Path(self.getarg("dst", context))
-        self.domain = self.getarg("domain", context)
-        self.grid = self.getarg("grid", context, default="T")
+        src = self.getarg("src", context)
         var_name = self.getarg("varname", context)
-        self.log_info(
-            f"Create time series for ocean variable {var_name} at {self.dst}."
-        )
+        self.log_info(f"Create time series for ocean variable {var_name}.")
 
-        self.check_file_extension(self.dst)
-
-        var_data = helpers.cubes.load_input_cube(self.src, var_name)
+        var_data = helpers.cubes.load_input_cube(src, var_name)
         return var_data
 
 
 class NemoGlobalSumYearMeanTimeseries(NemoTimeseries):
+    _required_arguments = ("domain",)
+
+    def __init__(self, arguments):
+        NemoGlobalSumYearMeanTimeseries.check_arguments(arguments)
+        super().__init__(arguments)
+
     @timed_runner
     def run(self, context):
         var_data = self._load_input(context)
 
+        domain = self.getarg("domain", context)
+        grid = self.getarg("grid", context, default="T")
         global_sum = helpers.nemo.compute_global_aggregate(
-            var_data, self.domain, self.grid, iris.analysis.SUM
+            var_data, domain, grid, iris.analysis.SUM
         )
 
         annual_mean = helpers.cubes.compute_annual_mean(global_sum)
@@ -75,16 +76,26 @@ class NemoGlobalSumYearMeanTimeseries(NemoTimeseries):
             comment=comment,
         )
 
-        self.save(annual_mean, self.dst)
+        dst = Path(self.getarg("dst", context))
+        self.check_file_extension(dst)
+        self.save(annual_mean, dst)
 
 
 class NemoGlobalMeanYearMeanTimeseries(NemoTimeseries):
+    _required_arguments = ("domain",)
+
+    def __init__(self, arguments):
+        NemoGlobalMeanYearMeanTimeseries.check_arguments(arguments)
+        super().__init__(arguments)
+
     @timed_runner
     def run(self, context):
         var_data = self._load_input(context)
 
+        domain = self.getarg("domain", context)
+        grid = self.getarg("grid", context, default="T")
         global_mean = helpers.nemo.compute_global_aggregate(
-            var_data, self.domain, self.grid, iris.analysis.MEAN
+            var_data, domain, grid, iris.analysis.MEAN
         )
 
         annual_mean = helpers.cubes.compute_annual_mean(global_mean)
@@ -111,4 +122,36 @@ class NemoGlobalMeanYearMeanTimeseries(NemoTimeseries):
             comment=comment,
         )
 
-        self.save(annual_mean, self.dst)
+        dst = Path(self.getarg("dst", context))
+        self.check_file_extension(dst)
+        self.save(annual_mean, dst)
+
+
+class NemoYearMeanTimeseries(NemoTimeseries):
+    @timed_runner
+    def run(self, context):
+        var_data = self._load_input(context)
+
+        if not var_data.ndim == 1:
+            self.log_error(f"Input data is not one-dimensional.")
+            raise ScriptEngineTaskArgumentInvalidError
+
+        annual_mean = helpers.cubes.compute_annual_mean(var_data)
+
+        annual_mean.cell_methods = (
+            iris.coords.CellMethod("mean", coords="time", intervals="1 year"),
+        )
+
+        long_name = annual_mean.long_name
+        var_name = annual_mean.standard_name
+        comment = f"Annual mean of {long_name} / **{var_name}**."
+
+        annual_mean = helpers.cubes.set_metadata(
+            annual_mean,
+            title=f"{long_name} (annual mean)",
+            comment=comment,
+        )
+
+        dst = Path(self.getarg("dst", context))
+        self.check_file_extension(dst)
+        self.save(annual_mean, dst)

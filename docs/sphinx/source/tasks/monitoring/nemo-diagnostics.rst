@@ -75,6 +75,31 @@ If it is, e.g., six months long, the task will compute the six month global mean
         varname: qt_oce
 
 
+NemoYearMeanTimeseries
+================================
+
+| Diagnostic Type: Time Series
+| Mapped to: ``ece.mon.nemo_year_mean_timeseries``
+
+This processing task computes the temporal average of a one-dimensional oceanic quantity, resulting in a time series diagnostic.
+
+To compute an annual mean, the leg has to be one year long.
+If it is, e.g., six months long, the task will compute the six month global mean of the input variable.
+
+**Required arguments**
+
+* ``src``: A list of strings containing paths to the desired NEMO output files. This list can be manually entered or (often better) created by the ``find`` task.
+* ``dst``: A string ending in ``.nc``. This is where the diagnostic will be saved.
+* ``varname``: The name of the oceanic variable as it is saved in the NEMO output file.
+
+::
+
+    - ece.mon.nemo_year_mean_timeseries:
+        src: "{{bgc_files}}"
+        dst: "{{mondir}}/tdenit_nemo_year_mean_timeseries.nc"
+        varname: tdenit
+
+
 NemoAllMeanMap
 ==============
 
