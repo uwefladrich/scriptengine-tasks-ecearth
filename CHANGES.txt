@@ -11,6 +11,7 @@ Features
 - Show optional reference value in timeseries plots (PR #100)
 - Update supported Python versions (PR #103)
 - Add a new processing task NemoGlobalSumYearMeanTimeseries (PR #106)
+- Add a new processing task NemoYearMeanTimeseries (PR #108)
 
 Internal changes
 ----------------

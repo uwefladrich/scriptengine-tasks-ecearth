@@ -2,10 +2,14 @@
 
 import cf_units
 import iris
+import numpy as np
+import pytest
+import scriptengine.exceptions
 
 from monitoring.nemo_timeseries import (
     NemoGlobalMeanYearMeanTimeseries,
     NemoGlobalSumYearMeanTimeseries,
+    NemoYearMeanTimeseries,
 )
 
 
@@ -62,4 +66,34 @@ def test_nemo_global_sum_year_mean_timeseries_working(tmp_path):
     assert cube.cell_methods == (
         iris.coords.CellMethod("mean", coords="time", intervals="1 year"),
         iris.coords.CellMethod("sum", coords="area"),
+    )
+
+
+def test_nemo_year_mean_timeseries_wrong_dim(tmp_path):
+    init = {
+        "src": ["./tests/testdata/NEMO_output_sivolu-199003.nc"],
+        "dst": str(tmp_path / "test.nc"),
+        "varname": "sivolu",
+    }
+    year_mean_ts = NemoYearMeanTimeseries(init)
+    pytest.raises(
+        scriptengine.exceptions.ScriptEngineTaskArgumentInvalidError,
+        year_mean_ts.run,
+        init,
+    )
+
+
+def test_nemo_year_mean_timeseries_working(tmp_path):
+    init = {
+        "src": ["./tests/testdata/a8gx_bgc_5d_bioscalar_1990-1990.nc"],
+        "dst": str(tmp_path / "test.nc"),
+        "varname": "tdenit",
+    }
+    year_mean_ts = NemoYearMeanTimeseries(init)
+    year_mean_ts.run(init)
+    out_cube = iris.load_cube(init["dst"])
+    assert out_cube.shape == (1,)
+    assert out_cube.coord().has_bounds()
+    assert out_cube.cell_methods == (
+        iris.coords.CellMethod("mean", coords="time", intervals="1 year"),
     )
