@@ -41,6 +41,7 @@ jobs:
   test-from-pypi:
 
     runs-on: ubuntu-latest
+    needs: build-n-publish
 
     strategy:
       matrix:
