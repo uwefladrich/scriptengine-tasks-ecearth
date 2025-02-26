@@ -1,0 +1,46 @@
+name: Test from PyPI
+on:
+  push:
+
+jobs:
+
+  test-from-pypi:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
+
+    steps:
+      - 
+        name: Install GEOS
+        run: |
+          # cartopy requires libgeos-dev
+          sudo apt update && sudo apt install --yes \
+          libgeos-dev
+      -
+        # Need to checkout code to get conda_environment.yml
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{matrix.python-version}}
+      -
+        name: Setup miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: latest
+          environment-file: conda_environment.yml
+          python-version: ${{matrix.python-version}}
+      -
+        name: Install scriptengine-tasks-ecearth with dependencies
+        run: |
+          python -m pip install scriptengine-tasks-ecearth
+      -
+        name: Test run ScriptEngine
+        run: |
+          se --help
+          se --help | grep -q "ece\.mon"
