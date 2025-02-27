@@ -6,3 +6,4 @@ dependencies:
     - iris>=3.5
     - cartopy>=0.20
     - hdf5!=1.12.2
+    - numpy<2.0
