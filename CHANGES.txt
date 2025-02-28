@@ -1,3 +1,11 @@
+Next Release
+=============
+
+Internal changes
+----------------
+- CI: Use latest version of external actions, use `bash -el {0}` for actions need miniconda environments (#110)
+
+
 ScriptEngine Tasks for EC-Earth 0.7.0
 ======================================
 
