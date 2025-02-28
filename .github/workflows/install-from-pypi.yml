@@ -8,17 +8,20 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        shell: bash -el {0}
     strategy:
       matrix:
         python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
 
     steps:
-      - 
-        name: Install GEOS
-        run: |
-          # cartopy requires libgeos-dev
-          sudo apt update && sudo apt install --yes \
-          libgeos-dev
+      # - 
+      #   name: Install GEOS
+      #   run: |
+      #     # cartopy requires libgeos-dev
+      #     sudo apt update && sudo apt install --yes \
+      #     libgeos-dev
       -
         # Need to checkout code to get conda_environment.yml
         name: Checkout
