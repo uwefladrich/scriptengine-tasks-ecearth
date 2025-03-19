@@ -76,7 +76,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
             self.log_warning(
                 (
                     f"Invalid varname '{varname}', must be one of {_meta_dict.keys()}; "
-                    "diagnostic will not be ignored."
+                    "diagnostic will be ignored."
                 )
             )
             return
@@ -85,7 +85,7 @@ class Si3HemisSumMonthMeanTimeseries(Timeseries):
             self.log_warning(
                 (
                     f"Invalid hemisphere '{hemisphere}', must be 'north' or 'south'; "
-                    "diagnostic will not be ignored."
+                    "diagnostic will be ignored."
                 )
             )
             return
