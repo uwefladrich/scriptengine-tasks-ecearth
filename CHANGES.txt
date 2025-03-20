@@ -3,7 +3,7 @@ Next Release
 
 Fixes
 -----
-- Fixed a bug introduced in #106 that broke sea ice timeseries task
+- Fixed a bug introduced in #106 that broke sea ice timeseries task (#113)
 
 Internal changes
 ----------------
