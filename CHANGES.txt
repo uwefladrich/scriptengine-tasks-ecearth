@@ -1,6 +1,10 @@
 Next Release
 =============
 
+Fixes
+-----
+- Fixed a bug introduced in #106 that broke sea ice timeseries task (#113)
+
 Internal changes
 ----------------
 - CI: Use latest version of external actions, use `bash -el {0}` for actions need miniconda environments (#110)
