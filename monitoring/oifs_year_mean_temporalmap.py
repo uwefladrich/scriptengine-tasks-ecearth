@@ -71,7 +71,4 @@ class OifsYearMeanTemporalmap(Temporalmap):
             comment=f"Annual mean of **{varname}**.",
             map_type="global atmosphere",
         )
-        # Convert unit to °C if varname is given in K
-        if temporalmap_cube.units.name == "kelvin":
-            temporalmap_cube.convert_units("degC")
-        return temporalmap_cube
+        return helpers.cubes.convert_units(temporalmap_cube)

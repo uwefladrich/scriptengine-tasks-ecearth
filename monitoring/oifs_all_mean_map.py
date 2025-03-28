@@ -1,4 +1,5 @@
 """Processing Task that creates a 2D map of a given extensive atmosphere quantity."""
+
 from pathlib import Path
 
 import iris
@@ -82,7 +83,4 @@ class OifsAllMeanMap(Map):
             comment=f"Simulation average of **{varname}**.",
             map_type="global atmosphere",
         )
-        # Convert unit to °C if varname is given in K
-        if map_cube.units.name == "kelvin":
-            map_cube.convert_units("degC")
-        return map_cube
+        return helpers.cubes.convert_units(map_cube)

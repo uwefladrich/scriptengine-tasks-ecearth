@@ -128,7 +128,4 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
             title=f"{timeseries_cube.long_name} (annual mean)",
             comment=comment,
         )
-        # Convert unit to °C if varname is given in K
-        if timeseries_cube.units.name == "kelvin":
-            timeseries_cube.convert_units("degC")
-        return timeseries_cube
+        return helpers.cubes.convert_units(timeseries_cube)

@@ -3,6 +3,7 @@
 import warnings
 
 import iris
+import iris.cube
 import numpy as np
 from iris.util import equalise_attributes
 from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
@@ -33,6 +34,34 @@ def load_input_cube(src, varname):
     )  # 'timeStamp' and 'uuid' would cause ConcatenateError
     leg_cube = month_cubes.concatenate_cube()
     return leg_cube
+
+
+DEFAULT_UNIT_CONVERSIONS = {
+    "kelvin": "degC",
+    "meter^-2-kilogram-second^-1": "meter^-2-kilogram-day^-1",
+}
+
+
+def convert_units(cube: iris.cube.Cube, conversions=None) -> iris.cube.Cube:
+    """Converts units of an Iris cube
+
+    Converts units if the current unit is present in the 'conversions' dict.
+    Does nothing otherwise.
+
+    Args:
+        cube: An Iris cube
+        conversions: A mapping (dict) with 'unit': 'converted_unit' strings.
+          If None (default), then DEFAULT_UNIT_CONVERSIONS (defined above) is used.
+    Returns:
+        An Iris cube with modified units.
+    """
+    if conversions is None:
+        conversions = DEFAULT_UNIT_CONVERSIONS
+    try:
+        cube.convert_units(conversions[cube.units.name])
+    except KeyError:
+        pass
+    return cube
 
 
 def set_metadata(cube, **kwargs):
@@ -66,6 +95,20 @@ def compute_time_weights(monthly_data_cube, cube_shape=None):
     return month_weights
 
 
+def compute_annual_mean(cube):
+    # Remove auxiliary time coordinate before collapsing cube
+    cube.remove_coord(cube.coord("time", dim_coords=False))
+
+    annual_mean = cube.collapsed(
+        "time",
+        iris.analysis.MEAN,
+        weights=compute_time_weights(cube),
+    )
+    # Promote time from scalar to dimension coordinate
+    annual_mean = iris.util.new_axis(annual_mean, "time")
+    return annual_mean
+
+
 def extract_month(cube, month):
     return cube.extract(
         iris.Constraint(time=lambda cell: cell.point.month == month_number(month))
@@ -83,7 +126,6 @@ def remove_aux_time(cube):
 
 
 def annual_time_bounds(cube):
-
     t_coord = cube.coord("time")
     cube.remove_coord("time")
 

@@ -1,3 +1,37 @@
+ScriptEngine Tasks for EC-Earth 0.7.1
+======================================
+
+Fixes
+-----
+- Fixed a bug introduced in #106 that broke sea ice timeseries task (#113)
+
+Internal changes
+----------------
+- CI: Use latest version of external actions, use `bash -el {0}` for actions need miniconda environments (#110)
+
+
+ScriptEngine Tasks for EC-Earth 0.7.0
+======================================
+
+Fixes
+-----
+- Add missing iris.cube import in helpers/cubes (PR #102)
+
+Features
+--------
+- Convert cubes with unit kg m-2 s-1 to kg m-2 day-1 (PR #99)
+- Show optional reference value in timeseries plots (PR #100)
+- Update supported Python versions (PR #103)
+- Add a new processing task NemoGlobalSumYearMeanTimeseries (PR #106)
+- Add a new processing task NemoYearMeanTimeseries (PR #108)
+
+Internal changes
+----------------
+- Streamline unit conversions for cubes (PR #99)
+- Add a new NemoTimeseries parent class (PR #106)
+- Improve global aggregation in NEMO timeseries tasks: Iris now changes units automatically when necessary (PR #106)
+
+
 ScriptEngine Tasks for EC-Earth 0.6.3
 ======================================
 

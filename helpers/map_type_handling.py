@@ -24,7 +24,7 @@ def global_ocean_plot(
     units=None,
     value_range=[None, None],
     colormap="RdBu_r",
-    **kwargs
+    **kwargs,
 ):
     """Map Type Handling for Global Ocean Maps"""
     fig = plt.figure(figsize=(6, 4), dpi=150)
@@ -74,7 +74,7 @@ def global_atmosphere_plot(
     units=None,
     value_range=[None, None],
     colormap="RdBu_r",
-    **kwargs
+    **kwargs,
 ):
     """Map Type Handling for Global Atmosphere Maps"""
     fig = plt.figure(figsize=(6, 4), dpi=150)
@@ -114,7 +114,7 @@ def polar_ice_sheet_plot(
     units=None,
     value_range=[None, None],
     colormap="RdBu_r",
-    **kwargs
+    **kwargs,
 ):
     fig = plt.figure(figsize=(6, 4), dpi=150)
     fig.suptitle(title)

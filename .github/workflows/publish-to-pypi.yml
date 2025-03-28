@@ -17,12 +17,12 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.12"
       -
         name: Install pypa/build
         run: |
@@ -43,23 +43,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-n-publish
 
+    defaults:
+      run:
+        shell: bash -el {0}
+
     strategy:
       matrix:
-        python-version: [ "3.7", "3.8", "3.9", "3.10" ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
 
     steps:
       -
         # Need to checkout code to get conda_environment.yml
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{matrix.python-version}}
       -
         name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: latest
           environment-file: conda_environment.yml
