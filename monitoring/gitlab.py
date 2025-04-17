@@ -44,7 +44,7 @@ class Gitlab(Task):
         gitlab_template = self.get_template(context, template_path)
         gitlab_template.globals["urlencode"] = urllib.parse.quote
 
-        server_url = "https://gitlab.lrz.de"
+        server_url = "https://git.smhi.se"
         gl = gitlab.Gitlab(server_url, private_token=key)
 
         self.log_debug("Connecting to Gitlab.")
@@ -110,7 +110,7 @@ class Gitlab(Task):
     def get_project_and_issue(self, gl, issue_subject):
         """Connect to Gitlab server, find and return correct issue and project based on user input"""
 
-        project_id = 127437  # TODO update this
+        project_id = 1982
         try:
             project = gl.projects.get(project_id)
         except (
