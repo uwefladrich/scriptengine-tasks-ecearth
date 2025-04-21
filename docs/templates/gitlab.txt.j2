@@ -4,7 +4,7 @@
 
 {% for item in presentation_list -%}
 {% if item["presentation_type"] == "text" -%}
-**{{ item["title"] }}**: {{ item["value"] }}
+**{{ item["title"] }}**: {{ item["value"]  }}
 {% if "comment" in item %}{{item["comment"]}}{% endif %}
 
 {% endif -%}
