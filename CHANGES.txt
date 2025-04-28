@@ -1,3 +1,15 @@
+Next Release
+=============
+
+Fixes
+-----
+- Reorganize presentation task documentation for consistency (#95)
+
+Features
+--------
+- Add presentation task for posting monitoring output as a Gitlab issue (#95)
+
+
 ScriptEngine Tasks for EC-Earth 0.7.1
 ======================================
 
