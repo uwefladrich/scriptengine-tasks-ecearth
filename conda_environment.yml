@@ -6,4 +6,4 @@ dependencies:
     - iris>=3.5
     - cartopy>=0.20
     - hdf5!=1.12.2
-    - dask!=2025.4
+    - dask-core!=2025.4.0,!=2025.4.1
