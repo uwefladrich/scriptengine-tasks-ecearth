@@ -130,11 +130,11 @@ class Gitlab(Task):
         return project, issue
 
 
-def create_anchor(anchor: str) -> str:
+def create_anchor(title: str) -> str:
     """
     create correct anchors for Gitlab issue URLs
     """
-    anchor = re.sub(r"[^a-zA-Z\s-]", "", anchor)
+    anchor = re.sub(r"[^a-zA-Z\s-]", "", title)
     anchor = re.sub(r"\s+(\-+\s*)?", "-", anchor)
     anchor = anchor.lower()
     return anchor
