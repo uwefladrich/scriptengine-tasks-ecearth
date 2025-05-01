@@ -14,6 +14,10 @@ from scriptengine.tasks.core import Task, timed_runner
 from helpers.exceptions import PresentationException
 from helpers.presentation_objects import PresentationObject
 
+# Repository where monitoring results are posted
+SERVER_URL = "https://git.smhi.se"
+PROJECT_ID = 1982
+
 
 class Gitlab(Task):
     """Gitlab Presentation Task"""
@@ -44,12 +48,8 @@ class Gitlab(Task):
         gitlab_template = self.get_template(context, template_path)
         gitlab_template.globals["urlencode"] = urllib.parse.quote
 
-        server_url = "https://git.smhi.se"
-        gl = gitlab.Gitlab(server_url, private_token=key)
-
         self.log_debug("Connecting to Gitlab.")
-
-        project, issue = self.get_project_and_issue(gl, issue_subject)
+        project, issue = self.get_project_and_issue(key, issue_subject)
 
         self.log_debug("Uploading attachments.")
         issue.uploads = []
@@ -107,12 +107,12 @@ class Gitlab(Task):
             environment.filters[name] = function
         return environment.get_template(template)
 
-    def get_project_and_issue(self, gl, issue_subject):
+    def get_project_and_issue(self, key, issue_subject):
         """Connect to Gitlab server, find and return correct issue and project based on user input"""
 
-        project_id = 1982
+        gl = gitlab.Gitlab(SERVER_URL, private_token=key)
         try:
-            project = gl.projects.get(project_id)
+            project = gl.projects.get(PROJECT_ID)
         except (
             gitlab.GitlabAuthenticationError,
             requests.exceptions.ConnectionError,
