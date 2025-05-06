@@ -7,7 +7,7 @@
 
 [project]
     name = "scriptengine-tasks-ecearth"
-    version = "0.7.1"
+    version = "0.8.0"
     authors = [
         { name = "Valentina Schueller", email = "valentina.schueller@gmail.com" },
         { name = "Uwe Fladrich", email = "uwe.fladrich@protonmail.com" },

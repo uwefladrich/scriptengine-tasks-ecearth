@@ -1,13 +1,14 @@
-Next Release
-=============
-
-Fixes
------
-- Reorganize presentation task documentation for consistency (#95)
+ScriptEngine Tasks for EC-Earth 0.8.0
+======================================
 
 Features
 --------
 - Add presentation task for posting monitoring output as a Gitlab issue (#95)
+
+Fixes
+-----
+- Reorganize presentation task documentation for consistency (#95)
+- Temporarily disallow dask v2025.4.0, v2025.4.1 due to Iris incompatibility (#114)
 
 
 ScriptEngine Tasks for EC-Earth 0.7.1
