@@ -35,13 +35,10 @@ def test_gitlab_connection_error(tmp_path):
         "api_key": "Invalid Key",
     }
     gitlab_task = Gitlab(init)
-    gitlab_instance = gitlab.Gitlab(
-        "https://www.invalid.url", private_token=init["api_key"]
-    )
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskRunError,
         gitlab_task.get_project_and_issue,
-        gitlab_instance,
+        init["api_key"],
         init["subject"],
     )
 
@@ -55,13 +52,10 @@ def test_gitlab_auth_error(tmp_path):
         "api_key": "Invalid Key",
     }
     gitlab_task = Gitlab(init)
-    gitlab_instance = gitlab.Gitlab(
-        "https://gitlab.lrz.de/", private_token=init["api_key"]
-    )
     pytest.raises(
         scriptengine.exceptions.ScriptEngineTaskRunError,
         gitlab_task.get_project_and_issue,
-        gitlab_instance,
+        init["api_key"],
         init["subject"],
     )
 
