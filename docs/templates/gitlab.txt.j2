@@ -1,0 +1,32 @@
+# EC-Earth 4: Monitoring
+
+## Experiment status
+
+{% for item in presentation_list -%}
+{% if item["presentation_type"] == "text" -%}
+**{{ item["title"] }}**: {{ item["value"] }}  
+{% if "comment" in item %}{{item["comment"]}}{% endif %}
+
+{% endif -%}
+{% endfor %}
+
+## Short-links to diagnostic plots below
+
+{% for item in presentation_list %}
+{%- if item["presentation_type"] == "image" %}
+* [{{item["title"]}}]({{issue_url}}#{{create_anchor(item["title"])}})
+{%- endif -%}
+{% endfor %}
+
+
+{% for item in presentation_list -%}
+{% if item["presentation_type"] == "image" %}
+## {{item["title"]}}
+
+{{item["image_link"]}}
+
+{{item["comment"]}}
+{% endif -%}
+{% endfor %}
+
+
