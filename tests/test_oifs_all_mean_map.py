@@ -25,6 +25,24 @@ def test_oifs_all_mean_map_working(tmp_path):
     assert len(cube.coord("time").points) == 1
 
 
+def test_oifs_all_mean_map_regular_grid(tmp_path):
+    init = {
+        "src": ["./tests/testdata/regular_grid.nc"],
+        "dst": str(tmp_path / "test.nc"),
+        "varname": "tas",
+    }
+    atmo_map = OifsAllMeanMap(init)
+    atmo_map.run(init)
+    cube = iris.load_cube(init["dst"])
+    assert cube.name() == "air_temperature"
+    assert cube.attributes["title"] is not None
+    assert cube.attributes["comment"] is not None
+    assert cube.attributes["diagnostic_type"] == "map"
+    assert cube.attributes["map_type"] == "global atmosphere"
+    assert cube.coord("time").climatological
+    assert len(cube.coord("time").points) == 1
+
+
 def test_oifs_all_mean_map_wrong_code(tmp_path):
     init = {
         "src": ["./tests/testdata/TES1_atm_1m_1990_2t.nc"],
