@@ -30,8 +30,8 @@ def test_oifs_global_mean_year_mean_timeseries_working(tmp_path):
 
 def test_oifs_timeseries_compare_grids(tmp_path):
     init = {
-        "src": ["./tests/testdata/regular_grid.nc"],
-        "dst": str(tmp_path / "test.nc"),
+        "src": ["./tests/testdata/regular_grid_tas.nc"],
+        "dst": str(tmp_path / "test_reg.nc"),
         "varname": "tas",
     }
     atmo_ts = OifsGlobalMeanYearMeanTimeseries(init)
@@ -39,21 +39,14 @@ def test_oifs_timeseries_compare_grids(tmp_path):
     cube_reg = iris.load_cube(init["dst"])
 
     init = {
-        "src": ["./tests/testdata/reduced_grid.nc"],
-        "dst": str(tmp_path / "test.nc"),
+        "src": ["./tests/testdata/reduced_grid_tas.nc"],
+        "dst": str(tmp_path / "test_red.nc"),
         "varname": "tas",
     }
     atmo_ts = OifsGlobalMeanYearMeanTimeseries(init)
     atmo_ts.run(init)
     cube_red = iris.load_cube(init["dst"])
-    assert cube_red.name() == "air_temperature"
-    assert cube_red.attributes["title"] is not None
-    assert cube_red.attributes["comment"] is not None
-    assert cube_red.attributes["diagnostic_type"] == "time series"
-    assert cube_red.cell_methods == (
-        iris.coords.CellMethod("mean", coords="time", intervals="1 year"),
-        iris.coords.CellMethod("mean", coords="area"),
-    )
+    assert abs(cube_red.data - cube_reg.data) < 1e-3
 
 
 def test_oifs_global_mean_year_mean_timeseries_wrong_varname(tmp_path):

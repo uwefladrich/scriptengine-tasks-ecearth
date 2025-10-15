@@ -25,7 +25,7 @@ def test_oifs_year_mean_temporalmap_working(tmp_path):
 
 def test_oifs_year_mean_temporalmap_regular_grid(tmp_path):
     init = {
-        "src": ["./tests/testdata/regular_grid.nc"],
+        "src": ["./tests/testdata/regular_grid_tas.nc"],
         "dst": str(tmp_path / "test.nc"),
         "varname": "tas",
     }
