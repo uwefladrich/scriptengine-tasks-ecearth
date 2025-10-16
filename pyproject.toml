@@ -19,14 +19,14 @@
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
     ]
-    requires-python = ">=3.8"
+    requires-python = ">=3.11"
     dependencies = [
         "scriptengine>=0.8.1",
         "pyYAML>=5.1",
         "matplotlib>=3.1",
         "numpy>=1.18",
         "imageio>=2.18",
-        "scitools-iris>=3.5",
+        "scitools-iris>=3.12.2",
         "cartopy>=0.20",
         "python-redmine",
         "python-gitlab",
