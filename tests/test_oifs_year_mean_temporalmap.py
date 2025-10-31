@@ -23,6 +23,22 @@ def test_oifs_year_mean_temporalmap_working(tmp_path):
     assert cube.attributes["map_type"] == "global atmosphere"
 
 
+def test_oifs_year_mean_temporalmap_regular_grid(tmp_path):
+    init = {
+        "src": ["./tests/testdata/regular_grid_tas.nc"],
+        "dst": str(tmp_path / "test.nc"),
+        "varname": "tas",
+    }
+    atmos_time_map = OifsYearMeanTemporalmap(init)
+    atmos_time_map.run(init)
+    cube = iris.load_cube(init["dst"])
+    assert cube.name() == "air_temperature"
+    assert cube.attributes["title"] is not None
+    assert cube.attributes["comment"] is not None
+    assert cube.attributes["diagnostic_type"] == "temporal map"
+    assert cube.attributes["map_type"] == "global atmosphere"
+
+
 def test_oifs_year_mean_temporalmap_wrong_varname(tmp_path):
     init = {
         "src": ["./tests/testdata/TES1_atm_1m_1990_2t.nc"],

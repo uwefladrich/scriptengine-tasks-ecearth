@@ -37,35 +37,12 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
 
         time_mean_cube = self.compute_time_mean(oifs_cube)
 
-        area_weights = self.compute_area_weights(time_mean_cube)
+        area_weights = helpers.cubes.compute_area_weights(time_mean_cube)
         timeseries_cube = self.compute_spatial_mean(time_mean_cube, area_weights)
 
         self.set_cell_methods(timeseries_cube)
         timeseries_cube = self.adjust_metadata(timeseries_cube, varname)
         self.save(timeseries_cube, dst)
-
-    def compute_area_weights(self, cube):
-        """compute area weights for the reduced gaussian grid"""
-        self.log_debug("Computing area weights.")
-        nh_latitudes = np.ma.masked_less(cube.coord("latitude").points, 0)
-        unique_lats, gridpoints_per_lat = np.unique(nh_latitudes, return_counts=True)
-        unique_lats, gridpoints_per_lat = unique_lats[0:-1], gridpoints_per_lat[0:-1]
-        areas = []
-        last_angle = 0
-        earth_radius = 6371
-        for latitude, amount in zip(unique_lats, gridpoints_per_lat):
-            delta = latitude - last_angle
-            current_angle = last_angle + 2 * delta
-            sin_diff = np.sin(np.deg2rad(current_angle)) - np.sin(
-                np.deg2rad(last_angle)
-            )
-            ring_area = 2 * np.pi * earth_radius**2 * sin_diff
-            grid_area = ring_area / amount
-            areas.extend([grid_area] * amount)
-            last_angle = current_angle
-        areas = np.append(areas[::-1], areas)
-        area_weights = np.broadcast_to(areas, cube.data.shape)
-        return area_weights
 
     def set_cell_methods(self, timeseries_cube):
         """add the correct cell methods"""
@@ -100,7 +77,7 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
         ).bounds[:, [0, 1]]
         time_mean_cube.coord("longitude").bounds = time_mean_cube.coord(
             "longitude"
-        ).bounds[:, [0, 2]]
+        ).bounds[:, [0, 1]]
         with warnings.catch_warnings():
             # Suppress warning about insufficient metadata.
             warnings.filterwarnings(
