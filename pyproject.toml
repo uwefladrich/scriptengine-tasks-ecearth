@@ -26,7 +26,7 @@
         "matplotlib>=3.1",
         "numpy>=1.18",
         "imageio>=2.18",
-        "scitools-iris>=3.12.2",
+        "scitools-iris>=3.12.2",  # https://github.com/SciTools/iris/issues/6417
         "cartopy>=0.20",
         "python-redmine",
         "python-gitlab",

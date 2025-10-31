@@ -1,6 +1,8 @@
 Next Release
 ============
 
+Breaking
+--------
 - Drop support for Python<=3.10 (PR #121)
 
 
