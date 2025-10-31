@@ -1,9 +1,8 @@
 channels:
     - conda-forge
 dependencies:
-    - python>=3.8
+    - python>=3.11
     - pip
-    - iris>=3.5
+    - iris>=3.12.2 # https://github.com/SciTools/iris/issues/6417
     - cartopy>=0.20
     - hdf5!=1.12.2
-    - dask-core!=2025.4.0,!=2025.4.1

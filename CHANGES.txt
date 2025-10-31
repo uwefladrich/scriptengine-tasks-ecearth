@@ -1,3 +1,11 @@
+Next Release
+============
+
+Breaking
+--------
+- Drop support for Python<=3.10 (PR #121)
+
+
 ScriptEngine Tasks for EC-Earth 0.8.0
 ======================================
 
