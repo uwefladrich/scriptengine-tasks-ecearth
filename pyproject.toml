@@ -53,6 +53,7 @@
         "ece.mon.oifs_all_mean_map" = "monitoring.oifs_all_mean_map:OifsAllMeanMap"
         "ece.mon.oifs_year_mean_temporalmap" = "monitoring.oifs_year_mean_temporalmap:OifsYearMeanTemporalmap"
         "ece.mon.oifs_global_mean_year_mean_timeseries" = "monitoring.oifs_timeseries:OifsGlobalMeanYearMeanTimeseries"
+        "ece.mon.oifs_global_sum_year_mean_timeseries" = "monitoring.oifs_timeseries:OifsGlobalSumYearMeanTimeseries"
         "ece.mon.presentation.markdown" = "monitoring.markdown:Markdown"
         "ece.mon.presentation.redmine" = "monitoring.redmine:Redmine"
         "ece.mon.presentation.gitlab" = "monitoring.gitlab:Gitlab"
