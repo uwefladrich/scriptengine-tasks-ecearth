@@ -96,3 +96,29 @@ class OifsGlobalMeanYearMeanTimeseries(OifsTimeseries):
         dst = Path(self.getarg("dst", context))
         self.check_file_extension(dst)
         self.save(annual_mean, dst)
+
+
+class OifsGlobalSumYearMeanTimeseries(OifsTimeseries):
+    """OifsGlobalSumYearMeanTimeseries Processing Task"""
+
+    _required_arguments = ("src", "dst", "varname")
+
+    def __init__(self, arguments=None):
+        OifsGlobalSumYearMeanTimeseries.check_arguments(arguments)
+        super().__init__(
+            {**arguments, "title": None, "coord_value": None, "data_value": None}
+        )
+
+    @timed_runner
+    def run(self, context):
+        oifs_cube = self._load_input(context)
+
+        global_sum = self._compute_global_aggregate(oifs_cube, iris.analysis.SUM)
+        annual_mean = helpers.cubes.compute_annual_mean(global_sum)
+        annual_mean.cell_methods = (iris.coords.CellMethod("sum", coords="area"),)
+
+        annual_mean = self._adjust_metadata(annual_mean)
+
+        dst = Path(self.getarg("dst", context))
+        self.check_file_extension(dst)
+        self.save(annual_mean, dst)
