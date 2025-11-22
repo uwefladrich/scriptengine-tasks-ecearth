@@ -70,11 +70,11 @@ def test_oifs_global_sum_year_mean_timeseries_working(tmp_path):
         "dst": str(tmp_path / "test.nc"),
         "varname": "2t",
     }
-    atmo_ts = OifsGlobalMeanYearMeanTimeseries(init)
+    atmo_ts = OifsGlobalSumYearMeanTimeseries(init)
     atmo_ts.run(init)
     cube = iris.load_cube(init["dst"])
     assert cube.name() == "2 metre temperature"
-    # assert cube.units == "degC m^2"
+    assert cube.units == "K m2"
     assert cube.attributes["title"] is not None
     assert cube.attributes["comment"] is not None
     assert cube.attributes["diagnostic_type"] == "time series"

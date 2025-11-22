@@ -5,6 +5,7 @@ from pathlib import Path
 
 import iris
 from iris.analysis import WeightedAggregator
+from iris.coords import CellMeasure
 from scriptengine.tasks.core import timed_runner
 
 import helpers.cubes
@@ -54,6 +55,11 @@ class OifsTimeseries(Timeseries):
     def _compute_global_aggregate(self, cube, operation: WeightedAggregator):
         """Area-weighted aggregate of cube (e.g., sum, mean)."""
         area_weights = helpers.cubes.compute_area_weights(cube)
+        cell_size = CellMeasure(
+            area_weights, var_name="cell_size", units="m2", measure="area"
+        )
+        dims = tuple(range(len(area_weights.shape)))
+        cube.add_cell_measure(cell_size, dims)
         # Remove duplicate boundary values before averaging
         cube.coord("latitude").bounds = cube.coord("latitude").bounds[:, [0, 1]]
         cube.coord("longitude").bounds = cube.coord("longitude").bounds[:, [0, 1]]
@@ -67,7 +73,7 @@ class OifsTimeseries(Timeseries):
             global_aggregate = cube.collapsed(
                 ["latitude", "longitude"],
                 operation,
-                weights=area_weights,
+                weights="cell_size",
             )
         return global_aggregate
 
