@@ -56,7 +56,7 @@ If it is, e.g., six months long, the task will compute the six month global mean
 
     - ece.mon.oifs_global_sum_year_mean_timeseries:
         src: "{{rundir}}/output/oifs/{{exp_id}}_atm_1m_1990-1990.nc"
-        varname: 2t
+        varname: tcwv
         dst: "{{mondir}}/2t_oifs_global_mean_year_mean_timeseries.nc"
 
 
