@@ -1,10 +1,10 @@
-"""Tests for monitoring/oifs_global_mean_year_mean_timeseries.py"""
+"""Tests for monitoring/oifs_timeseries.py"""
 
 import iris
 import pytest
 import scriptengine.exceptions
 
-from monitoring.oifs_global_mean_year_mean_timeseries import (
+from monitoring.oifs_timeseries import (
     OifsGlobalMeanYearMeanTimeseries,
 )
 
