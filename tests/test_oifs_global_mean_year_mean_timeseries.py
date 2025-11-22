@@ -23,8 +23,8 @@ def test_oifs_global_mean_year_mean_timeseries_working(tmp_path):
     assert cube.attributes["comment"] is not None
     assert cube.attributes["diagnostic_type"] == "time series"
     assert cube.cell_methods == (
-        iris.coords.CellMethod("mean", coords="time", intervals="1 year"),
         iris.coords.CellMethod("mean", coords="area"),
+        iris.coords.CellMethod("mean", coords="time", intervals="1 year"),
     )
 
 

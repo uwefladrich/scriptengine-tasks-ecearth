@@ -98,7 +98,10 @@ def compute_time_weights(monthly_data_cube, cube_shape=None):
 
 def compute_annual_mean(cube):
     # Remove auxiliary time coordinate before collapsing cube
-    cube.remove_coord(cube.coord("time", dim_coords=False))
+    try:
+        cube.coord("time")
+    except iris.exceptions.CoordinateNotFoundError:
+        cube.remove_coord(cube.coord("time", dim_coords=False))
 
     annual_mean = cube.collapsed(
         "time",

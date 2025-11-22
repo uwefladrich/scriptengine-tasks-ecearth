@@ -4,7 +4,7 @@ import warnings
 from pathlib import Path
 
 import iris
-import numpy as np
+from iris.analysis import WeightedAggregator
 from scriptengine.tasks.core import timed_runner
 
 import helpers.cubes
@@ -12,7 +12,67 @@ import helpers.cubes
 from .timeseries import Timeseries
 
 
-class OifsGlobalMeanYearMeanTimeseries(Timeseries):
+class OifsTimeseries(Timeseries):
+    """OifsTimeseries Processing Task"""
+
+    _required_arguments = (
+        "src",
+        "varname",
+        "dst",
+    )
+
+    def __init__(self, arguments):
+        OifsTimeseries.check_arguments(arguments)
+        super().__init__(
+            {**arguments, "title": None, "coord_value": None, "data_value": None}
+        )
+
+    def _load_input(self, context):
+        src = self.getarg("src", context)
+        var_name = self.getarg("varname", context)
+        self.log_info(f"Create time series for atmosphere variable {var_name}.")
+        self.log_debug(f"Source file(s): {src}")
+
+        var_data = helpers.cubes.load_input_cube(src, var_name)
+        return var_data
+
+    def _adjust_metadata(self, cube):
+        """Adjustments to the cube metadata before saving."""
+        long_name = cube.long_name
+        var_name = cube.standard_name
+        comment = f"Annual mean of {long_name} / **{var_name}**."
+        cube.add_cell_method(
+            iris.coords.CellMethod("mean", coords="time", intervals="1 year")
+        )
+        cube = helpers.cubes.set_metadata(
+            cube,
+            title=f"{long_name} (annual mean)",
+            comment=comment,
+        )
+        return helpers.cubes.convert_units(cube)
+
+    def _compute_global_aggregate(self, cube, operation: WeightedAggregator):
+        """Area-weighted aggregate of cube (e.g., sum, mean)."""
+        area_weights = helpers.cubes.compute_area_weights(cube)
+        # Remove duplicate boundary values before averaging
+        cube.coord("latitude").bounds = cube.coord("latitude").bounds[:, [0, 1]]
+        cube.coord("longitude").bounds = cube.coord("longitude").bounds[:, [0, 1]]
+        with warnings.catch_warnings():
+            # Suppress warning about insufficient metadata.
+            warnings.filterwarnings(
+                "ignore",
+                "Collapsing a non-contiguous coordinate.",
+                UserWarning,
+            )
+            global_aggregate = cube.collapsed(
+                ["latitude", "longitude"],
+                operation,
+                weights=area_weights,
+            )
+        return global_aggregate
+
+
+class OifsGlobalMeanYearMeanTimeseries(OifsTimeseries):
     """OifsGlobalMeanYearMeanTimeseries Processing Task"""
 
     _required_arguments = ("src", "dst", "varname")
@@ -25,84 +85,14 @@ class OifsGlobalMeanYearMeanTimeseries(Timeseries):
 
     @timed_runner
     def run(self, context):
-        src = self.getarg("src", context)
+        oifs_cube = self._load_input(context)
+
+        global_mean = self._compute_global_aggregate(oifs_cube, iris.analysis.MEAN)
+        annual_mean = helpers.cubes.compute_annual_mean(global_mean)
+        annual_mean.cell_methods = (iris.coords.CellMethod("mean", coords="area"),)
+
+        annual_mean = self._adjust_metadata(annual_mean)
+
         dst = Path(self.getarg("dst", context))
-        varname = self.getarg("varname", context)
-        self.log_info(f"Create time series for atmosphere variable {varname} at {dst}.")
-        self.log_debug(f"Source file(s): {src}")
-
         self.check_file_extension(dst)
-
-        oifs_cube = helpers.cubes.load_input_cube(src, varname)
-
-        time_mean_cube = self.compute_time_mean(oifs_cube)
-
-        area_weights = helpers.cubes.compute_area_weights(time_mean_cube)
-        timeseries_cube = self.compute_spatial_mean(time_mean_cube, area_weights)
-
-        self.set_cell_methods(timeseries_cube)
-        timeseries_cube = self.adjust_metadata(timeseries_cube, varname)
-        self.save(timeseries_cube, dst)
-
-    def set_cell_methods(self, timeseries_cube):
-        """add the correct cell methods"""
-        timeseries_cube.cell_methods = ()
-        timeseries_cube.add_cell_method(
-            iris.coords.CellMethod("mean", coords="time", intervals="1 year")
-        )
-        timeseries_cube.add_cell_method(iris.coords.CellMethod("mean", coords="area"))
-
-    def compute_time_mean(self, output_cube):
-        """Apply the temporal average."""
-        self.log_debug("Averaging over the time coordinate.")
-        # Remove auxiliary time coordinate before collapsing cube
-        try:
-            output_cube.coord("time")
-        except iris.exceptions.CoordinateNotFoundError:
-            output_cube.remove_coord(output_cube.coord("time", dim_coords=False))
-        time_mean_cube = output_cube.collapsed(
-            "time",
-            iris.analysis.MEAN,
-        )
-        # Promote time from scalar to dimension coordinate
-        time_mean_cube = iris.util.new_axis(time_mean_cube, "time")
-        return time_mean_cube
-
-    def compute_spatial_mean(self, time_mean_cube, area_weights):
-        """Apply the spatial average."""
-        self.log_debug("Averaging over latitude and longitude.")
-        # Remove duplicate boundary values before averaging
-        time_mean_cube.coord("latitude").bounds = time_mean_cube.coord(
-            "latitude"
-        ).bounds[:, [0, 1]]
-        time_mean_cube.coord("longitude").bounds = time_mean_cube.coord(
-            "longitude"
-        ).bounds[:, [0, 1]]
-        with warnings.catch_warnings():
-            # Suppress warning about insufficient metadata.
-            warnings.filterwarnings(
-                "ignore",
-                "Collapsing a non-contiguous coordinate.",
-                UserWarning,
-            )
-            spatial_mean_cube = time_mean_cube.collapsed(
-                ["latitude", "longitude"],
-                iris.analysis.MEAN,
-                weights=area_weights,
-            )
-        return spatial_mean_cube
-
-    def adjust_metadata(self, timeseries_cube, varname: str):
-        """Do further adjustments to the cube metadata before saving."""
-        # Add File Metadata
-        comment = (
-            f"Global average time series of **{varname}**. "
-            f"Each data point represents the (spatial and temporal) "
-            f"average over one year."
-        )
-        timeseries_cube = helpers.cubes.set_metadata(
-            timeseries_cube,
-            title=f"{timeseries_cube.long_name} (annual mean)",
-            comment=comment,
-        )
-        return helpers.cubes.convert_units(timeseries_cube)
+        self.save(annual_mean, dst)
