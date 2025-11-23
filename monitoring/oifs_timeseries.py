@@ -1,4 +1,4 @@
-"""Processing Task that creates a 2D map of a given extensive ocean quantity."""
+"""Processing Tasks for computing Timeseries from OpenIFS output."""
 
 import warnings
 from pathlib import Path
