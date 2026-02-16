@@ -217,22 +217,28 @@ def align_time_coords(new_cube, old_cube):
     # Check that time exists in both cubes, then 
     # convert time coord in new cube to that of old cube
     if (  "time" in old_cube_coords and "time" in new_cube_coords):
+
         new_cube.coord("time").convert_units(old_cube.coord("time").units)
-    elif ("time" in old_cube_coords and "time" not in new_cube_coords): 
+
+        # We also need to match the attribute time_origin between
+        # new_cube and current_cube to make Iris happy.
+        # Note: This does not always exist
+        if (     "time_origin" in old_cube.coord("time").attributes.keys()
+             and "time_origin" in new_cube.coord("time").attributes.keys() ):
+            new_cube.coord("time").attributes["time_origin"] = old_cube.coord("time").attributes["time_origin"]
+        
+        elif ( "time_origin" in     old_cube.coord("time").attributes.keys() and 
+               "time_origin" not in new_cube.coord("time").attributes.keys() ):
+            raise ScriptEngineTaskRunError("Attribute time_origin for time coord exists in old_cube but not new_cube")
+        
+        elif ( "time_origin" not in old_cube.coord("time").attributes.keys() and
+               "time_origin" in     new_cube.coord("time").attributes.keys() ):
+            raise ScriptEngineTaskRunError("Attribute time_origin for time coord exists in new_cube but not old_cube")
+
+    elif ("time" in old_cube_coords and "time" not in new_cube_coords):
         raise ScriptEngineTaskRunError("Coord time exists in old_cube but not new_cube")
+    
     elif ("time" not in old_cube_coords and "time" in new_cube_coords):
         raise ScriptEngineTaskRunError("Coord time exists in new_cube but not old_cube")
 
-    # We also need to match the attribute time_origin between
-    # new_cube and current_cube to make Iris happy.
-    # Note: This does not always exist
-    if (     "time_origin" in old_cube.coord("time").attributes.keys()
-         and "time_origin" in new_cube.coord("time").attributes.keys() ):
-        new_cube.coord("time").attributes["time_origin"] = old_cube.coord("time").attributes["time_origin"]
-    elif ( "time_origin" in     old_cube.coord("time").attributes.keys() and 
-           "time_origin" not in new_cube.coord("time").attributes.keys() ):
-        raise ScriptEngineTaskRunError("Attribute time_origin for time coord exists in old_cube but not new_cube")
-    elif ( "time_origin" not in old_cube.coord("time").attributes.keys() and
-           "time_origin" in     new_cube.coord("time").attributes.keys() ):
-        raise ScriptEngineTaskRunError("Attribute time_origin for time coord exists in new_cube but not old_cube")
     return new_cube
