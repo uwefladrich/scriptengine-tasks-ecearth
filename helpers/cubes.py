@@ -201,3 +201,27 @@ def compute_regular_grid_weights(cube):
     cube.coord("latitude").guess_bounds()
     cube.coord("longitude").guess_bounds()
     return iris.analysis.cartography.area_weights(cube)
+
+def align_time_coords(new_cube, old_cube):
+    """
+    Align the time coordinates in two cubes. 
+    Useful if one cube has time in units seconds since 1990-01-01 00:00:00
+    while the other has seconds since 1995-01-01 00:00:00. 
+    Iris can not concatenate two such cubes. 
+    """
+    # convert time coord in new cube to that of old cube
+    new_cube.coord("time").convert_units(old_cube.coord("time").units)
+
+    # We also need to match the attribute time_origin between
+    # new_cube and current_cube to make Iris happy.
+    # Note: This does not always exist
+    if (     "time_origin" in old_cube.coord("time").attributes.keys()
+         and "time_origin" in new_cube.coord("time").attributes.keys() ):
+        new_cube.coord("time").attributes["time_origin"] = old_cube.coord("time").attributes["time_origin"]
+    elif ( "time_origin" in     old_cube.coord("time").attributes.keys() and 
+           "time_origin" not in new_cube.coord("time").attributes.keys() ):
+        raise ScriptEngineTaskRunError("Attribute time_origin for time coord exists in old_cube but not new_cube")
+    elif ( "time_origin" not in old_cube.coord("time").attributes.keys() and
+           "time_origin" in     new_cube.coord("time").attributes.keys() ):
+        raise ScriptEngineTaskRunError("Attribute time_origin for time coord exists in new_cube but not old_cube")
+    return new_cube
