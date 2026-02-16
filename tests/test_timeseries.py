@@ -7,8 +7,9 @@ import iris
 import pytest
 import scriptengine.exceptions
 
-from monitoring.timeseries import Timeseries
+import helpers.cubes
 
+from monitoring.timeseries import Timeseries
 
 def test_timeseries_dst_error():
     init = {
@@ -168,3 +169,38 @@ def test_time_series_date_time(tmp_path):
     assert cube.units.name == "1"
     assert cube.coord().name() == "time"
     assert cube.coord().units.name == "second since 1900-01-01 00:00:00.0000000 UTC"
+
+def test_time_series_align(tmp_path):
+    seconds_value = ( datetime.datetime(1992,1,1) - datetime.datetime(1990,1,1) ).total_seconds()
+    init_datetime1 = {
+            "title": "A date diagnostic", 
+            "dst": str(tmp_path / "date_file1.nc"),
+            "data_value": 0, 
+            "coord_value": 31536000,
+            "coord_unit": "seconds since 1990-01-01 00:00:00", 
+    }
+    init_datetime2 = {
+            "title": "A date diagnostic",
+            "dst": str(tmp_path / "date_file2.nc"),
+            "data_value": 0,
+            "coord_value": 31536000, 
+            "coord_unit": "seconds since 1991-01-01 00:00:00",
+    }
+    time_series1 = Timeseries(init_datetime1)
+    time_series2 = Timeseries(init_datetime2) 
+    time_series1.run(init_datetime1)
+    time_series2.run(init_datetime2)
+
+    cube1 = iris.load_cube(init_datetime1["dst"])
+    cube2 = iris.load_cube(init_datetime2["dst"])
+    cube1.coord("time").attributes["time_origin"] = "1990-01-01 00:00:00"
+    cube2.coord("time").attributes["time_origin"] = "1991-01-01 00:00:00"
+
+    cube2 = helpers.cubes.align_time_coords(cube2, cube1)
+    
+    print(cube1.coord("time").units.name)
+    print(cube2.coord("time").units.name)     
+    assert cube2.coord("time").units.name == "second since 1990-01-01 00:00:00.00000000 UTC"
+    assert cube2.coord("time").attributes["time_origin"] == "1990-01-01 00:00:00"
+    assert cube2.coord("time").points == [seconds_value]
+    
