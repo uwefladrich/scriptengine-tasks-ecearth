@@ -1,3 +1,11 @@
+ScriptEngine Tasks for EC-Earth 0.10.1
+=======================================
+
+Bugfixes
+---------
+- Avoid time coordinate mismatches when saving cubes (PR #124)
+
+
 ScriptEngine Tasks for EC-Earth 0.10.0
 =======================================
 
