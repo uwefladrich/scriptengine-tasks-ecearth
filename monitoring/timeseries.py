@@ -93,6 +93,16 @@ class Timeseries(Task):
             iris.save(new_cube, str(dst))
             return
 
+        # set units and attribute for time coord to be the same
+        # in current_cube and new_cube
+        # Only necessary when coordinate in time, not Leg etc.
+        try:
+            # Will work if time coordinate exists
+            new_cube = helpers.cubes.align_time_coords(new_cube, current_cube)
+        except iris.exceptions.CoordinateNotFoundError:
+            # Cube does not use "time" as its DimCoord
+            pass
+
         self.test_monotonic_increase(current_cube.coords()[0], new_cube.coords()[0])
 
         # Iris changes metadata when saving/loading cube

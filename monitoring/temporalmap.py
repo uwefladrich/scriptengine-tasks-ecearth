@@ -11,6 +11,8 @@ from scriptengine.exceptions import (
 )
 from scriptengine.tasks.core import Task
 
+import helpers.cubes
+
 
 class Temporalmap(Task):
     """Temporalmap Processing Task"""
@@ -24,6 +26,10 @@ class Temporalmap(Task):
         except OSError:  # file does not exist yet.
             iris.save(new_cube, dst)
             return
+
+        # set units and attribute for time coord to be the same
+        # in current_cube and new_cube
+        new_cube = helpers.cubes.align_time_coords(new_cube, current_cube)
 
         current_bounds = current_cube.coord("time").bounds
         new_bounds = new_cube.coord("time").bounds

@@ -7,7 +7,10 @@ import iris.analysis.cartography
 import iris.cube
 import numpy as np
 from iris.util import equalise_attributes
-from scriptengine.exceptions import ScriptEngineTaskArgumentInvalidError
+from scriptengine.exceptions import (
+    ScriptEngineTaskArgumentInvalidError,
+    ScriptEngineTaskRunError,
+)
 
 from helpers.dates import month_number
 from helpers.nemo import remove_unique_attributes
@@ -201,3 +204,26 @@ def compute_regular_grid_weights(cube):
     cube.coord("latitude").guess_bounds()
     cube.coord("longitude").guess_bounds()
     return iris.analysis.cartography.area_weights(cube)
+
+
+def align_time_coords(new_cube, old_cube):
+    """
+    Align the time coordinates in two cubes.
+    Useful if one cube has time in units seconds since 1990-01-01 00:00:00
+    while the other has seconds since 1995-01-01 00:00:00.
+    Iris can not concatenate two such cubes.
+    """
+
+    old_time_coord = old_cube.coord("time")
+
+    new_cube.coord("time").convert_units(old_time_coord.units)
+
+    # We also need to match the attribute time_origin between
+    # new_cube and current_cube to make Iris happy.
+    # Note: This does not always exist
+    if "time_origin" in old_cube.coord("time").attributes.keys():
+        new_cube.coord("time").attributes["time_origin"] = old_cube.coord(
+            "time"
+        ).attributes["time_origin"]
+
+    return new_cube

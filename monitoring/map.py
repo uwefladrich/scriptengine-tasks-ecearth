@@ -1,4 +1,5 @@
 """Base class for map processing tasks."""
+
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -25,6 +26,10 @@ class Map(Task):
         except OSError:  # file does not exist yet.
             iris.save(new_cube, str(dst))
             return
+
+        # align the time coordinates of current and new cube.
+        # Sets units and coordinate attributes to be the same
+        new_cube = helpers.cubes.align_time_coords(new_cube, current_cube)
 
         current_bounds = current_cube.coord("time").bounds
         new_bounds = new_cube.coord("time").bounds
