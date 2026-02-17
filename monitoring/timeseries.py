@@ -52,7 +52,7 @@ class Timeseries(Task):
         coord_name = self.getarg("coord_name", context, default="time")
         data_name = self.getarg("data_name", context, default=title)
         comment = self.getarg("comment", context, default=".")
-        
+
         self.log_debug(f"Value: {data_value} at time: {coord_value}, title: {title}")
 
         self.check_file_extension(dst)
@@ -92,7 +92,7 @@ class Timeseries(Task):
         except OSError:  # file does not exist yet.
             iris.save(new_cube, str(dst))
             return
-        
+
         # set units and attribute for time coord to be the same
         # in current_cube and new_cube
         # Only necessary when coordinate in time, not Leg etc. 
@@ -102,11 +102,9 @@ class Timeseries(Task):
         except iris.exceptions.CoordinateNotFoundError:
             # Cube does not use "time" as its DimCoord
             pass
-        #if ("time" in [coord.name() for coord in current_cube.coords()]):
-        #new_cube = helpers.cubes.align_time_coords(new_cube, current_cube)
 
         self.test_monotonic_increase(current_cube.coords()[0], new_cube.coords()[0])
-        
+
         # Iris changes metadata when saving/loading cube
         # save & reload to prevent metadata mismatch
         # keep tempfile until the merged cube is saved

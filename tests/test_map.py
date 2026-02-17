@@ -1,4 +1,5 @@
 """Tests for monitoring/map.py"""
+
 from pathlib import Path
 
 import iris
@@ -21,10 +22,10 @@ def test_map_nonmonotonic_increase(tmp_path):
     test_map = Map({})
 
     old_coord_with_bounds = iris.coords.DimCoord(
-        [1], bounds=[0.5, 1.5], var_name="time"
+        [1], bounds=[0.5, 1.5], var_name="time", units="seconds"
     )
     new_coord_with_bounds = iris.coords.DimCoord(
-        [2], bounds=[1.5, 2.5], var_name="time"
+        [2], bounds=[1.5, 2.5], var_name="time", units="seconds"
     )
     old_cube = iris.cube.Cube([0], dim_coords_and_dims=[(old_coord_with_bounds, 0)])
     new_cube = iris.cube.Cube([0], dim_coords_and_dims=[(new_coord_with_bounds, 0)])
