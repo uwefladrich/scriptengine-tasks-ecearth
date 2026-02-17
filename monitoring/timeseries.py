@@ -95,7 +95,7 @@ class Timeseries(Task):
 
         # set units and attribute for time coord to be the same
         # in current_cube and new_cube
-        # Only necessary when coordinate in time, not Leg etc. 
+        # Only necessary when coordinate in time, not Leg etc.
         try:
             # Will work if time coordinate exists
             new_cube = helpers.cubes.align_time_coords(new_cube, current_cube)

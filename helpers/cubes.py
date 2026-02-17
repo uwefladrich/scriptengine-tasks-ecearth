@@ -215,13 +215,15 @@ def align_time_coords(new_cube, old_cube):
     """
 
     old_time_coord = old_cube.coord("time")
-    
+
     new_cube.coord("time").convert_units(old_time_coord.units)
 
     # We also need to match the attribute time_origin between
     # new_cube and current_cube to make Iris happy.
     # Note: This does not always exist
     if "time_origin" in old_cube.coord("time").attributes.keys():
-        new_cube.coord("time").attributes["time_origin"] = old_cube.coord("time").attributes["time_origin"]
+        new_cube.coord("time").attributes["time_origin"] = old_cube.coord(
+            "time"
+        ).attributes["time_origin"]
 
     return new_cube
