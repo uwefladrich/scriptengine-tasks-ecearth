@@ -2,8 +2,6 @@
 
 from unittest.mock import Mock, patch
 
-import gitlab
-import jinja2.exceptions
 import pytest
 import scriptengine.exceptions
 
@@ -60,19 +58,6 @@ def test_gitlab_auth_error(tmp_path):
     )
 
 
-def test_gitlab_get_template(tmp_path):
-    init = {
-        "src": str(tmp_path),
-        "local_dst": str(tmp_path),
-        "template": str(tmp_path / "gitlab.txt.j2"),
-        "subject": "Test Issue",
-        "api_key": "Invalid Key",
-    }
-    gitlab_task = Gitlab(init)
-    with pytest.raises(jinja2.exceptions.TemplateNotFound):
-        gitlab_task.get_template(init, init["template"])
-
-
 class MockTemplateOrIssue:
     def __init__(self):
         self.globals = {}
@@ -92,14 +77,13 @@ def test_gitlab_run(tmp_path):
     init = {
         "src": str(tmp_path),
         "local_dst": str(tmp_path),
-        "template": str(tmp_path / "redmine.txt.j2"),
+        "template": "./docs/templates/gitlab.txt.j2",
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
     gitlab_task = Gitlab(init)
     gitlab_task.get_presentation_list = Mock(return_value=[])
     mock_object = MockTemplateOrIssue()
-    gitlab_task.get_template = Mock(return_value=mock_object)
     gitlab_task.get_project_and_issue = Mock(return_value=(mock_object, mock_object))
     with patch.object(gitlab_task, "log_debug") as mock:
         gitlab_task.run(init)

@@ -2,10 +2,8 @@
 
 from unittest.mock import Mock, patch
 
-import jinja2.exceptions
 import pytest
 import redminelib
-import redminelib.exceptions
 import scriptengine.exceptions
 
 from monitoring.redmine import Redmine, sanitize_anchor_name
@@ -63,19 +61,6 @@ def test_redmine_auth_error(tmp_path):
     )
 
 
-def test_redmine_get_template(tmp_path):
-    init = {
-        "src": str(tmp_path),
-        "local_dst": str(tmp_path),
-        "template": str(tmp_path / "redmine.txt.j2"),
-        "subject": "Test Issue",
-        "api_key": "Invalid Key",
-    }
-    redmine_output = Redmine(init)
-    with pytest.raises(jinja2.exceptions.TemplateNotFound):
-        redmine_output.get_template(init, init["template"])
-
-
 class MockTemplateOrIssue:
     def __init__(self):
         self.globals = {}
@@ -92,14 +77,13 @@ def test_redmine_run(tmp_path):
     init = {
         "src": str(tmp_path),
         "local_dst": str(tmp_path),
-        "template": str(tmp_path / "redmine.txt.j2"),
+        "template": "./docs/templates/redmine.txt.j2",
         "subject": "Test Issue",
         "api_key": "Invalid Key",
     }
     redmine_output = Redmine(init)
     redmine_output.get_presentation_list = Mock(return_value=[])
     mock_object = MockTemplateOrIssue()
-    redmine_output.get_template = Mock(return_value=mock_object)
     redmine_output.get_issue = Mock(return_value=mock_object)
     with patch.object(redmine_output, "log_debug") as mock:
         redmine_output.run(init)
