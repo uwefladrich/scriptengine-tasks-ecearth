@@ -1,3 +1,11 @@
+Next Release
+=============
+
+Internal changes
+-----------------
+- Move `get_template` into `helpers.files` (PR #125)
+
+
 ScriptEngine Tasks for EC-Earth 0.10.1
 =======================================
 

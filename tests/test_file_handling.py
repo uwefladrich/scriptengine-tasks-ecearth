@@ -3,13 +3,26 @@
 import os
 
 import iris
+import jinja2
 import numpy as np
+import pytest
 from iris.coords import DimCoord
 from iris.cube import Cube, CubeList
 
-import helpers.cubes
 import helpers.nemo
-from helpers.files import ChangeDirectory
+from helpers.files import ChangeDirectory, get_template
+
+
+def test_get_template(tmp_path):
+    init = {
+        "src": str(tmp_path),
+        "local_dst": str(tmp_path),
+        "template": str(tmp_path / "redmine.txt.j2"),
+        "subject": "Test Issue",
+        "api_key": "Invalid Key",
+    }
+    with pytest.raises(jinja2.exceptions.TemplateNotFound):
+        get_template(init, init["template"])
 
 
 def test_change_directory(tmpdir):
