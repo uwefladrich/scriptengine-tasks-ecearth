@@ -5,6 +5,7 @@ import warnings
 import iris
 import iris.analysis.cartography
 import iris.cube
+import iris.warnings
 import numpy as np
 from iris.util import equalise_attributes
 from scriptengine.exceptions import (
@@ -203,7 +204,14 @@ def compute_regular_grid_weights(cube):
     """compute area weights for a regular lat/lon grid"""
     cube.coord("latitude").guess_bounds()
     cube.coord("longitude").guess_bounds()
-    return iris.analysis.cartography.area_weights(cube)
+    with warnings.catch_warnings():
+        # Suppress default radius warning
+        warnings.filterwarnings(
+            action="ignore",
+            message="Using DEFAULT_SPHERICAL_EARTH_RADIUS",
+            category=iris.warnings.IrisDefaultingWarning,
+        )
+        return iris.analysis.cartography.area_weights(cube)
 
 
 def align_time_coords(new_cube, old_cube):
