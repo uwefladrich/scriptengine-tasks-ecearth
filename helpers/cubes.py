@@ -186,7 +186,7 @@ def compute_reduced_grid_weights(cube):
     unique_lats, gridpoints_per_lat = unique_lats[0:-1], gridpoints_per_lat[0:-1]
     areas = []
     last_angle = 0
-    earth_radius = 6.371229e6
+    earth_radius = 6.371229e6  # m
     for latitude, amount in zip(unique_lats, gridpoints_per_lat):
         delta = latitude - last_angle
         current_angle = last_angle + 2 * delta
