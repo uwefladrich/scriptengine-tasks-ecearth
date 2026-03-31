@@ -4,6 +4,7 @@ Next Release
 Internal changes
 -----------------
 - Move `get_template` into `helpers.files` (PR #125)
+- CI fix: Omit netCDF4 file from coverage runs (PR #128)
 
 
 ScriptEngine Tasks for EC-Earth 0.10.1
