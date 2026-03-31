@@ -1,6 +1,10 @@
 Next Release
 =============
 
+Bugfixes
+---------
+- Fix Earth area computation for reduced Gaussian grid (PR #127)
+
 Internal changes
 -----------------
 - Move `get_template` into `helpers.files` (PR #125)
